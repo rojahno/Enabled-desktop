@@ -1,28 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import icon from '../assets/icon.svg';
 import './styles/App.global.css';
-import frontPage from './components/FrontPage';
-
-const Hello = () => {
-  return (
-    <div>
-      <div className="Hello">
-        <img width="200px" alt="icon" src={icon} />
-      </div>
-      <h1>Enabled</h1>
-      <div className="Hello">
-
-      </div>
-    </div>
-  );
-};
+import FrontPage from './components/FrontPage';
 
 export default function App() {
   return (
     <Router>
       <Switch>
-        <Route path="/" component={frontPage} />
+        <Route path="/" component={FrontPage} />
       </Switch>
     </Router>
   );
