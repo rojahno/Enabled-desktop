@@ -46,7 +46,7 @@ class frontPage extends React.Component {
         let cortex = new Cortex(user, socketUrl);
         
         console.log("before await")
-        let profiles = await cortex.getProfiles();
+        let profiles = await cortex.loadProfile("D7");
         console.log("after await:" + profiles);
         console.log("profiles:" + profiles);
         return profiles;
