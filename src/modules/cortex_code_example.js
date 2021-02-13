@@ -421,26 +421,35 @@ class Cortex {
     async getProfiles() {
 
         this.parsedData = "goodbye";
+        let test = new Promise((resolve, reject) => {
+
+        
         this.socket.onopen = async () => {
             
-            // Checks and sets the class variables needed for the profile query. 
             await this.checkGrantAccessAndQuerySessionInfo();
+            // Checks and sets the class variables needed for the profile query. 
             
-            this.queryProfileRequest(this.authToken).then((data) => {
+            const data = await this.queryProfileRequest(this.authToken)
+            resolve(data);
+            
+            // .then((data) => {
+
                 
-            
-                this.parsedData = "hello";
-                //parsedData = JSON.parse(data);
-                console.log("parsed data: " + parsedData);
+                // this.parsedData = 'hello' + parsedData1;
                 //console.table(parsedData.result);
-                return this.parsedData;
-
-
-            }).catch((data) => {
-                console.log('catch',data);
-            });
-       }
-        return this.parsedData;
+                
+                // }).catch((data) => {
+                    //         console.log('catch',data);
+                    //     });
+                //     test = new Promise((resolve) => {
+                //         let parsedData1 = JSON.parse(data);
+                //         resolve(parsedData1)
+                // })
+                // }
+            }
+            //return this.parsedData;
+        })
+        return test;
     }
 
     // Maybe return a promise instead?? Check when module is implemented.
