@@ -1,18 +1,10 @@
-const WebSocket = require('isomorphic-ws');
+let WebSocket = require('isomorphic-ws');
 require('events').EventEmitter.defaultMaxListeners = 15;
 
 //TODO 
 // - Refactor the code for our use.
-// - Make the Cortex class a module, so we can import it to our project.
 // - Translate the code to TypeScript. 
 // ---------------------------------------------------------    
-let socketUrl = 'wss://localhost:6868'
-let user = {
-  "license": "",
-  "clientId": "0wyWnYNd61cedWF0Bp7AbZ10ogKlpa6EvgsH4DCV",
-  "clientSecret": "HFxX7S8qWPVF7DC5nVqMoIgkBNAYAvy78c759qWHbSnJuV9IvepnTI6EXHjoPxZc1wpAwHZGIiZHj1S8JNZTyNWENQ91Kn3YxFubw3obcMPvOUIuzuGJXFD86MN4kRcQ",
-  "debit": 1
-};
 /**
  * This class handle:
  *  - create websocket connection
@@ -21,7 +13,15 @@ let user = {
  *  - use async/await and Promise for request need to be run on sync
  */
 class Cortex {
-  constructor(user, socketUrl) {
+  private socket: any;
+  private headsetId:any = "";
+  private authToken:any = "";
+  private sessionId:any = "";
+  private ctResult:any = "";
+  private parsedData:String = "";
+
+  constructor(public user:any, socketUrl:string) {
+    
     // create socket
     //process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0; Why is this here? only for node?
     this.socket = new WebSocket(socketUrl);
@@ -30,7 +30,7 @@ class Cortex {
 
   queryHeadsetId() {
     const QUERY_HEADSET_ID = 2
-    let socket = this.socket
+    let socket = this.socket;
     let queryHeadsetRequest = {
       "jsonrpc": "2.0",
       "id": QUERY_HEADSET_ID,
@@ -40,20 +40,18 @@ class Cortex {
 
     return new Promise(function (resolve, reject) {
       socket.send(JSON.stringify(queryHeadsetRequest));
-      socket.onmessage = ({
-        data
-      }) => {
+      socket.onmessage = ({data}:any) => {
         try {
           if (JSON.parse(data)['id'] == QUERY_HEADSET_ID) {
             if (JSON.parse(data)['result'].length > 0) {
-              let headsetId = JSON.parse(data)['result'][0]['id']
-              resolve(headsetId)
+              let headsetId = JSON.parse(data)['result'][0]['id'];
+              resolve(headsetId);
             } else {
-              console.log('Cant find any headset. Please connect a headset to your pc.')
+              console.log('Cant find any headset. Please connect a headset to your pc.');
             }
           }
 
-        } catch (error) {}
+        } catch (error) { }
       }
     })
   }
@@ -77,7 +75,7 @@ class Cortex {
       }
 
       socket.send(JSON.stringify(requestAccessRequest));
-      socket.onmessage = (data) => {
+      socket.onmessage = (data:any) => {
         try {
           let parsed = JSON.parse(data.data);
           if (parsed['id'] == REQUEST_ACCESS_ID) {
@@ -90,7 +88,7 @@ class Cortex {
     })
   }
   
-
+// Generates the Cortex token. The token can be used for 2 days.
   authorize() {
     let socket = this.socket
     let user = this.user
@@ -108,9 +106,7 @@ class Cortex {
         "id": AUTHORIZE_ID
       }
       socket.send(JSON.stringify(authorizeRequest))
-      socket.onmessage = ({
-        data
-      }) => {
+      socket.onmessage = ({data }:any) => {
         try {
           if (JSON.parse(data)['id'] == AUTHORIZE_ID) {
             let cortexToken = JSON.parse(data)['result']['cortexToken']
@@ -121,7 +117,7 @@ class Cortex {
     })
   }
 
-  controlDevice(headsetId) {
+  controlDevice(headsetId:string) {
     let socket = this.socket
     const CONTROL_DEVICE_ID = 3
     let controlDeviceRequest = {
@@ -135,9 +131,7 @@ class Cortex {
     }
     return new Promise(function (resolve, reject) {
       socket.send(JSON.stringify(controlDeviceRequest));
-      socket.onmessage = ({
-        data
-      }) => {
+      socket.onmessage = ({data}:any) => {
         try {
           if (JSON.parse(data)['id'] == CONTROL_DEVICE_ID) {
             resolve(data)
@@ -147,7 +141,7 @@ class Cortex {
     });
   }
 
-  createSession(authToken, headsetId) {
+  createSession(authToken:string, headsetId:string) {
     let socket = this.socket
     const CREATE_SESSION_ID = 5
     let createSessionRequest = {
@@ -162,9 +156,7 @@ class Cortex {
     }
     return new Promise(function (resolve, reject) {
       socket.send(JSON.stringify(createSessionRequest));
-      socket.onmessage = ({
-        data
-      }) => {
+      socket.onmessage = ({data}:any) => {
         try {
           if (JSON.parse(data)['id'] == CREATE_SESSION_ID) {
             let sessionId = JSON.parse(data)['result']['id']
@@ -177,7 +169,7 @@ class Cortex {
     });
   }
 
-  subRequest(stream, authToken, sessionId) {
+  subRequest(stream:any, authToken:string, sessionId:string) {
     let socket = this.socket
     const SUB_REQUEST_ID = 6
     let subRequest = {
@@ -192,7 +184,7 @@ class Cortex {
     }
     
     socket.send(JSON.stringify(subRequest))
-    socket.onmessage = (data) => {
+    socket.onmessage = (data:any) => {
       try {
         // if(JSON.parse(data)['id']==SUB_REQUEST_ID){
         //console.log('SUB REQUEST RESULT --------------------------------')
@@ -203,7 +195,7 @@ class Cortex {
     }
   }
 
-  mentalCommandActiveActionRequest(authToken, sessionId, profile, action) {
+  mentalCommandActiveActionRequest(authToken:string, sessionId:string, profile:string, action:string) {
     let socket = this.socket
     const MENTAL_COMMAND_ACTIVE_ACTION_ID = 10
     let mentalCommandActiveActionRequest = {
@@ -220,7 +212,7 @@ class Cortex {
     }
     return new Promise(function (resolve, reject) {
       socket.send(JSON.stringify(mentalCommandActiveActionRequest))
-      socket.onmessage = (data) => {
+      socket.onmessage = (data:any) => {
         try {
           if (JSON.parse(data)['id'] == MENTAL_COMMAND_ACTIVE_ACTION_ID) {
             // console.log('MENTAL COMMAND ACTIVE ACTION RESULT --------------------')
@@ -265,34 +257,37 @@ class Cortex {
   }
 
   /**
-   * - check if user logined
+   * - check if user logged in.
    * - check if app is granted for access
    * - query session info to prepare for sub and train
    */
   async checkGrantAccessAndQuerySessionInfo() {
-    let requestAccessResult = ""
+    let requestAccessResult = "";
 
-    await this.requestAccess().then((result) => {
-      requestAccessResult = result
+    await this.requestAccess().then((result:any) => {
+      requestAccessResult = result;
 
     })
 
     let accessGranted = requestAccessResult;
 
     // check if user is logged in CortexUI
-    if ("error" in accessGranted) {
+    let error:number = accessGranted.toString().indexOf("error");
+    if (error !== -1) {
       console.log('You must login on CortexUI before request for grant access then rerun')
       throw new Error('You must login on CortexUI before request for grant access')
     } else {
-      console.log(accessGranted['result']['message'])
+     // console.log(accessGranted['result']['message'])
       // console.log(accessGranted['result'])
-      if (accessGranted['result']['accessGranted']) {
+      
+      //if (accessGranted['result']['accessGranted']) {
         await this.querySessionInfo()
 
-      } else {
-        console.log('You must accept access request from this app on CortexUI then rerun')
-        throw new Error('You must accept access request from this app on CortexUI')
-      }
+      //} 
+      //else {
+       // console.log('You must accept access request from this app on CortexUI then rerun')
+       // throw new Error('You must accept access request from this app on CortexUI')
+      //}
     }
   }
 
@@ -301,18 +296,18 @@ class Cortex {
    * - subcribe for stream
    * - logout data stream to console or file
    */
-  sub(streams) {
+  sub(streams:any) {
     this.socket.on('open', async () => {
       await this.checkGrantAccessAndQuerySessionInfo()
       this.subRequest(streams, this.authToken, this.sessionId)
-      socket.onmessage = (data) => {
+      this.socket.onmessage = (data: any) => {
         // log stream data to file or console here
-        //console.log(data)
+        console.log(data)
       }
     })
   }
 
-  setupProfile(authToken, headsetId, profileName, status) {
+  setupProfile(authToken:string, headsetId:string, profileName:string, status:string) {
     const SETUP_PROFILE_ID = 7
     let setupProfileRequest = {
       "jsonrpc": "2.0",
@@ -329,9 +324,7 @@ class Cortex {
     let socket = this.socket
     return new Promise(function (resolve, reject) {
       socket.send(JSON.stringify(setupProfileRequest));
-      socket.onmessage = ({
-        data
-      }) => {
+      socket.onmessage = ({data}:any) => {
         if (status == 'create') {
           resolve(data)
         }
@@ -357,7 +350,7 @@ class Cortex {
     })
   }
 
-  queryProfileRequest(authToken) {
+  queryProfileRequest(authToken:string) {
 
     const QUERY_PROFILE_ID = 9
     let queryProfileRequest = {
@@ -372,9 +365,7 @@ class Cortex {
     let socket = this.socket
     return new Promise(function (resolve, reject) {
       socket.send(JSON.stringify(queryProfileRequest))
-      socket.onmessage = ({
-        data
-      }) => {
+      socket.onmessage = ({data}:any) => {
         try {
           if (JSON.parse(data)['id'] == QUERY_PROFILE_ID) {
             /*console.log('\r\n')
@@ -397,25 +388,23 @@ class Cortex {
    * - user think specific thing which used while training, for example 'push' action
    * - 'push' command should show up on mental command stream
    */
-  live(profileName) {
+  live(profileName:string) {
     this.socket.onopen = async () => {
 
       await this.checkGrantAccessAndQuerySessionInfo()
 
       // load profile
-      let loadProfileResult = ""
+      //let loadProfileResult = ""
       let status = "load"
-      await this.setupProfile(this.authToken,
-        this.headsetId,
-        profileName,
+      await this.setupProfile(this.authToken,this.headsetId,profileName,
         status).then((result) => {
-        loadProfileResult = result
+        //loadProfileResult = result
       })
 
       // // sub 'com' stream and view live mode
       this.subRequest(['com'], this.authToken, this.sessionId)
 
-      this.socket.on('message', (data) => {
+      this.socket.on('message', (data:any) => {
         console.log(data)
       })
     }
@@ -431,7 +420,7 @@ class Cortex {
         try {
           await this.checkGrantAccessAndQuerySessionInfo();
           // Checks and sets the class variables needed for the profile query. 
-          const data = await this.queryProfileRequest(this.authToken);
+          const data:any = await this.queryProfileRequest(this.authToken);
           let parsedData = JSON.parse(data)['result'];
           let profileNames = [];
           for(let i=0; i<parsedData.length; i++){
@@ -447,15 +436,14 @@ class Cortex {
     return profilePromise;
   }
 
-
-
-  // The load function only works one time. Need to unload function or restart the app to test further.
-  async loadProfile(profileName) {
+  // The load function only works one time. Need to unload 
+  //function or restart the app to test further.
+  async loadProfile(profileName:string) {
     let loadPromise = new Promise((resolve, reject) => {
       this.socket.onopen = async () => {
 
         await this.checkGrantAccessAndQuerySessionInfo()
-        const data = await this.setupProfile(this.authToken, this.headsetId, profileName, "load")
+        const data:any = await this.setupProfile(this.authToken, this.headsetId, profileName, "load")
         let parsedData = JSON.parse(data);
         console.log(parsedData);
         resolve(data);
