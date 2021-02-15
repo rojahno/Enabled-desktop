@@ -23,13 +23,9 @@ let user = {
 class Cortex {
   constructor(user, socketUrl) {
     // create socket
-    process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
+    //process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0; Why is this here? only for node?
     this.socket = new WebSocket(socketUrl);
-    console.log(this.socket);
-    // read user infor
     this.user = user;
-
-    //let users = this.getProfiles();
   }
 
   queryHeadsetId() {
@@ -51,7 +47,6 @@ class Cortex {
           if (JSON.parse(data)['id'] == QUERY_HEADSET_ID) {
             if (JSON.parse(data)['result'].length > 0) {
               let headsetId = JSON.parse(data)['result'][0]['id']
-              console.log("headset", headsetId);
               resolve(headsetId)
             } else {
               console.log('Cant find any headset. Please connect a headset to your pc.')
@@ -63,8 +58,10 @@ class Cortex {
     })
   }
 
+  //Requests acces to the emotive app. When the script calls this method for the first time 
+  //a display message is shown in the Emotiv.
+  //Returns true and a message string if the user accepts and false and a message string otherwise.
   requestAccess() {
-
     let socket = this.socket
     let user = this.user
     return new Promise(function (resolve, reject) {
@@ -79,8 +76,6 @@ class Cortex {
         "id": REQUEST_ACCESS_ID
       }
 
-      // console.log('start send request: ',requestAccessRequest)
-
       socket.send(JSON.stringify(requestAccessRequest));
       socket.onmessage = (data) => {
         try {
@@ -89,11 +84,12 @@ class Cortex {
             resolve(parsed);
           }
         } catch (error) {
-
+          reject(new Error("Can't access the Emotive App"));
         }
       }
     })
   }
+  
 
   authorize() {
     let socket = this.socket
@@ -118,7 +114,7 @@ class Cortex {
         try {
           if (JSON.parse(data)['id'] == AUTHORIZE_ID) {
             let cortexToken = JSON.parse(data)['result']['cortexToken']
-            resolve(cortexToken)
+            resolve(cortexToken);
           }
         } catch (error) {}
       }
@@ -194,7 +190,7 @@ class Cortex {
       },
       "id": SUB_REQUEST_ID
     }
-    //  console.log('sub eeg request: ', subRequest)
+    
     socket.send(JSON.stringify(subRequest))
     socket.onmessage = (data) => {
       try {
@@ -222,7 +218,6 @@ class Cortex {
       },
       "id": MENTAL_COMMAND_ACTIVE_ACTION_ID
     }
-    // console.log(mentalCommandActiveActionRequest)
     return new Promise(function (resolve, reject) {
       socket.send(JSON.stringify(mentalCommandActiveActionRequest))
       socket.onmessage = (data) => {
@@ -344,7 +339,6 @@ class Cortex {
         try {
           // console.log('inside setup profile', data)
           if (JSON.parse(data)['id'] == SETUP_PROFILE_ID) {
-            console.log("eskil");
             let parsed = JSON.parse(data);
             console.table(parsed);
             if (JSON.parse(data)['result']['action'] == status) {
@@ -417,7 +411,6 @@ class Cortex {
         status).then((result) => {
         loadProfileResult = result
       })
-      console.log("loaded profile result: " + loadProfileResult)
 
       // // sub 'com' stream and view live mode
       this.subRequest(['com'], this.authToken, this.sessionId)
@@ -439,7 +432,13 @@ class Cortex {
           await this.checkGrantAccessAndQuerySessionInfo();
           // Checks and sets the class variables needed for the profile query. 
           const data = await this.queryProfileRequest(this.authToken);
-          resolve(data);
+          let parsedData = JSON.parse(data)['result'];
+          let profileNames = [];
+          for(let i=0; i<parsedData.length; i++){
+            profileNames.push(parsedData[i].name);
+          }
+          console.log("parsed: " +parsedData);
+          resolve(profileNames);
         } catch (error) {
           reject(error);
         }
@@ -447,6 +446,7 @@ class Cortex {
     })
     return profilePromise;
   }
+
 
 
   // The load function only works one time. Need to unload function or restart the app to test further.
@@ -467,28 +467,5 @@ class Cortex {
 export {
   Cortex
 };
-//let c = new Cortex(user, socketUrl)
-//let streams = ['com']
-//c.sub(streams);
-//c.getProfiles();
-//c.loadProfile("D7");
-//console.log("auth: " + auth);
 
-/*
-eeg
-The raw EEG data from the headset.
-mot
-The motion data from the headset.
-dev
-The device data from the headset. It includes the battery level, the wireless signal strength, and the contact quality of each EEG sensor.
-pow
-The band power of each EEG sensor. It includes the alpha, low beta, high beta, gamma, and theta bands.
-met
-The results of the performance metrics detection.
-com
-The results of the mental commands detection. You must load a profile to get meaningful results.
-fac
-The results of the facial expressions detection.
-sys
-The system events. These events are related to the training of the mental commands and facial expressions. See BCI for details.
-*/
+
