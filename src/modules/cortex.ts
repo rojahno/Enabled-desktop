@@ -1,11 +1,12 @@
+import { QueryHeadsetIdObject, QueryProfileObject, RequestAccessObject, SetupProfileObject } from './interfaces';
+
 let WebSocket = require('isomorphic-ws');
 require('events').EventEmitter.defaultMaxListeners = 15;
-import {RequestAccessObject, SetupProfileObject, QueryHeadsetIdObject, QueryProfileObject} from "./interfaces";
-
 //TODO 
 // - Refactor the code for our use.
 // - Handle rejects in async functions.
-// . Handle errors being thrown. 
+// - Handle errors being thrown. 
+//
 // ---------------------------------------------------------    
 /**
  * This class handle:
@@ -20,7 +21,6 @@ class Cortex {
   private authToken:string = "";
   private sessionId:string = "";
   private ctResult:string = "";
-  private parsedData:string = "";
 
   constructor(public user:any, socketUrl:string) {
     
@@ -30,8 +30,12 @@ class Cortex {
     this.user = user;
   }
 
-
-  // Find and connects a headseth. If there are more than one headset it connects to the first headseth.
+async init(){
+  this.socket.onopen = async () => {
+  await this.checkGrantAccessAndQuerySessionInfo();
+  }
+}
+  // Find and connects a headset. If there are more than one headset it connects to the first headset.
   queryHeadsetId() {
     const QUERY_HEADSET_ID = 2
     let socket = this.socket;
@@ -55,6 +59,7 @@ class Cortex {
               resolve(headsetId);
             } else {
               console.log('Cant find any headset. Please connect a headset to your pc.');
+              reject('Cant find any headset. Please connect a headset to your pc.');
             }
           }
 
@@ -66,19 +71,19 @@ class Cortex {
   //Requests acces to the emotive app. When the script calls this method for the first time 
   //a display message is shown in the Emotiv app.
   //Returns true and a message string if the user accepts and false and a message string otherwise.
-  requestAccess() {
+  requestAccess():Promise<RequestAccessObject> {
     let socket = this.socket
     let user = this.user
     return new Promise<RequestAccessObject>(function (resolve, reject) {
       const REQUEST_ACCESS_ID = 1
       let requestAccessRequest = {
+        "id": REQUEST_ACCESS_ID,
         "jsonrpc": "2.0",
         "method": "requestAccess",
         "params": {
           "clientId": user.clientId,
           "clientSecret": user.clientSecret
         },
-        "id": REQUEST_ACCESS_ID
       }
 
       socket.send(JSON.stringify(requestAccessRequest));
@@ -90,7 +95,7 @@ class Cortex {
             resolve(parsed);
           }
         } catch (error) {
-          reject(new Error("Can't access the Emotive App"));
+          throw new Error("Can't access the EmotiveBCI application");
         }
       }
     })
@@ -125,6 +130,7 @@ class Cortex {
     });
   }
 
+  // Connects to the headset.
   controlDevice(headsetId:string) {
     let socket = this.socket
     const CONTROL_DEVICE_ID = 3
@@ -179,7 +185,8 @@ class Cortex {
     });
   }
 
-  subRequest(stream:any, authToken:string, sessionId:string) {
+  
+  subRequest(stream:string[], authToken:string, sessionId:string) {
     let socket = this.socket
     const SUB_REQUEST_ID = 6
     let subRequest = {
@@ -205,6 +212,9 @@ class Cortex {
     }
   }
 
+  //This method is to get or set the active action for the mental command detection.
+  //If the status is "get" then the result is and array of strings.
+  //If the status is "set", then the result is an object with "action" and "message" as fields. 
   mentalCommandActiveActionRequest(authToken:string, sessionId:string, profile:string, action:string) {
     let socket = this.socket
     const MENTAL_COMMAND_ACTIVE_ACTION_ID = 10
@@ -242,10 +252,15 @@ class Cortex {
    * - create session and get back session id
    */
   async querySessionInfo() {
+    try{
     this.headsetId = await this.queryHeadsetId();
     this.ctResult = await this.controlDevice(this.headsetId); //Variable isn't used anywhere
     this.authToken = await this.authorize();
     this.sessionId = await this.createSession(this.authToken, this.headsetId);
+    }
+     catch(error){
+       console.log("query session error: " + error);
+     }
   
   }
 
@@ -255,13 +270,25 @@ class Cortex {
    * - query session info to prepare for sub and train
    */
   async checkGrantAccessAndQuerySessionInfo() {
+  try{
+    let hasAccess:boolean = await this.hasAccess();
+    if(!hasAccess){
     let requestAccess:RequestAccessObject = await this.requestAccess();
     let resultMessage:string = requestAccess.result.message;
     let accessGranted:boolean = requestAccess.result.accessGranted;
-
     let canAccess:boolean = this.canAccessCortexApp(accessGranted,resultMessage);
+
     if(canAccess){
       await this.querySessionInfo();
+    }
+    
+    }
+    else if(hasAccess){
+      await this.querySessionInfo();
+    }
+  }
+    catch(error){
+      console.log("implement error handling");
     }
   }
 
@@ -281,6 +308,38 @@ class Cortex {
     return canAccess;
 
   }
+
+  hasAccess() {
+    let socket = this.socket
+    let user = this.user
+    return new Promise<boolean>(function (resolve, reject) {
+      const REQUEST_ACCESS_ID = 1
+      let requestAccessRequest = {
+        "id": REQUEST_ACCESS_ID,
+        "jsonrpc": "2.0",
+        "method": "requestAccess",
+        "params": {
+          "clientId": user.clientId,
+          "clientSecret": user.clientSecret
+        },
+      }
+
+      socket.send(JSON.stringify(requestAccessRequest));
+      socket.onmessage = ({data}:MessageEvent) => {
+        try {
+          let accessQuery:RequestAccessObject = JSON.parse(data);
+          if (accessQuery.id == REQUEST_ACCESS_ID) {
+            console.log("request parsed: " + accessQuery);
+            resolve(accessQuery.result.accessGranted);
+          }
+        } catch (error) {
+          reject(new Error("Can't access the Emotive App"));
+        }
+      }
+    })
+  }
+
+
   /**
    * - check login and grant access
    * - subcribe for stream
@@ -288,13 +347,18 @@ class Cortex {
    */
   sub(streams:any) {
     this.socket.on('open', async () => {
-      await this.checkGrantAccessAndQuerySessionInfo()
+      try{
+      await this.checkGrantAccessAndQuerySessionInfo();
       this.subRequest(streams, this.authToken, this.sessionId)
       this.socket.onmessage = ({data}: MessageEvent) => {
         // log stream data to file or console here
         console.log(data)
       }
-    })
+    }
+    catch(error){
+      console.log("Implement error hanlding")
+    }
+  })
   }
 
   setupProfile(authToken:string, headsetId:string, profileName:string, status:string) {
@@ -310,22 +374,20 @@ class Cortex {
       },
       "id": SETUP_PROFILE_ID
     }
-    // console.log(setupProfileRequest)
+
     let socket = this.socket
     return new Promise(function (resolve) {
       socket.send(JSON.stringify(setupProfileRequest));
       socket.onmessage = ({data}:MessageEvent) => {
+        
+        let setupQuery:SetupProfileObject = JSON.parse(data);
+        
         if (status == 'create') {
-          let parsed:SetupProfileObject = JSON.parse(data);
-          resolve(parsed)
+          resolve(setupQuery)
         }
-
         try {
-          // console.log('inside setup profile', data)
-          if (JSON.parse(data)['id'] == SETUP_PROFILE_ID) {
-            let parsed = JSON.parse(data);
-            console.table(parsed);
-            if (JSON.parse(data)['result']['action'] == status) {
+          if (setupQuery.id == SETUP_PROFILE_ID) {
+            if (setupQuery.result.action == status) {
               resolve(data);
             }
           }
@@ -359,8 +421,7 @@ class Cortex {
             resolve(profileQuery);
           }
         } catch (error) {
-          console.log("query profile error:");
-
+          
         }
       }
     })
@@ -373,7 +434,7 @@ class Cortex {
    * - user think specific thing which used while training, for example 'push' action
    * - 'push' command should show up on mental command stream
    */
-  live(profileName:string) {
+  async live(profileName:string) {
     this.socket.onopen = async () => {
 
       await this.checkGrantAccessAndQuerySessionInfo()
@@ -386,22 +447,22 @@ class Cortex {
       // // sub 'com' stream and view live mode
       this.subRequest(['com'], this.authToken, this.sessionId)
 
-      this.socket.on('message', (data:any) => {
+      this.socket.onmessage = ({data}:MessageEvent) => {
         console.log(data)
-      })
+      }
     }
   }
-  // Maybe return a promise instead?? Check when module is implemented.
+  // Returns an array of profile names. 
   async getProfiles() {
     let profilePromise = new Promise((resolve, reject) => {
 
       this.socket.onopen = async () => {
         try {
-          await this.checkGrantAccessAndQuerySessionInfo();
-          // Checks and sets the class variables needed for the profile query. 
+          await this.checkGrantAccessAndQuerySessionInfo(); 
           const data:any = await this.queryProfileRequest(this.authToken);
           let profiles = data.result;
           let profileNames = [];
+          
           for(let i=0; i<profiles.length; i++){
             profileNames.push(profiles[i].name);
           }
@@ -415,6 +476,7 @@ class Cortex {
     })
     return profilePromise;
   }
+  
 
   // The load function only works one time. Need to unload 
   //function or restart the app to test further.
