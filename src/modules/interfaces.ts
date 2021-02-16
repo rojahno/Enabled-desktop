@@ -1,9 +1,26 @@
-interface EmotiveObject{
-    "id": number,
-    "jsonrpc": string,
-    "result": {
-        "accessGranted": boolean,
-        "message": string,
-    }
+interface RequestAccessObject{
+    id: number,
+    jsonrpc: string,
+    result: RequestAccessResult, 
 }
-export default EmotiveObject;
+
+
+interface RequestAccessResult{
+    accessGranted: boolean,
+    message: string,
+}
+
+interface SetupProfileObject{
+    id:number,
+    jsonrpc:string,
+    result: SetupProfileResult,
+        
+    
+}
+interface SetupProfileResult{
+    action: string,
+    message: string,
+    name: string,
+}
+
+export {RequestAccessObject,RequestAccessResult,SetupProfileObject, SetupProfileResult};
