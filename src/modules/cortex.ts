@@ -1,6 +1,6 @@
 let WebSocket = require('isomorphic-ws');
 require('events').EventEmitter.defaultMaxListeners = 15;
-import {RequestAccessObject, SetupProfileObject} from "./interfaces";
+import {RequestAccessObject, SetupProfileObject, QueryHeadsetIdObject, QueryProfileObject} from "./interfaces";
 
 //TODO 
 // - Refactor the code for our use.
@@ -30,6 +30,8 @@ class Cortex {
     this.user = user;
   }
 
+
+  // Find and connects a headseth. If there are more than one headset it connects to the first headseth.
   queryHeadsetId() {
     const QUERY_HEADSET_ID = 2
     let socket = this.socket;
@@ -44,9 +46,12 @@ class Cortex {
       socket.send(JSON.stringify(queryHeadsetRequest));
       socket.onmessage = ({data}:MessageEvent) => {
         try {
-          if (JSON.parse(data)['id'] == QUERY_HEADSET_ID) {
-            if (JSON.parse(data)['result'].length > 0) {
-              let headsetId:string = JSON.parse(data)['result'][0]['id'];
+          let headsetQuery: QueryHeadsetIdObject = JSON.parse(data);
+          let queryHeadsetId:number = headsetQuery.id;
+          
+          if (queryHeadsetId == QUERY_HEADSET_ID) {
+            if (headsetQuery.result.length > 0) {
+              let headsetId:string = headsetQuery.result[0].id;
               resolve(headsetId);
             } else {
               console.log('Cant find any headset. Please connect a headset to your pc.');
@@ -250,31 +255,32 @@ class Cortex {
    * - query session info to prepare for sub and train
    */
   async checkGrantAccessAndQuerySessionInfo() {
-    let requestAccessResult:string  ="";
-    let canAccess: boolean = false;
+    let requestAccess:RequestAccessObject = await this.requestAccess();
+    let resultMessage:string = requestAccess.result.message;
+    let accessGranted:boolean = requestAccess.result.accessGranted;
 
-    await this.requestAccess().then((result:RequestAccessObject) => {
-      requestAccessResult = result.result.message;
-      canAccess = result.result.accessGranted;
-
-    })
-
-    if (requestAccessResult.indexOf('error') !== -1) {
-      console.log('You must login on CortexUI before request for grant access then rerun')
-      throw new Error('You must login on CortexUI before request for grant access')
-    } else {
-   
-      if (canAccess) {
-        await this.querySessionInfo()
-
-      } 
-      else {
-       console.log('You must accept access request from this app on CortexUI then rerun')
-       throw new Error('You must accept access request from this app on CortexUI')
-      }
+    let canAccess:boolean = this.canAccessCortexApp(accessGranted,resultMessage);
+    if(canAccess){
+      await this.querySessionInfo();
     }
   }
 
+  canAccessCortexApp(accessGranted:boolean, resultMessage:string):boolean{
+    let canAccess = false;
+    if (resultMessage.indexOf('error') !== -1) {
+      console.log('You must login on CortexUI before request for grant access then rerun')
+      throw new Error('You must login on CortexUI before request for grant access')
+    } 
+    else if(!accessGranted) {
+       console.log('You must accept access request from this app on CortexUI then rerun')
+       throw new Error('You must accept access request from this app on CortexUI')
+    }
+    else if(accessGranted){
+       canAccess = true;
+    }
+    return canAccess;
+
+  }
   /**
    * - check login and grant access
    * - subcribe for stream
@@ -348,16 +354,13 @@ class Cortex {
       socket.send(JSON.stringify(queryProfileRequest))
       socket.onmessage = ({data}:MessageEvent) => {
         try {
-
-          if (JSON.parse(data)['id'] == QUERY_PROFILE_ID) {
-            /*console.log('\r\n')
-            console.log("query profile: ")
-            console.log(data)
-            */
-            resolve(data)
+            let profileQuery: QueryProfileObject = JSON.parse(data);
+          if (profileQuery.id == QUERY_PROFILE_ID) {
+            resolve(profileQuery);
           }
         } catch (error) {
-          console.log("query profile error:")
+          console.log("query profile error:");
+
         }
       }
     })
@@ -377,11 +380,8 @@ class Cortex {
 
       // load profile
       //let loadProfileResult = ""
-      let status = "load"
-      await this.setupProfile(this.authToken,this.headsetId,profileName,
-        status).then((result) => {
-        //loadProfileResult = result
-      })
+      const data:any = await this.setupProfile(this.authToken, this.headsetId, profileName, "load")
+      let parsedData:SetupProfileObject = JSON.parse(data);
 
       // // sub 'com' stream and view live mode
       this.subRequest(['com'], this.authToken, this.sessionId)
@@ -400,13 +400,14 @@ class Cortex {
           await this.checkGrantAccessAndQuerySessionInfo();
           // Checks and sets the class variables needed for the profile query. 
           const data:any = await this.queryProfileRequest(this.authToken);
-          let parsedData = JSON.parse(data)['result'];
+          let profiles = data.result;
           let profileNames = [];
-          for(let i=0; i<parsedData.length; i++){
-            profileNames.push(parsedData[i].name);
+          for(let i=0; i<profiles.length; i++){
+            profileNames.push(profiles[i].name);
           }
-          console.log("parsed: " +parsedData);
+          console.log("parsed: " +profiles);
           resolve(profileNames);
+
         } catch (error) {
           reject(error);
         }
