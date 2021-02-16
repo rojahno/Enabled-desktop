@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {Cortex} from './../modules/cortex'
 
-class frontPage extends React.Component {
+class FrontPage extends React.Component {
     
     state = {
         count: 0,
@@ -78,4 +78,4 @@ class frontPage extends React.Component {
    }
 }
 
-export default frontPage;
+export default FrontPage;
