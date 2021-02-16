@@ -1,38 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import {Cortex} from './../modules/cortex_code_example'
+import {Cortex} from './../modules/cortex'
 
 class frontPage extends React.Component {
     
     state = {
         count: 0,
-        profiles:  "",
+        profiles:  [],
+        loaded: [],
     }
 
     async componentDidMount(){
-        /*
-    let socketUrl = 'wss://localhost:6868'
-    let user = {
-        "license": "",
-        "clientId": "0wyWnYNd61cedWF0Bp7AbZ10ogKlpa6EvgsH4DCV",
-        "clientSecret": "HFxX7S8qWPVF7DC5nVqMoIgkBNAYAvy78c759qWHbSnJuV9IvepnTI6EXHjoPxZc1wpAwHZGIiZHj1S8JNZTyNWENQ91Kn3YxFubw3obcMPvOUIuzuGJXFD86MN4kRcQ",
-        "debit": 1
-    };
-
-    try{
-    let cortex = new Cortex(user, socketUrl);
-    console.log(69);
-    const profiles = await cortex.getProfiles();
-    console.log(profiles);
-    this.setState({profiles: await cortex.getProfiles()});
-    console.log("typeof: "+typeof profiles);
-    }
-    catch(error){
-        console.log("Error: "+ error);
-        }
-        */
-        const profiles = await this.getHeadsethInfo();
-        this.setState({profiles:profiles});
-
+        await this.getHeadsethInfo();
+        await this.loadProfile();
     }
 
      async getHeadsethInfo(){
@@ -45,12 +24,24 @@ class frontPage extends React.Component {
         };
         let cortex = new Cortex(user, socketUrl);
         
-        console.log("before await")
-        let profiles = await cortex.loadProfile("D7");
-        console.log("after await:" + profiles);
+        let profiles = await cortex.getProfiles();
         console.log("profiles:" + profiles);
-        return profiles;
+        this.setState({profiles:profiles});
+    };
 
+    async loadProfile(){
+        let socketUrl = 'wss://localhost:6868'
+        let user = {
+            "license": "",
+            "clientId": "0wyWnYNd61cedWF0Bp7AbZ10ogKlpa6EvgsH4DCV",
+            "clientSecret": "HFxX7S8qWPVF7DC5nVqMoIgkBNAYAvy78c759qWHbSnJuV9IvepnTI6EXHjoPxZc1wpAwHZGIiZHj1S8JNZTyNWENQ91Kn3YxFubw3obcMPvOUIuzuGJXFD86MN4kRcQ",
+            "debit": 1
+        };
+        let cortex = new Cortex(user, socketUrl);
+        
+        let profiles = await cortex.loadProfile("D7");
+        console.log("loaded:" + profiles);
+        this.setState({loaded:profiles});
     };
 
     incrementCount = ()=> {
@@ -64,15 +55,23 @@ class frontPage extends React.Component {
     return(
         <div>
         <div className="Hello">
-        <h1>{this.state.profiles}</h1>
+        <ul className="profileButtons"> 
+                {this.state.profiles.map((profile: React.ReactNode) => {
+                    return <button>{profile}</button>
+                })} 
+
+            </ul>
+
+            <p>
+                {this.state.loaded}
+            </p>
             <button onClick={this.getHeadsethInfo}>
                 se shit
             </button>
             <button onClick={this.getHeadsethInfo}>
-                {this.state.profiles}
+                
             </button>
-            <ul>
-        </ul>
+            
         </div>
       </div>
     )

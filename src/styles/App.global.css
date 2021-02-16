@@ -19,6 +19,13 @@ body {
   align-items: center;
 }
 
+.profileButtons{
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  align-items: center;
+}
+
 button {
   background-color: white;
   padding: 10px 20px;

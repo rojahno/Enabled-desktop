@@ -1,18 +1,12 @@
-const WebSocket = require('isomorphic-ws');
+let WebSocket = require('isomorphic-ws');
 require('events').EventEmitter.defaultMaxListeners = 15;
+import {RequestAccessObject, SetupProfileObject, QueryHeadsetIdObject, QueryProfileObject} from "./interfaces";
 
 //TODO 
 // - Refactor the code for our use.
-// - Make the Cortex class a module, so we can import it to our project.
-// - Translate the code to TypeScript. 
+// - Handle rejects in async functions.
+// . Handle errors being thrown. 
 // ---------------------------------------------------------    
-let socketUrl = 'wss://localhost:6868'
-let user = {
-  "license": "",
-  "clientId": "0wyWnYNd61cedWF0Bp7AbZ10ogKlpa6EvgsH4DCV",
-  "clientSecret": "HFxX7S8qWPVF7DC5nVqMoIgkBNAYAvy78c759qWHbSnJuV9IvepnTI6EXHjoPxZc1wpAwHZGIiZHj1S8JNZTyNWENQ91Kn3YxFubw3obcMPvOUIuzuGJXFD86MN4kRcQ",
-  "debit": 1
-};
 /**
  * This class handle:
  *  - create websocket connection
@@ -21,20 +15,26 @@ let user = {
  *  - use async/await and Promise for request need to be run on sync
  */
 class Cortex {
-  constructor(user, socketUrl) {
-    // create socket
-    process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
-    this.socket = new WebSocket(socketUrl);
-    console.log(this.socket);
-    // read user infor
-    this.user = user;
+  private socket: any;
+  private headsetId:string = "";
+  private authToken:string = "";
+  private sessionId:string = "";
+  private ctResult:string = "";
+  private parsedData:string = "";
 
-    //let users = this.getProfiles();
+  constructor(public user:any, socketUrl:string) {
+    
+    // create socket
+    //process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0; Why is this here? only for node?
+    this.socket = new WebSocket(socketUrl);
+    this.user = user;
   }
 
+
+  // Find and connects a headseth. If there are more than one headset it connects to the first headseth.
   queryHeadsetId() {
     const QUERY_HEADSET_ID = 2
-    let socket = this.socket
+    let socket = this.socket;
     let queryHeadsetRequest = {
       "jsonrpc": "2.0",
       "id": QUERY_HEADSET_ID,
@@ -42,32 +42,34 @@ class Cortex {
       "params": {}
     }
 
-    return new Promise(function (resolve, reject) {
+    return new Promise<string>(function (resolve, reject) {
       socket.send(JSON.stringify(queryHeadsetRequest));
-      socket.onmessage = ({
-        data
-      }) => {
+      socket.onmessage = ({data}:MessageEvent) => {
         try {
-          if (JSON.parse(data)['id'] == QUERY_HEADSET_ID) {
-            if (JSON.parse(data)['result'].length > 0) {
-              let headsetId = JSON.parse(data)['result'][0]['id']
-              console.log("headset", headsetId);
-              resolve(headsetId)
+          let headsetQuery: QueryHeadsetIdObject = JSON.parse(data);
+          let queryHeadsetId:number = headsetQuery.id;
+          
+          if (queryHeadsetId == QUERY_HEADSET_ID) {
+            if (headsetQuery.result.length > 0) {
+              let headsetId:string = headsetQuery.result[0].id;
+              resolve(headsetId);
             } else {
-              console.log('Cant find any headset. Please connect a headset to your pc.')
+              console.log('Cant find any headset. Please connect a headset to your pc.');
             }
           }
 
-        } catch (error) {}
+        } catch (error) { }
       }
     })
   }
 
+  //Requests acces to the emotive app. When the script calls this method for the first time 
+  //a display message is shown in the Emotiv app.
+  //Returns true and a message string if the user accepts and false and a message string otherwise.
   requestAccess() {
-
     let socket = this.socket
     let user = this.user
-    return new Promise(function (resolve, reject) {
+    return new Promise<RequestAccessObject>(function (resolve, reject) {
       const REQUEST_ACCESS_ID = 1
       let requestAccessRequest = {
         "jsonrpc": "2.0",
@@ -79,26 +81,26 @@ class Cortex {
         "id": REQUEST_ACCESS_ID
       }
 
-      // console.log('start send request: ',requestAccessRequest)
-
       socket.send(JSON.stringify(requestAccessRequest));
-      socket.onmessage = (data) => {
+      socket.onmessage = ({data}:MessageEvent) => {
         try {
-          let parsed = JSON.parse(data.data);
+          let parsed:RequestAccessObject = JSON.parse(data);
           if (parsed['id'] == REQUEST_ACCESS_ID) {
+            console.log("request parsed: " + parsed);
             resolve(parsed);
           }
         } catch (error) {
-
+          reject(new Error("Can't access the Emotive App"));
         }
       }
     })
   }
-
+  
+// Generates the Cortex token. The token can be used for 2 days.
   authorize() {
     let socket = this.socket
     let user = this.user
-    return new Promise(function (resolve, reject) {
+    return new Promise<string>(function (resolve, reject) {
       const AUTHORIZE_ID = 4
       let authorizeRequest = {
         "jsonrpc": "2.0",
@@ -112,20 +114,18 @@ class Cortex {
         "id": AUTHORIZE_ID
       }
       socket.send(JSON.stringify(authorizeRequest))
-      socket.onmessage = ({
-        data
-      }) => {
+      socket.onmessage = ({data}:MessageEvent) => {
         try {
           if (JSON.parse(data)['id'] == AUTHORIZE_ID) {
-            let cortexToken = JSON.parse(data)['result']['cortexToken']
-            resolve(cortexToken)
+            let cortexToken:string = JSON.parse(data)['result']['cortexToken']
+            resolve(cortexToken);
           }
         } catch (error) {}
       }
-    })
+    });
   }
 
-  controlDevice(headsetId) {
+  controlDevice(headsetId:string) {
     let socket = this.socket
     const CONTROL_DEVICE_ID = 3
     let controlDeviceRequest = {
@@ -137,11 +137,9 @@ class Cortex {
         "headset": headsetId
       }
     }
-    return new Promise(function (resolve, reject) {
+    return new Promise<any>(function (resolve, reject) {
       socket.send(JSON.stringify(controlDeviceRequest));
-      socket.onmessage = ({
-        data
-      }) => {
+      socket.onmessage = ({data}:MessageEvent) => {
         try {
           if (JSON.parse(data)['id'] == CONTROL_DEVICE_ID) {
             resolve(data)
@@ -151,7 +149,9 @@ class Cortex {
     });
   }
 
-  createSession(authToken, headsetId) {
+  // This method is to subscribe to one or more data strams. After you successfully subscribe
+  // Cortex will keep sending data sample objects.
+  createSession(authToken:string, headsetId:string) {
     let socket = this.socket
     const CREATE_SESSION_ID = 5
     let createSessionRequest = {
@@ -164,14 +164,12 @@ class Cortex {
         "status": "active"
       }
     }
-    return new Promise(function (resolve, reject) {
+    return new Promise<string>(function (resolve, reject) {
       socket.send(JSON.stringify(createSessionRequest));
-      socket.onmessage = ({
-        data
-      }) => {
+      socket.onmessage = ({data}:MessageEvent) => {
         try {
           if (JSON.parse(data)['id'] == CREATE_SESSION_ID) {
-            let sessionId = JSON.parse(data)['result']['id']
+            let sessionId:string = JSON.parse(data)['result']['id']
             resolve(sessionId)
           }
         } catch (error) {
@@ -181,7 +179,7 @@ class Cortex {
     });
   }
 
-  subRequest(stream, authToken, sessionId) {
+  subRequest(stream:any, authToken:string, sessionId:string) {
     let socket = this.socket
     const SUB_REQUEST_ID = 6
     let subRequest = {
@@ -194,9 +192,9 @@ class Cortex {
       },
       "id": SUB_REQUEST_ID
     }
-    //  console.log('sub eeg request: ', subRequest)
+    
     socket.send(JSON.stringify(subRequest))
-    socket.onmessage = (data) => {
+    socket.onmessage = ({data}:MessageEvent) => {
       try {
         // if(JSON.parse(data)['id']==SUB_REQUEST_ID){
         //console.log('SUB REQUEST RESULT --------------------------------')
@@ -207,7 +205,7 @@ class Cortex {
     }
   }
 
-  mentalCommandActiveActionRequest(authToken, sessionId, profile, action) {
+  mentalCommandActiveActionRequest(authToken:string, sessionId:string, profile:string, action:string) {
     let socket = this.socket
     const MENTAL_COMMAND_ACTIVE_ACTION_ID = 10
     let mentalCommandActiveActionRequest = {
@@ -222,10 +220,9 @@ class Cortex {
       },
       "id": MENTAL_COMMAND_ACTIVE_ACTION_ID
     }
-    // console.log(mentalCommandActiveActionRequest)
     return new Promise(function (resolve, reject) {
       socket.send(JSON.stringify(mentalCommandActiveActionRequest))
-      socket.onmessage = (data) => {
+      socket.onmessage = ({data}:MessageEvent) => {
         try {
           if (JSON.parse(data)['id'] == MENTAL_COMMAND_ACTIVE_ACTION_ID) {
             // console.log('MENTAL COMMAND ACTIVE ACTION RESULT --------------------')
@@ -246,78 +243,61 @@ class Cortex {
    */
   async querySessionInfo() {
     this.headsetId = await this.queryHeadsetId();
-
-    this.ctResult = await this.controlDevice(this.headsetId);
-
+    this.ctResult = await this.controlDevice(this.headsetId); //Variable isn't used anywhere
     this.authToken = await this.authorize();
-
     this.sessionId = await this.createSession(this.authToken, this.headsetId);
-    /*
-        console.log('\r\n')
-        console.log('HEADSET ID -----------------------------------')
-        console.log(this.headsetId)
-        console.log('\r\n')
-        console.log('CONNECT STATUS -------------------------------')
-        console.log(this.ctResult)
-        console.log('\r\n')
-        console.log('AUTH TOKEN -----------------------------------')
-        console.log(this.authToken)
-        console.log('\r\n')
-        console.log('SESSION ID -----------------------------------')
-        console.log(this.sessionId);
-        console.log('\r\n')
-        */
+  
   }
 
   /**
-   * - check if user logined
+   * - check if user logged in.
    * - check if app is granted for access
    * - query session info to prepare for sub and train
    */
   async checkGrantAccessAndQuerySessionInfo() {
-    let requestAccessResult = ""
+    let requestAccess:RequestAccessObject = await this.requestAccess();
+    let resultMessage:string = requestAccess.result.message;
+    let accessGranted:boolean = requestAccess.result.accessGranted;
 
-    await this.requestAccess().then((result) => {
-      requestAccessResult = result
-
-    })
-
-    let accessGranted = requestAccessResult;
-
-    // check if user is logged in CortexUI
-    if ("error" in accessGranted) {
-      console.log('You must login on CortexUI before request for grant access then rerun')
-      throw new Error('You must login on CortexUI before request for grant access')
-    } else {
-      console.log(accessGranted['result']['message'])
-      // console.log(accessGranted['result'])
-      if (accessGranted['result']['accessGranted']) {
-        await this.querySessionInfo()
-
-      } else {
-        console.log('You must accept access request from this app on CortexUI then rerun')
-        throw new Error('You must accept access request from this app on CortexUI')
-      }
+    let canAccess:boolean = this.canAccessCortexApp(accessGranted,resultMessage);
+    if(canAccess){
+      await this.querySessionInfo();
     }
   }
 
+  canAccessCortexApp(accessGranted:boolean, resultMessage:string):boolean{
+    let canAccess = false;
+    if (resultMessage.indexOf('error') !== -1) {
+      console.log('You must login on CortexUI before request for grant access then rerun')
+      throw new Error('You must login on CortexUI before request for grant access')
+    } 
+    else if(!accessGranted) {
+       console.log('You must accept access request from this app on CortexUI then rerun')
+       throw new Error('You must accept access request from this app on CortexUI')
+    }
+    else if(accessGranted){
+       canAccess = true;
+    }
+    return canAccess;
+
+  }
   /**
    * - check login and grant access
    * - subcribe for stream
    * - logout data stream to console or file
    */
-  sub(streams) {
+  sub(streams:any) {
     this.socket.on('open', async () => {
       await this.checkGrantAccessAndQuerySessionInfo()
       this.subRequest(streams, this.authToken, this.sessionId)
-      socket.onmessage = (data) => {
+      this.socket.onmessage = ({data}: MessageEvent) => {
         // log stream data to file or console here
-        //console.log(data)
+        console.log(data)
       }
     })
   }
 
-  setupProfile(authToken, headsetId, profileName, status) {
+  setupProfile(authToken:string, headsetId:string, profileName:string, status:string) {
     const SETUP_PROFILE_ID = 7
     let setupProfileRequest = {
       "jsonrpc": "2.0",
@@ -332,38 +312,32 @@ class Cortex {
     }
     // console.log(setupProfileRequest)
     let socket = this.socket
-    return new Promise(function (resolve, reject) {
+    return new Promise(function (resolve) {
       socket.send(JSON.stringify(setupProfileRequest));
-      socket.onmessage = ({
-        data
-      }) => {
+      socket.onmessage = ({data}:MessageEvent) => {
         if (status == 'create') {
-          resolve(data)
+          let parsed:SetupProfileObject = JSON.parse(data);
+          resolve(parsed)
         }
 
         try {
           // console.log('inside setup profile', data)
           if (JSON.parse(data)['id'] == SETUP_PROFILE_ID) {
-            console.log("eskil");
             let parsed = JSON.parse(data);
             console.table(parsed);
             if (JSON.parse(data)['result']['action'] == status) {
-              // console.log('SETUP PROFILE -------------------------------------')
-              //console.log(data)
-              //console.log('\r\n')
-              resolve(data)
+              resolve(data);
             }
           }
 
         } catch (error) {
           console.log("error: " + error);
-
         }
       }
     })
   }
 
-  queryProfileRequest(authToken) {
+  queryProfileRequest(authToken:String) {
 
     const QUERY_PROFILE_ID = 9
     let queryProfileRequest = {
@@ -378,19 +352,15 @@ class Cortex {
     let socket = this.socket
     return new Promise(function (resolve, reject) {
       socket.send(JSON.stringify(queryProfileRequest))
-      socket.onmessage = ({
-        data
-      }) => {
+      socket.onmessage = ({data}:MessageEvent) => {
         try {
-          if (JSON.parse(data)['id'] == QUERY_PROFILE_ID) {
-            /*console.log('\r\n')
-            console.log("query profile: ")
-            console.log(data)
-            */
-            resolve(data)
+            let profileQuery: QueryProfileObject = JSON.parse(data);
+          if (profileQuery.id == QUERY_PROFILE_ID) {
+            resolve(profileQuery);
           }
         } catch (error) {
-          console.log("query profile error:")
+          console.log("query profile error:");
+
         }
       }
     })
@@ -403,43 +373,41 @@ class Cortex {
    * - user think specific thing which used while training, for example 'push' action
    * - 'push' command should show up on mental command stream
    */
-  live(profileName) {
+  live(profileName:string) {
     this.socket.onopen = async () => {
 
       await this.checkGrantAccessAndQuerySessionInfo()
 
       // load profile
-      let loadProfileResult = ""
-      let status = "load"
-      await this.setupProfile(this.authToken,
-        this.headsetId,
-        profileName,
-        status).then((result) => {
-        loadProfileResult = result
-      })
-      console.log("loaded profile result: " + loadProfileResult)
+      //let loadProfileResult = ""
+      const data:any = await this.setupProfile(this.authToken, this.headsetId, profileName, "load")
+      let parsedData:SetupProfileObject = JSON.parse(data);
 
       // // sub 'com' stream and view live mode
       this.subRequest(['com'], this.authToken, this.sessionId)
 
-      this.socket.on('message', (data) => {
+      this.socket.on('message', (data:any) => {
         console.log(data)
       })
     }
   }
   // Maybe return a promise instead?? Check when module is implemented.
   async getProfiles() {
-
-    this.parsedData = "goodbye";
     let profilePromise = new Promise((resolve, reject) => {
 
       this.socket.onopen = async () => {
-
         try {
           await this.checkGrantAccessAndQuerySessionInfo();
           // Checks and sets the class variables needed for the profile query. 
-          const data = await this.queryProfileRequest(this.authToken);
-          resolve(data);
+          const data:any = await this.queryProfileRequest(this.authToken);
+          let profiles = data.result;
+          let profileNames = [];
+          for(let i=0; i<profiles.length; i++){
+            profileNames.push(profiles[i].name);
+          }
+          console.log("parsed: " +profiles);
+          resolve(profileNames);
+
         } catch (error) {
           reject(error);
         }
@@ -448,15 +416,15 @@ class Cortex {
     return profilePromise;
   }
 
-
-  // The load function only works one time. Need to unload function or restart the app to test further.
-  async loadProfile(profileName) {
+  // The load function only works one time. Need to unload 
+  //function or restart the app to test further.
+  async loadProfile(profileName:string) {
     let loadPromise = new Promise((resolve, reject) => {
       this.socket.onopen = async () => {
 
         await this.checkGrantAccessAndQuerySessionInfo()
-        const data = await this.setupProfile(this.authToken, this.headsetId, profileName, "load")
-        let parsedData = JSON.parse(data);
+        const data:any = await this.setupProfile(this.authToken, this.headsetId, profileName, "load")
+        let parsedData:SetupProfileObject = JSON.parse(data);
         console.log(parsedData);
         resolve(data);
       }
@@ -467,28 +435,5 @@ class Cortex {
 export {
   Cortex
 };
-//let c = new Cortex(user, socketUrl)
-//let streams = ['com']
-//c.sub(streams);
-//c.getProfiles();
-//c.loadProfile("D7");
-//console.log("auth: " + auth);
 
-/*
-eeg
-The raw EEG data from the headset.
-mot
-The motion data from the headset.
-dev
-The device data from the headset. It includes the battery level, the wireless signal strength, and the contact quality of each EEG sensor.
-pow
-The band power of each EEG sensor. It includes the alpha, low beta, high beta, gamma, and theta bands.
-met
-The results of the performance metrics detection.
-com
-The results of the mental commands detection. You must load a profile to get meaningful results.
-fac
-The results of the facial expressions detection.
-sys
-The system events. These events are related to the training of the mental commands and facial expressions. See BCI for details.
-*/
+
