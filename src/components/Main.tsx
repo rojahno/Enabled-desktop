@@ -69,9 +69,10 @@ class Main extends React.Component{
         this.setState({profiles:profile});
     }
 
-    getStream = () => {
+    subscribeToStream = () => {
         const stream:string[] = ["com"];
-        const subRequest = this.createSubRequest(stream, this.state.cortexToken, this.state.sessionId);
+        let method:string = "subscribe";
+        const subRequest = this.createSubRequest(stream, this.state.cortexToken, this.state.sessionId, method);
         
         webSocket.send(JSON.stringify(subRequest));
         webSocket.onmessage =({data}:MessageEvent) =>{
@@ -83,16 +84,32 @@ class Main extends React.Component{
                 console.log("don fucked up");
             }
         }
-         
+    }
+
+    unsubscribeToStream =() =>{
+        const stream:string[] = ["com"];
+        let method:string = "unsubscribe";
+        const subRequest = this.createSubRequest(stream, this.state.cortexToken, this.state.sessionId, method);
+        
+        webSocket.send(JSON.stringify(subRequest));
+        webSocket.onmessage =({data}:MessageEvent) =>{
+            try{
+                //console.log(data);
+                this.setState({stream:data});
+            }
+            catch(error){
+                console.log("don fucked up");
+            }
+        }
         
     }
-    createSubRequest=(stream:string[], authToken:string, sessionId:string) =>{
+    createSubRequest=(stream:string[], authToken:string, sessionId:string, method:string) =>{
         
         const SUB_REQUEST_ID = 6
         let subRequest = {
             "id": SUB_REQUEST_ID,
             "jsonrpc": "2.0",
-            "method": "subscribe",
+            "method": method,
             "params": {
                 "cortexToken": authToken,
                 "session": sessionId,
@@ -134,8 +151,11 @@ class Main extends React.Component{
             <button onClick={this.removeProfiles}>
                 Fjern profiler!
             </button>
-            <button onClick={this.getStream}>
+            <button onClick={this.subscribeToStream}>
                 start streamen
+            </button>
+            <button onClick={this.unsubscribeToStream}>
+                stop streamen
             </button>
            
           </div>
