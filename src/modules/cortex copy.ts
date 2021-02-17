@@ -12,21 +12,12 @@ require('events').EventEmitter.defaultMaxListeners = 15;
 // - Refactor the code for our use.
 // - Handle rejects in async functions.
 // - Handle errors being thrown. 
+// - Comment the code.
+// - Create test classes.
 //
 // ---------------------------------------------------------    
-/**
- * This class handle:
- *  - create websocket connection
- *  - handle request for : headset , request access, control headset ...
- *  - handle 2 main flows : sub and train flow
- *  - use async/await and Promise for request need to be run on sync
- */
 
-async function init(){
-  
-  await checkGrantAccessAndQuerySessionInfo();
-  
-}
+
   // Find and connects a headset. If there are more than one headset it connects to the first headset.
   async function queryHeadsetId(socket:WebSocket) {
     const QUERY_HEADSET_ID = 2
@@ -80,7 +71,6 @@ async function init(){
         try {
           let parsed:RequestAccessObject = JSON.parse(data);
           if (parsed['id'] == REQUEST_ACCESS_ID) {
-            console.log("request parsed: " + parsed);
             resolve(data);
           }
         } catch (error) {
@@ -188,11 +178,7 @@ async function init(){
     socket.send(JSON.stringify(subRequest))
     socket.onmessage = ({data}:MessageEvent) => {
       try {
-        // if(JSON.parse(data)['id']==SUB_REQUEST_ID){
-        //console.log('SUB REQUEST RESULT --------------------------------')
-        //console.log(data)
-        //console.log('\r\n')
-        // }
+        
       } catch (error) {}
     }
   }
@@ -200,8 +186,8 @@ async function init(){
   //This method is to get or set the active action for the mental command detection.
   //If the status is "get" then the result is and array of strings.
   //If the status is "set", then the result is an object with "action" and "message" as fields. 
- function mentalCommandActiveActionRequest(authToken:string, sessionId:string, profile:string, action:string) {
-    let socket = this.socket
+ function mentalCommandActiveActionRequest(socket:WebSocket ,authToken:string, sessionId:string, profile:string, action:string) {
+  
     const MENTAL_COMMAND_ACTIVE_ACTION_ID = 10
     let mentalCommandActiveActionRequest = {
       "jsonrpc": "2.0",
@@ -220,80 +206,11 @@ async function init(){
       socket.onmessage = ({data}:MessageEvent) => {
         try {
           if (JSON.parse(data)['id'] == MENTAL_COMMAND_ACTIVE_ACTION_ID) {
-            // console.log('MENTAL COMMAND ACTIVE ACTION RESULT --------------------')
-            // console.log(data)
-            //console.log('\r\n')
             resolve(data)
           }
         } catch (error) {}
       }
     })
-  }
-
-  /**
-   * - query headset infor
-   * - connect to headset with control device request
-   * - authentication and get back auth token
-   * - create session and get back session id
-   */
-  /*
-  async function querySessionInfo() {
-    try{
-    this.headsetId = await queryHeadsetId();
-    this.ctResult = await controlDevice(this.headsetId); //Variable isn't used anywhere
-    await authorize();
-    this.sessionId = await createSession(this.authToken, this.headsetId);
-    }
-     catch(error){
-       console.log("query session error: " + error);
-     }
-  
-  }
-  */
-
-  /**
-   * - check if user logged in.
-   * - check if app is granted for access
-   * - query session info to prepare for sub and train
-   */
-  async function checkGrantAccessAndQuerySessionInfo() {
-  try{
-    let hasAccess:boolean = await hasAccess();
-    if(!hasAccess){
-    let requestAccess:RequestAccessObject = await this.requestAccess();
-    let resultMessage:string = requestAccess.result.message;
-    let accessGranted:boolean = requestAccess.result.accessGranted;
-    let canAccess:boolean = this.canAccessCortexApp(accessGranted,resultMessage);
-
-    if(canAccess){
-      await querySessionInfo();
-    }
-    
-    }
-    else if(hasAccess){
-      await this.querySessionInfo();
-    }
-  }
-    catch(error){
-      console.log("implement error handling");
-    }
-  }
-
-  function canAccessCortexApp(accessGranted:boolean, resultMessage:string):boolean{
-    let canAccess = false;
-    if (resultMessage.indexOf('error') !== -1) {
-      console.log('You must login on CortexUI before request for grant access then rerun')
-      throw new Error('You must login on CortexUI before request for grant access')
-    } 
-    else if(!accessGranted) {
-       console.log('You must accept access request from this app on CortexUI then rerun')
-       throw new Error('You must accept access request from this app on CortexUI')
-    }
-    else if(accessGranted){
-       canAccess = true;
-    }
-    return canAccess;
-
   }
 
   async function hasAccess(socket:WebSocket, user:any) {
@@ -325,30 +242,6 @@ async function init(){
     })
   }
 
-
-  /**
-   * - check login and grant access
-   * - subcribe for stream
-   * - logout data stream to console or file
-   */
-  /*
-  function sub(streams:any) {
-    this.socket.on('open', async () => {
-      try{
-      await this.checkGrantAccessAndQuerySessionInfo();
-      subRequest(streams, this.authToken, this.sessionId)
-      this.socket.onmessage = ({data}: MessageEvent) => {
-        // log stream data to file or console here
-        console.log(data)
-      }
-    }
-    catch(error){
-      console.log("Implement error hanlding")
-    }
-  })
-  }
-  */
-
   async function setupProfile(socket:WebSocket, authToken:string, headsetId:string, profileName:string, status:string) {
     const SETUP_PROFILE_ID = 7
     let setupProfileRequest = {
@@ -362,7 +255,6 @@ async function init(){
       },
       "id": SETUP_PROFILE_ID
     }
-console.log("her");
 
     return new Promise<string>(function (resolve) {
       socket.send(JSON.stringify(setupProfileRequest));
@@ -463,41 +355,7 @@ async function queryProfileRequest(socket:WebSocket,authToken:String) {
     });
   }
 
-  /**
-   * 
-   * - load profile which trained before
-   * - sub 'com' stream (mental command)
-   * - user think specific thing which used while training, for example 'push' action
-   * - 'push' command should show up on mental command stream
-   */
-  /*
-  async function live(profileName:string) {
-    let profilePromise = new Promise((resolve, reject) => {
-    this.socket.onopen = async () => {
-      
-      await this.checkGrantAccessAndQuerySessionInfo();
-      const data:any = await this.setupProfile(this.authToken, this.headsetId, profileName, "load")
-      // load profile
-      //let loadProfileResult = ""
-      let parsedData:SetupProfileObject = JSON.parse(data);
-
-      // // sub 'com' stream and view live mode
-      subRequest(['com'], this.authToken, this.sessionId)
-
-      this.socket.onmessage = ({data}:MessageEvent) => {
-        console.log(data);
-        resolve(data);
-      }
-    }
-  });
-  return profilePromise;
-  
-  }
-  */
- 
-
 export {
-  init,
   queryHeadsetId,
   controlDevice,
   authorize,

@@ -12,7 +12,6 @@ import {
     queryProfileRequest,
     requestAccess,
     setupProfile,
-    subRequest,
 } from './../modules/cortex copy';
 import { QueryProfileObject, QueryProfileResult } from './../modules/interfaces';
 
@@ -91,7 +90,9 @@ class Main extends React.Component{
         let profile:string[] = [];
         this.setState({profiles:profile});
     }
-
+    //For some reason you cant load or unload a profile if you have already loaded a profile 
+    //from the EmotiveBCI app or another version of the electron desktop app. The best way to deal with 
+    //this is to restart both the emotive app and the EmotiveBCI.
     loadProfiles = async() =>{
         let status:string = "load";
         let profileName:string = "D7";
@@ -184,6 +185,12 @@ class Main extends React.Component{
             Control id: {this.state.controlId}
             <br/>
             <br/>
+            Access: {this.state.access  }
+            <br/>
+            <br/>
+            Has access: {this.state.hasAccess.toString()}
+            <br/>
+            <br/>
             Stream: {this.state.stream}
             <br/>
             {/*{this.state.cortexToken} */}
@@ -195,15 +202,12 @@ class Main extends React.Component{
             Onload message: {this.state.unloadMsg}
             <br/>
             <br/>
-            Access: {this.state.access  }
-            <br/>
-            <br/>
-            Has access: {this.state.hasAccess.toString()}
-            <br/>
-            <br/>
             Current profile: {this.state.thisProfile}
             <br/>
             <br/>
+           
+           
+          
             <ul className="profileButtons"> 
                 {this.state.profiles.map((profile: React.ReactNode) => {
                     return <button>{profile}</button>
