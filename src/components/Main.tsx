@@ -70,14 +70,13 @@ class Main extends React.Component{
     }
 
     getStream = () => {
-
         const stream:string[] = ["com"];
         const subRequest = this.createSubRequest(stream, this.state.cortexToken, this.state.sessionId);
         
         webSocket.send(JSON.stringify(subRequest));
         webSocket.onmessage =({data}:MessageEvent) =>{
-            
             try{
+                //console.log(data);
                 this.setState({stream:data});
             }
             catch(error){
@@ -114,6 +113,8 @@ class Main extends React.Component{
             {this.state.headsetId}
             <br/>
             {this.state.controlId}
+            <br/>
+            {this.state.stream}
             <br/>
             {/*{this.state.cortexToken} */}
             </div>
