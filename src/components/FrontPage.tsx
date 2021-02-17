@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 import { Cortex } from './../modules/cortex';
+
 
 class frontPage extends React.Component {
     
@@ -13,7 +14,9 @@ class frontPage extends React.Component {
     async componentDidMount(){
         await this.getHeadsethInfo();
        // await this.loadProfile();
-       await this.getStream();
+     
+        this.getStream();
+        
     }
 
      async getHeadsethInfo(){
@@ -55,6 +58,9 @@ class frontPage extends React.Component {
         };
         let cortex = new Cortex(user, socketUrl);
         
+
+       
+
         let profiles = await cortex.live("D7");
         console.log("loaded:" + profiles);
         this.setState({loaded:profiles});

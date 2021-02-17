@@ -31,8 +31,6 @@ interface QueryHeadsetIdObject{
        
 }
 interface QueryHeadsetIdResult{
-        
-        
             connectedBy:string,
             customName: string,
             dongle: string,
@@ -61,4 +59,4 @@ interface QueryProfileResult{
     name: string,
 }
 
-export {RequestAccessObject,RequestAccessResult,SetupProfileObject, SetupProfileResult,QueryHeadsetIdObject,QueryHeadsetIdResult, QueryProfileObject} ;
+export {RequestAccessObject,RequestAccessResult,SetupProfileObject, SetupProfileResult,QueryHeadsetIdObject,QueryHeadsetIdResult, QueryProfileObject,QueryProfileResult} ;
