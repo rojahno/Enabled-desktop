@@ -1,4 +1,5 @@
 import { QueryHeadsetIdObject, QueryProfileObject, RequestAccessObject, SetupProfileObject } from './interfaces';
+
 //let WebSocket = require('isomorphic-ws');
 require('events').EventEmitter.defaultMaxListeners = 15;
 //TODO 

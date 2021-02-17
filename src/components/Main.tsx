@@ -1,3 +1,4 @@
+import { stat } from 'fs';
 import { Socket } from 'net';
 import React from 'react';
 
@@ -5,8 +6,12 @@ import {
     authorize,
     controlDevice,
     createSession,
+    getCurrentProfile,
+    hasAccess,
     queryHeadsetId,
     queryProfileRequest,
+    requestAccess,
+    setupProfile,
     subRequest,
 } from './../modules/cortex copy';
 import { QueryProfileObject, QueryProfileResult } from './../modules/interfaces';
@@ -24,6 +29,8 @@ const clientSecret ="HFxX7S8qWPVF7DC5nVqMoIgkBNAYAvy78c759qWHbSnJuV9IvepnTI6EXHj
 
 class Main extends React.Component{
     state = {
+        hasAccess:false,
+        access:"hey",
         headsetId: "",
         controlId: "",
         cortexToken: "",
@@ -31,6 +38,9 @@ class Main extends React.Component{
         errorMsg:"",
         sessionId:"",
         stream:"",
+        loadedMsg:"hello",
+        unloadMsg:"uload",
+        thisProfile: "",
     }
         componentDidMount() {
         webSocket.onopen = async() => {
@@ -41,10 +51,20 @@ class Main extends React.Component{
 
     initCortex= async () => {
         try{
-        const id = await queryHeadsetId(webSocket);
+
+        let accessGranted:boolean = await hasAccess(webSocket,user);
+        console.log("bool" + accessGranted);
+        this.setState({hasAccess:accessGranted});
+        
+        if(!accessGranted){
+            let access:string = await requestAccess(webSocket,user);
+            this.setState({access:access});
+        }
+            
+        const id:string = await queryHeadsetId(webSocket);
         this.setState({headsetId:id});
         
-        const controlID = await controlDevice(this.state.headsetId,webSocket);
+        const controlID:string = await controlDevice(this.state.headsetId,webSocket);
         this.setState({controlId:controlID});
 
         const token = await authorize(webSocket, user);
@@ -52,6 +72,9 @@ class Main extends React.Component{
         
         const sessionId = await createSession(webSocket, this.state.cortexToken,this.state.headsetId);
         this.setState({sessionId:sessionId});
+        
+        const currentProfile = await getCurrentProfile(webSocket, this.state.cortexToken,this.state.headsetId);
+        this.setState({thisProfile:currentProfile});
         }
         catch(error){
             this.setState({errorMsg:"check headset and connection"})
@@ -68,6 +91,33 @@ class Main extends React.Component{
         let profile:string[] = [];
         this.setState({profiles:profile});
     }
+
+    loadProfiles = async() =>{
+        let status:string = "load";
+        let profileName:string = "D7";
+        try{
+            await this.unloadProfiles();
+            
+        const loaded:string = await setupProfile(webSocket, this.state.cortexToken, this.state.headsetId, profileName,status);
+            this.setState({loadedMsg:loaded});
+        }
+        catch(error){
+            this.setState({errorMsg:"error"});
+        }
+    }
+
+    unloadProfiles = async() =>{
+        let status:string = "unload";
+        let profileName:string = "";
+        try{
+        const unloaded:string = await setupProfile(webSocket, this.state.cortexToken, this.state.headsetId, profileName,status);
+            this.setState({unloadMsg:unloaded});
+        }
+        catch(error){
+            this.setState({errorMsg:"error"});
+        }
+    }
+       
 
     subscribeToStream = () => {
         const stream:string[] = ["com"];
@@ -101,8 +151,8 @@ class Main extends React.Component{
                 console.log("don fucked up");
             }
         }
-        
     }
+    
     createSubRequest=(stream:string[], authToken:string, sessionId:string, method:string) =>{
         
         const SUB_REQUEST_ID = 6
@@ -127,26 +177,46 @@ class Main extends React.Component{
             <div className="Hello">
                 {this.state.errorMsg}
                <br/>
-            {this.state.headsetId}
+               <br/>
+           Headset id:  {this.state.headsetId}
             <br/>
-            {this.state.controlId}
             <br/>
-            {this.state.stream}
+            Control id: {this.state.controlId}
+            <br/>
+            <br/>
+            Stream: {this.state.stream}
             <br/>
             {/*{this.state.cortexToken} */}
             </div>
+            <br/>
+            Loaded message: {this.state.loadedMsg}
+            <br/>
+            <br/>
+            Onload message: {this.state.unloadMsg}
+            <br/>
+            <br/>
+            Access: {this.state.access  }
+            <br/>
+            <br/>
+            Has access: {this.state.hasAccess.toString()}
+            <br/>
+            <br/>
+            Current profile: {this.state.thisProfile}
+            <br/>
+            <br/>
             <ul className="profileButtons"> 
                 {this.state.profiles.map((profile: React.ReactNode) => {
                     return <button>{profile}</button>
                 })} 
 
             </ul>
+          
 
             <button type={"button"} onClick= { async () => {
                 await this.getProfiles();
                 
             }}>
-                Click for å få profiler
+                Profiler
             </button>
             <button onClick={this.removeProfiles}>
                 Fjern profiler!
@@ -156,6 +226,9 @@ class Main extends React.Component{
             </button>
             <button onClick={this.unsubscribeToStream}>
                 stop streamen
+            </button>
+            <button onClick={this.loadProfiles}>
+                Load profile
             </button>
            
           </div>

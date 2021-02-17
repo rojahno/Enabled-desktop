@@ -62,10 +62,9 @@ async function init(){
   //Requests acces to the emotive app. When the script calls this method for the first time 
   //a display message is shown in the Emotiv app.
   //Returns true and a message string if the user accepts and false and a message string otherwise.
-  function requestAccess():Promise<RequestAccessObject> {
-    let socket = this.socket
-    let user = this.user
-    return new Promise<RequestAccessObject>(function (resolve, reject) {
+  async function requestAccess(socket:WebSocket, user:any):Promise<string> {
+  
+    return new Promise<string>(function (resolve, reject) {
       const REQUEST_ACCESS_ID = 1
       let requestAccessRequest = {
         "id": REQUEST_ACCESS_ID,
@@ -76,14 +75,13 @@ async function init(){
           "clientSecret": user.clientSecret
         },
       }
-
       socket.send(JSON.stringify(requestAccessRequest));
       socket.onmessage = ({data}:MessageEvent) => {
         try {
           let parsed:RequestAccessObject = JSON.parse(data);
           if (parsed['id'] == REQUEST_ACCESS_ID) {
             console.log("request parsed: " + parsed);
-            resolve(parsed);
+            resolve(data);
           }
         } catch (error) {
           throw new Error("Can't access the EmotiveBCI application");
@@ -238,6 +236,7 @@ async function init(){
    * - authentication and get back auth token
    * - create session and get back session id
    */
+  /*
   async function querySessionInfo() {
     try{
     this.headsetId = await queryHeadsetId();
@@ -250,6 +249,7 @@ async function init(){
      }
   
   }
+  */
 
   /**
    * - check if user logged in.
@@ -258,7 +258,7 @@ async function init(){
    */
   async function checkGrantAccessAndQuerySessionInfo() {
   try{
-    let hasAccess:boolean = await this.hasAccess();
+    let hasAccess:boolean = await hasAccess();
     if(!hasAccess){
     let requestAccess:RequestAccessObject = await this.requestAccess();
     let resultMessage:string = requestAccess.result.message;
@@ -296,9 +296,8 @@ async function init(){
 
   }
 
-  function hasAccess() {
-    let socket = this.socket
-    let user = this.user
+  async function hasAccess(socket:WebSocket, user:any) {
+  
     return new Promise<boolean>(function (resolve, reject) {
       const REQUEST_ACCESS_ID = 1
       let requestAccessRequest = {
@@ -332,6 +331,7 @@ async function init(){
    * - subcribe for stream
    * - logout data stream to console or file
    */
+  /*
   function sub(streams:any) {
     this.socket.on('open', async () => {
       try{
@@ -347,8 +347,9 @@ async function init(){
     }
   })
   }
+  */
 
-  function setupProfile(socket:WebSocket, authToken:string, headsetId:string, profileName:string, status:string) {
+  async function setupProfile(socket:WebSocket, authToken:string, headsetId:string, profileName:string, status:string) {
     const SETUP_PROFILE_ID = 7
     let setupProfileRequest = {
       "jsonrpc": "2.0",
@@ -361,17 +362,23 @@ async function init(){
       },
       "id": SETUP_PROFILE_ID
     }
+console.log("her");
 
-    return new Promise(function (resolve) {
+    return new Promise<string>(function (resolve) {
       socket.send(JSON.stringify(setupProfileRequest));
       socket.onmessage = ({data}:MessageEvent) => {
-        
-        let setupQuery:SetupProfileObject = JSON.parse(data);
-        
-        if (status == 'create') {
-          resolve(setupQuery)
-        }
         try {
+          
+        let setupQuery:SetupProfileObject = JSON.parse(data);
+        console.log("setupquery : " +data);
+        
+        if (data.indexOf('error') !== -1) {
+          resolve(data);
+        }
+        
+         else if (status == 'create') {
+          resolve(setupQuery.result.message)
+        }
           if (setupQuery.id == SETUP_PROFILE_ID) {
             if (setupQuery.result.action == status) {
               resolve(data);
@@ -379,7 +386,44 @@ async function init(){
           }
 
         } catch (error) {
-          console.log("error: " + error);
+          resolve(error);
+          console.log("setup profile error: " + error);
+        }
+      }
+    })
+  }
+
+  async function getCurrentProfile(socket:WebSocket, authToken:string, headsetId:string) {
+    const SETUP_PROFILE_ID = 7
+    let currentProfileRequest = {
+      "id": 1,
+      "jsonrpc": "2.0",
+      "method": "getCurrentProfile",
+      "params": {
+          "cortexToken": authToken,
+          "headset": headsetId,
+      }
+  }
+console.log("her");
+
+    return new Promise<string>(function (resolve) {
+      socket.send(JSON.stringify(currentProfileRequest));
+      socket.onmessage = ({data}:MessageEvent) => {
+        try {
+  
+        if (data.indexOf('error') !== -1) {
+          console.log("was an error");
+          resolve(data);
+        }
+        
+          else {
+
+              resolve(data);
+  
+          }
+        } catch (error) {
+          resolve(error);
+          console.log("current profile error: " + error);
         }
       }
     })
@@ -426,6 +470,7 @@ async function queryProfileRequest(socket:WebSocket,authToken:String) {
    * - user think specific thing which used while training, for example 'push' action
    * - 'push' command should show up on mental command stream
    */
+  /*
   async function live(profileName:string) {
     let profilePromise = new Promise((resolve, reject) => {
     this.socket.onopen = async () => {
@@ -448,48 +493,8 @@ async function queryProfileRequest(socket:WebSocket,authToken:String) {
   return profilePromise;
   
   }
-  // Returns an array of profile names. 
-  async function getProfiles(authToken:string, socket:WebSocket) {
-    let profilePromise = new Promise((resolve, reject) => {
-
-      socket.onopen = async () => {
-        try {
-          await this.checkGrantAccessAndQuerySessionInfo(); 
-          const data:any = await this.queryProfileRequest(this.authToken);
-          let profiles = data.result;
-          let profileNames = [];
-          
-          for(let i=0; i<profiles.length; i++){
-            profileNames.push(profiles[i].name);
-          }
-          console.log("parsed: " +profiles);
-          resolve(profileNames);
-
-        } catch (error) {
-          reject(error);
-        }
-      }
-    })
-    return profilePromise;
-  }
-  
-
-  // The load function only works one time. Need to unload 
-  //function or restart the app to test further.
-  async function loadProfile(profileName:string) {
-    let loadPromise = new Promise((resolve, reject) => {
-      this.socket.onopen = async () => {
-
-        await this.checkGrantAccessAndQuerySessionInfo()
-        const data:any = await this.setupProfile(this.authToken, this.headsetId, profileName, "load")
-        let parsedData:SetupProfileObject = JSON.parse(data);
-        console.log(parsedData);
-        
-        resolve(data);
-      }
-    })
-    return loadPromise;
-  }
+  */
+ 
 
 export {
   init,
@@ -498,7 +503,11 @@ export {
   authorize,
   queryProfileRequest,
   createSession,
-  subRequest
+  subRequest,
+  setupProfile,
+  hasAccess,
+  requestAccess,
+  getCurrentProfile,
 };
 
 

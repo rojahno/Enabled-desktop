@@ -16,12 +16,11 @@ body {
   overflow-y: hidden;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .profileButtons{
   display: flex;
-  flex-direction: column;
   justify-content: end;
   align-items: center;
 }
