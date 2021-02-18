@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import {Cortex} from './../modules/cortex'
+import React from 'react';
+
+import { Cortex } from './../modules/cortex';
+
 
 class FrontPage extends React.Component {
     
@@ -11,7 +13,10 @@ class FrontPage extends React.Component {
 
     async componentDidMount(){
         await this.getHeadsethInfo();
-        await this.loadProfile();
+       // await this.loadProfile();
+     
+        this.getStream();
+        
     }
 
      async getHeadsethInfo(){
@@ -43,13 +48,23 @@ class FrontPage extends React.Component {
         console.log("loaded:" + profiles);
         this.setState({loaded:profiles});
     };
+    async getStream(){
+        let socketUrl = 'wss://localhost:6868'
+        let user = {
+            "license": "",
+            "clientId": "0wyWnYNd61cedWF0Bp7AbZ10ogKlpa6EvgsH4DCV",
+            "clientSecret": "HFxX7S8qWPVF7DC5nVqMoIgkBNAYAvy78c759qWHbSnJuV9IvepnTI6EXHjoPxZc1wpAwHZGIiZHj1S8JNZTyNWENQ91Kn3YxFubw3obcMPvOUIuzuGJXFD86MN4kRcQ",
+            "debit": 1
+        };
+        let cortex = new Cortex(user, socketUrl);
+        
 
-    incrementCount = ()=> {
-        // Note: this will *not* work as intended.
-        this.setState({count: this.state.count + 1});
-      }
+       
 
-
+        let profiles = await cortex.live("D7");
+        console.log("loaded:" + profiles);
+        this.setState({loaded:profiles});
+    };
 
    render() {
     return(
