@@ -5,11 +5,13 @@ import FrontPage from './components/FrontPage';
 import Main from './components/Main';
 import ConnectedIndicator from './components/connectedIndicator';
 import SetProfile from './components/setProfile';
+import TestPage from './testPage/testPage';
 
 export default function App() {
   return (
     <Router>
       <Switch>
+        <Route path="/" component={TestPage}/>
         <Route path="/" component={Main} />
         <Route path="/" component={SetProfile}/>
         <Route path="/" component={ConnectedIndicator} />

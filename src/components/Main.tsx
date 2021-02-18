@@ -14,6 +14,7 @@ import {
     setupProfile,
 } from './../modules/cortex copy';
 import { QueryProfileObject, QueryProfileResult } from './../modules/interfaces';
+import SetProfile from './setProfile';
 
 const webSocket = new WebSocket('wss://localhost:6868');
 const user = {
@@ -234,7 +235,6 @@ class Main extends React.Component{
             <button onClick={this.loadProfiles}>
                 Load profile
             </button>
-           
           </div>
         )
        }
