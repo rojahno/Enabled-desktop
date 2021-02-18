@@ -16,6 +16,12 @@ body {
   overflow-y: hidden;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
+}
+
+.profileButtons{
+  display: flex;
+  justify-content: end;
   align-items: center;
 }
 
