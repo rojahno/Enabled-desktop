@@ -1,0 +1,49 @@
+
+import {createStyles, makeStyles, Theme, ThemeProvider, withStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
+import React from 'react';
+
+const CssTextField = withStyles({
+  root: {
+    '& label.Mui-focused': {
+      color: 'white',
+    },
+    '& .MuiInput-underline:after': {
+      borderBottomColor: 'grey',
+    },
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+        borderColor: 'red',
+      },
+      '&:hover fieldset': {
+        borderColor: 'yellow',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: 'green',
+      },
+    },
+  },
+})(TextField);
+
+
+//Change the style of the element
+const useStyles = makeStyles(function (theme: Theme) {
+    return createStyles({
+      root: {
+        margin: theme.spacing(2),
+        width:theme.spacing(23),
+        justifySelf:"center",
+        alignItems:"center",
+        textAlign:"center",
+      },
+    });
+  },
+);
+
+export default function CustomInput() {
+  const classes = useStyles();
+
+  return (
+      <CssTextField className={classes.root} error={false} hiddenLabel={true} placeholder="127.0.0.1" label=" " />
+  );
+}

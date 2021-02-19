@@ -1,19 +1,20 @@
-import React from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import './styles/App.global.scss';
+
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+
+import ConnectedIndicator from './components/connectedIndicator';
 import FrontPage from './components/FrontPage';
 import Main from './components/Main';
-import ConnectedIndicator from './components/connectedIndicator';
 import SetProfile from './components/setProfile';
-import TestPage from './testPage/testPage';
 
 export default function App() {
   return (
     <Router>
       <Switch>
-        <Route path="/" component={TestPage}/>
-        <Route path="/" component={Main} />
-        <Route path="/" component={SetProfile}/>
+        <Route path="/" component={FrontPage} />
+        <Route path="/find-ip" exact component={Main} />
+        <Route path="/" component={SetProfile} />
         <Route path="/" component={ConnectedIndicator} />
         <Route path="/" component={FrontPage} />
       </Switch>
