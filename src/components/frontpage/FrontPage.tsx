@@ -1,9 +1,10 @@
 import React from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
 import CustomInput from './customInput';
-import CustomDialog from './customDialog';
-
+import CustomDialog from './CustomDialog';
+import SimplePaper from './SimplePaper';
+import Main from '../Main';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -20,21 +21,25 @@ const useStyles = makeStyles((theme: Theme) =>
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor:"#ffffff95"
+      backgroundColor: '#ffffff95',
     },
   })
 );
 
-export default function SimplePaper(_props: any) {
+
+export default function FrontPage(_props: any) {
   const classes = useStyles();
 
   return (
     <div className={classes.root}>
-      <Paper className={classes.paper} elevation={10}>
+      <SimplePaper>
         <h3>Add the IP of your phone</h3>
         <CustomInput />
         <CustomDialog />
-      </Paper>
+        <Link to="/main">
+          <button>Connect</button>
+        </Link>
+      </SimplePaper>
     </div>
   );
 }

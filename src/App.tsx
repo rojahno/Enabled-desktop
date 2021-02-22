@@ -1,10 +1,10 @@
 import './styles/App.global.scss';
 
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { HashRouter as Router, Route, Switch } from 'react-router-dom';
 
 import ConnectedIndicator from './components/connectedIndicator';
-import FrontPage from './components/FrontPage';
+import FrontPage from './components/frontpage/CenterContainer';
 import Main from './components/Main';
 import SetProfile from './components/setProfile';
 
@@ -12,11 +12,11 @@ export default function App() {
   return (
     <Router>
       <Switch>
-        <Route path="/" component={FrontPage} />
-        <Route path="/find-ip" exact component={Main} />
-        <Route path="/" component={SetProfile} />
-        <Route path="/" component={ConnectedIndicator} />
-        <Route path="/" component={FrontPage} />
+        <Route path="/" exact component={FrontPage} />
+        <Route path="/main" exact component={Main} />
+        <Route path="/" exact component={ConnectedIndicator} />
+        <Route path="/" exact component={FrontPage} />
+        <Route path="/" exact component={FrontPage} />
       </Switch>
     </Router>
   );

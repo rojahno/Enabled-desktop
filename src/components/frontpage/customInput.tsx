@@ -1,6 +1,4 @@
-
-import { colors } from '@material-ui/core';
-import {createStyles, makeStyles, Theme, ThemeProvider, withStyles } from '@material-ui/core/styles';
+import {createStyles, makeStyles, Theme, withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import React from 'react';
 

@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from '@material-ui/core/Link';
 import { makeStyles, Theme, createStyles } from '@material-ui/core';
-import CustomDialog from './customDialog';
+
 
 //Change the style of the element
 const useStyles = makeStyles(function (theme: Theme) {

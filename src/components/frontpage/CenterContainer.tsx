@@ -1,7 +1,7 @@
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import React from 'react';
-import backgroundImage from './../../assets/background.jpg'
-import SimplePaper from './backgroundPaper';
+import backgroundImage from './../../../assets/background.jpg'
+import FrontPage from './FrontPage';
 
 const useStyles = makeStyles(function (theme: Theme) {
     return createStyles({
@@ -16,19 +16,18 @@ const useStyles = makeStyles(function (theme: Theme) {
   }
 );
 
-class FrontPage extends React.Component {
+class centerContainer extends React.Component {
 
   render() {
     return (
         <div style={{backgroundImage: `url(${backgroundImage})`}} className="frontpage-container">
-          
-           <h2>
+          <h2>
           Enabled
         </h2>
-            <SimplePaper/>
+            <FrontPage/>
         </div>
     );
   }
 }
 
-export default FrontPage;
+export default centerContainer;

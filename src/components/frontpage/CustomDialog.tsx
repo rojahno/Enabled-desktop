@@ -9,7 +9,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Link from '@material-ui/core/Link';
 //import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
-import ButtonLink from './customLink';
+import ButtonLink from './CustomLink';
 
 const styles = (theme: Theme) =>
   createStyles({
