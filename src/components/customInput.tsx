@@ -1,4 +1,5 @@
 
+import { colors } from '@material-ui/core';
 import {createStyles, makeStyles, Theme, ThemeProvider, withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import React from 'react';
@@ -20,6 +21,8 @@ const CssTextField = withStyles({
       },
       '&.Mui-focused fieldset': {
         borderColor: 'green',
+        '&.MuiTextField-root':{
+        }
       },
     },
   },
@@ -32,8 +35,6 @@ const useStyles = makeStyles(function (theme: Theme) {
       root: {
         margin: theme.spacing(2),
         width:theme.spacing(23),
-        justifySelf:"center",
-        alignItems:"center",
         textAlign:"center",
       },
     });
@@ -44,6 +45,6 @@ export default function CustomInput() {
   const classes = useStyles();
 
   return (
-      <CssTextField className={classes.root} error={false} hiddenLabel={true} placeholder="127.0.0.1" label=" " />
+      <CssTextField className={classes.root} error={false} hiddenLabel={true} inputProps={{min: 0, style: { textAlign: 'center' }}} placeholder="127.0.0.1" label=" " />
   );
 }

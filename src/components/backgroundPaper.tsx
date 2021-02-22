@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme: Theme) =>
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor:"#ffffff27"
+      backgroundColor:"#ffffff95"
     },
   })
 );
