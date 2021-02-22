@@ -7,6 +7,7 @@ import ConnectedIndicator from './components/connectedIndicator';
 import FrontPage from './components/frontpage/CenterContainer';
 import Main from './components/Main';
 import SetProfile from './components/setProfile';
+import SettingsDialogue from './components/settings/SettingsDialogue'
 
 export default function App() {
   return (
@@ -14,7 +15,7 @@ export default function App() {
       <Switch>
         <Route path="/" exact component={FrontPage} />
         <Route path="/main" exact component={Main} />
-        <Route path="/" exact component={ConnectedIndicator} />
+        <Route path="/settings" exact component={SettingsDialogue} />
         <Route path="/" exact component={FrontPage} />
         <Route path="/" exact component={FrontPage} />
       </Switch>

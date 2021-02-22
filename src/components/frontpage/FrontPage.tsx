@@ -36,7 +36,7 @@ export default function FrontPage(_props: any) {
         <h3>Add the IP of your phone</h3>
         <CustomInput />
         <CustomDialog />
-        <Link to="/main">
+        <Link to="/settings">
           <button>Connect</button>
         </Link>
       </SimplePaper>
