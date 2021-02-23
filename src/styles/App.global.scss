@@ -10,6 +10,7 @@ body {
   position: relative;
   color: white;
   height: 100vh;
+<<<<<<< Updated upstream
   background: linear-gradient(
     200.96deg,
     #fedc2a -29.09%,
@@ -18,6 +19,23 @@ body {
   );
   font-family: sans-serif;
   overflow-y: hidden;
+=======
+  width: 100vw;
+  // background: linear-gradient(
+  //   200.96deg,
+  //   #fedc2a -29.09%,
+  //   #dd5789 51.77%,
+  //   #7a2c9e 129.35%
+  // );
+
+  background: url('../images/desktopappbackground.png') no-repeat center center fixed;
+  background-size: cover;
+  font-family: sans-serif;
+  overflow-y: hidden;
+}
+#img.desk
+.profileButtons {
+>>>>>>> Stashed changes
   display: flex;
 }
 
