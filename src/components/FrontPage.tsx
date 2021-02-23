@@ -1,9 +1,33 @@
 import React from 'react';
+<<<<<<< Updated upstream
 
 import { Cortex } from './../modules/cortex';
 
+=======
+import Paper from '@material-ui/core/Paper';
 
-class frontPage extends React.Component {
+import CustomInput from './customInput';
+import SimplePaper from './backgroundPaper'
+import VerticalLinearStepper from './stepper'
+
+import Image from '../images/desktopappbackground.ång'
+
+const useStyles = makeStyles(function (theme: Theme) {
+    return createStyles({
+      root: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        backgroundImage: 'url(${Image})'
+      },
+      margin: {
+        margin: theme.spacing(1),
+      },
+    });
+  }
+);
+>>>>>>> Stashed changes
+
+class FrontPage extends React.Component {
     
     state = {
         count: 0,
@@ -77,6 +101,7 @@ class frontPage extends React.Component {
 
             </ul>
 
+<<<<<<< Updated upstream
             <p>
                 {this.state.loaded}
             </p>
@@ -87,10 +112,20 @@ class frontPage extends React.Component {
                 
             </button>
             
+=======
+  render() {
+    return (
+        <div className="frontpage-container">
+           <h2>
+          Enabled
+        </h2>
+            <SimplePaper/>
+            <VerticalLinearStepper/>
+>>>>>>> Stashed changes
         </div>
       </div>
     )
    }
 }
 
-export default frontPage;
+export default FrontPage;

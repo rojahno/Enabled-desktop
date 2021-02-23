@@ -1,14 +1,23 @@
+import './styles/App.global.scss';
+
 import React from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import './styles/App.global.css';
-import FrontPage from './components/FrontPage';
+import { HashRouter as Router, Route, Switch } from 'react-router-dom';
+
+import ConnectedIndicator from './components/connectedIndicator';
+import FrontPage from './components/frontpage/CenterContainer';
 import Main from './components/Main';
+import SetProfile from './components/setProfile';
+import SettingsDialogue from './components/settings/SettingsDialogue'
 
 export default function App() {
   return (
     <Router>
       <Switch>
-        <Route path="/" component={Main} />
+        <Route path="/" exact component={FrontPage} />
+        <Route path="/main" exact component={Main} />
+        <Route path="/settings" exact component={SettingsDialogue} />
+        <Route path="/" exact component={FrontPage} />
+        <Route path="/" exact component={FrontPage} />
       </Switch>
     </Router>
   );
