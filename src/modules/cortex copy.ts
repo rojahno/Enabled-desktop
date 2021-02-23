@@ -6,7 +6,6 @@ import {
   SetupProfileObject,
 } from './interfaces';
 
-//let WebSocket = require('isomorphic-ws');
 require('events').EventEmitter.defaultMaxListeners = 15;
 //TODO 
 // - Refactor the code for our use.
@@ -16,6 +15,15 @@ require('events').EventEmitter.defaultMaxListeners = 15;
 // - Create test classes.
 //
 // ---------------------------------------------------------    
+
+const socket = new WebSocket('wss://localhost:6868');
+const user = {
+  license: '',
+  clientId: '0wyWnYNd61cedWF0Bp7AbZ10ogKlpa6EvgsH4DCV',
+  clientSecret:
+    'HFxX7S8qWPVF7DC5nVqMoIgkBNAYAvy78c759qWHbSnJuV9IvepnTI6EXHjoPxZc1wpAwHZGIiZHj1S8JNZTyNWENQ91Kn3YxFubw3obcMPvOUIuzuGJXFD86MN4kRcQ',
+  debit: 1,
+};
 
 
   // Find and connects a headset. If there are more than one headset it connects to the first headset.
@@ -354,6 +362,8 @@ async function queryProfileRequest(socket:WebSocket,authToken:String) {
       }
     });
   }
+
+  
 
 export {
   queryHeadsetId,
