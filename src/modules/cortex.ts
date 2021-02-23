@@ -13,9 +13,14 @@ require('events').EventEmitter.defaultMaxListeners = 15;
  *  - create websocket connection
  *  - handle request for : headset , request access, control headset ...
  *  - handle 2 main flows : sub and train flow
- *  - use async/await and Promise for request need to be run on sync
+ *  - us
+ * 
+ * e async/await and Promise for request need to be run on sync
  */
+
+
 class Cortex {
+  
   private socket: any;
   private headsetId:string = "";
   private authToken:string = "";
@@ -26,8 +31,14 @@ class Cortex {
     
     // create socket
     //process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0; Why is this here? only for node?
-    this.socket =socket;
-    this.user = user;
+    this.socket =new WebSocket('wss://localhost:6868');
+    this.user ={
+      license: '',
+      clientId: '0wyWnYNd61cedWF0Bp7AbZ10ogKlpa6EvgsH4DCV',
+      clientSecret:
+        'HFxX7S8qWPVF7DC5nVqMoIgkBNAYAvy78c759qWHbSnJuV9IvepnTI6EXHjoPxZc1wpAwHZGIiZHj1S8JNZTyNWENQ91Kn3YxFubw3obcMPvOUIuzuGJXFD86MN4kRcQ',
+      debit: 1,
+    };
   }
 
 async init(){
