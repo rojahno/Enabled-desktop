@@ -20,7 +20,7 @@ class centerContainer extends React.Component {
 
   render() {
     return (
-        <div style={{backgroundImage: `url(${backgroundImage})`}} className="frontpage-container">
+        <div className="frontpage-container">
           <h2>
           Enabled
         </h2>
