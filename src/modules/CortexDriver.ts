@@ -1,5 +1,7 @@
 import {
+  AuthorizeResponse,
   ControlDeviceObject,
+  CreateSessionResponse,
   QueryHeadsetIdObject,
   QueryProfileObject,
   RequestAccessObject,
@@ -8,7 +10,6 @@ import {
 
 require('events').EventEmitter.defaultMaxListeners = 15;
 //TODO
-// - Refactor the code for our use.
 // - Handle rejects in async functions.
 // - Handle errors being thrown.
 //
@@ -40,13 +41,13 @@ class CortexDriver {
   }
 
   // Find and connects a headset. If there are more than one headset it connects to the first headset.
-  async queryHeadsetId () {
+  async queryHeadsetId() {
     const QUERY_HEADSET_ID = 2;
     let queryHeadsetRequest = {
-      "jsonrpc": "2.0",
-      "id": QUERY_HEADSET_ID,
-      "method": "queryHeadsets",
-      "params": {}
+      jsonrpc: '2.0',
+      id: QUERY_HEADSET_ID,
+      method: 'queryHeadsets',
+      params: {},
     };
 
     return new Promise<string>((resolve, reject) => {
@@ -59,7 +60,7 @@ class CortexDriver {
           if (queryHeadsetId == QUERY_HEADSET_ID) {
             if (headsetQuery.result.length > 0) {
               let headsetId: string = headsetQuery.result[0].id;
-              console.log("query id" +headsetId);
+              console.log('query id' + headsetId);
               resolve(headsetId);
             }
           }
@@ -70,7 +71,7 @@ class CortexDriver {
         reject(rejectString);
       };
     });
-  };
+  }
 
   //Requests acces to the emotive app. When the script calls this method for the first time
   //a display message is shown in the Emotiv app.
@@ -79,13 +80,13 @@ class CortexDriver {
     return new Promise<string>((resolve, reject) => {
       const REQUEST_ACCESS_ID = 1;
       let requestAccessRequest = {
-        "id": REQUEST_ACCESS_ID,
-        "jsonrpc": "2.0",
-        "method": "requestAccess",
-        "params": {
-          "clientId": this._user.clientId,
-          "clientSecret": this._user.clientSecret
-        }
+        id: REQUEST_ACCESS_ID,
+        jsonrpc: '2.0',
+        method: 'requestAccess',
+        params: {
+          clientId: this._user.clientId,
+          clientSecret: this._user.clientSecret,
+        },
       };
       this._socket.send(JSON.stringify(requestAccessRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
@@ -95,7 +96,7 @@ class CortexDriver {
             resolve(data);
           }
         } catch (error) {
-          throw new Error("Can't access the EmotiveBCI application");
+          reject("Can't access the Emotive application");
         }
       };
     });
@@ -107,108 +108,82 @@ class CortexDriver {
     return new Promise<string>((resolve, reject) => {
       const AUTHORIZE_ID = 4;
       let authorizeRequest = {
-        "jsonrpc": "2.0",
-        "method": "authorize",
-        "params": {
-          "clientId": this._user.clientId,
-          "clientSecret": this._user.clientSecret,
-          "license": this._user.license,
-          "debit": this._user.debit
+        jsonrpc: '2.0',
+        method: 'authorize',
+        params: {
+          clientId: this._user.clientId,
+          clientSecret: this._user.clientSecret,
+          license: this._user.license,
+          debit: this._user.debit,
         },
-        "id": AUTHORIZE_ID
-      }
+        id: AUTHORIZE_ID,
+      };
       this._socket.send(JSON.stringify(authorizeRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
-          if (JSON.parse(data)['id'] == AUTHORIZE_ID) {
-            let cortexToken: string = JSON.parse(data)['result']['cortexToken'];
+          let parsed: AuthorizeResponse = JSON.parse(data);
+          if (parsed.id == AUTHORIZE_ID) {
+            let cortexToken: string = parsed.result.cortexToken;
             resolve(cortexToken);
           }
         } catch (error) {}
-        resolve('Authorize error');
+        reject('Authorize error');
       };
     });
   };
-/*
+
   // Connects to the headset.
-  controlDevice = async (headsetId: string) => {
+  controlDevice(headsetId: string) {
     const CONTROL_DEVICE_ID = 3;
     let controlDeviceRequest = {
-      "jsonrpc": "2.0",
-      "id": CONTROL_DEVICE_ID,
-      "method": "controlDevice",
-      "params": {
-        "command": "connect",
-        "headset": headsetId
-      }
+      jsonrpc: '2.0',
+      id: CONTROL_DEVICE_ID,
+      method: 'controlDevice',
+      params: {
+        command: 'connect',
+        headset: headsetId,
+      },
     };
-
     return new Promise<any>((resolve, reject) => {
       this._socket.send(JSON.stringify(controlDeviceRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
-          if (JSON.parse(data)['id'] == CONTROL_DEVICE_ID) {
+          let parsedData: ControlDeviceObject = JSON.parse(data);
+          if (parsedData.id == CONTROL_DEVICE_ID) {
             resolve(data);
           }
         } catch (error) {
-          reject('control device error');
+          reject('Control device error');
         }
       };
-    });
-  };
-  */
-   // Connects to the headset.
-    controlDevice (headsetId:string){
-    const CONTROL_DEVICE_ID = 3
-    let controlDeviceRequest = {
-      "jsonrpc": "2.0",
-      "id": CONTROL_DEVICE_ID,
-      "method": "controlDevice",
-      "params": {
-        "command": "connect",
-        "headset": headsetId
-      }
-    }
-    return new Promise<any>((resolve, reject)=> {
-      this._socket.send(JSON.stringify(controlDeviceRequest));
-      this._socket.onmessage = ({data}:MessageEvent) => {
-        try {
-          console.table(JSON.parse(data));
-          let parsedData: ControlDeviceObject = JSON.parse(data);
-          if (parsedData.id == CONTROL_DEVICE_ID) {
-            resolve(data)
-          }
-        } catch (error) {
-          reject('control device error');
-        }
-      }
     });
   }
 
   // This method is to subscribe to one or more data strams. After you successfully subscribe
   // Cortex will keep sending data sample objects.
-  createSession = async  (authToken: string, headsetId: string) => {
+  createSession = async (authToken: string, headsetId: string) => {
     const CREATE_SESSION_ID = 5;
     let createSessionRequest = {
-      "jsonrpc": "2.0",
-      "id": CREATE_SESSION_ID,
-      "method": "createSession",
-      "params": {
-        "cortexToken": authToken,
-        "headset": headsetId,
-        "status": "active"
-      }
-    }
+      jsonrpc: '2.0',
+      id: CREATE_SESSION_ID,
+      method: 'createSession',
+      params: {
+        cortexToken: authToken,
+        headset: headsetId,
+        status: 'active',
+      },
+    };
     return new Promise<string>((resolve, reject) => {
       this._socket.send(JSON.stringify(createSessionRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
-          if (JSON.parse(data)['id'] == CREATE_SESSION_ID) {
-            let sessionId: string = JSON.parse(data)['result']['id'];
+          let parsed: CreateSessionResponse = JSON.parse(data);
+          if (parsed.id == CREATE_SESSION_ID) {
+            let sessionId: string = parsed.result.id;
             resolve(sessionId);
           }
         } catch (error) {
-          console.log(error);
+          reject('Create session error');
         }
       };
     });
@@ -218,20 +193,23 @@ class CortexDriver {
   subRequest = (stream: string[], authToken: string, sessionId: string) => {
     const SUB_REQUEST_ID = 6;
     let subRequest = {
-      "jsonrpc": "2.0",
-      "method": "subscribe",
-      "params": {
-        "cortexToken": authToken,
-        "session": sessionId,
-        "streams": stream
+      jsonrpc: '2.0',
+      method: 'subscribe',
+      params: {
+        cortexToken: authToken,
+        session: sessionId,
+        streams: stream,
       },
-      "id": SUB_REQUEST_ID
-    }
+      id: SUB_REQUEST_ID,
+    };
 
     this._socket.send(JSON.stringify(subRequest));
     this._socket.onmessage = ({ data }: MessageEvent) => {
       try {
-      } catch (error) {}
+        console.log(data);
+      } catch (error) {
+        console.error('Sub request error');
+      }
     };
   };
 
@@ -246,16 +224,16 @@ class CortexDriver {
   ) => {
     const MENTAL_COMMAND_ACTIVE_ACTION_ID = 10;
     let mentalCommandActiveActionRequest = {
-      "jsonrpc": "2.0",
-      "method": "mentalCommandActiveAction",
-      "params": {
-        "cortexToken": authToken,
-        "status": "set",
-        "session": sessionId,
-        "profile": profile,
-        "actions": action
+      jsonrpc: '2.0',
+      method: 'mentalCommandActiveAction',
+      params: {
+        cortexToken: authToken,
+        status: 'set',
+        session: sessionId,
+        profile: profile,
+        actions: action,
       },
-      "id": MENTAL_COMMAND_ACTIVE_ACTION_ID
+      id: MENTAL_COMMAND_ACTIVE_ACTION_ID,
     };
     return new Promise((resolve, reject) => {
       this._socket.send(JSON.stringify(mentalCommandActiveActionRequest));
@@ -264,23 +242,25 @@ class CortexDriver {
           if (JSON.parse(data)['id'] == MENTAL_COMMAND_ACTIVE_ACTION_ID) {
             resolve(data);
           }
-        } catch (error) {}
+        } catch (error) {
+          reject('mental command active action error');
+        }
       };
     });
   };
 
-   hasAccess = async () => {
+  hasAccess = async () => {
     return new Promise<boolean>((resolve, reject) => {
       const REQUEST_ACCESS_ID = 1;
       let requestAccessRequest = {
-        "id": REQUEST_ACCESS_ID,
-        "jsonrpc": "2.0",
-        "method": "requestAccess",
-        "params": {
-          "clientId": this._user.clientId,
-          "clientSecret": this._user.clientSecret
+        id: REQUEST_ACCESS_ID,
+        jsonrpc: '2.0',
+        method: 'requestAccess',
+        params: {
+          clientId: this._user.clientId,
+          clientSecret: this._user.clientSecret,
         },
-      }
+      };
 
       this._socket.send(JSON.stringify(requestAccessRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
@@ -294,91 +274,89 @@ class CortexDriver {
         }
       };
     });
-  }
+  };
 
-    setupProfile = async (authToken:string, headsetId:string, profileName:string, status:string) => {
-    const SETUP_PROFILE_ID = 7
+  setupProfile = async (
+    authToken: string,
+    headsetId: string,
+    profileName: string,
+    status: string
+  ) => {
+    const SETUP_PROFILE_ID = 7;
     let setupProfileRequest = {
-      "jsonrpc": "2.0",
-      "method": "setupProfile",
-      "params": {
-        "cortexToken": authToken,
-        "headset": headsetId,
-        "profile": profileName,
-        "status": status
+      jsonrpc: '2.0',
+      method: 'setupProfile',
+      params: {
+        cortexToken: authToken,
+        headset: headsetId,
+        profile: profileName,
+        status: status,
       },
-      "id": SETUP_PROFILE_ID
-    }
+      id: SETUP_PROFILE_ID,
+    };
 
-    return new Promise<string>( (resolve) => {
+    return new Promise<string>((resolve) => {
       this._socket.send(JSON.stringify(setupProfileRequest));
-      this._socket.onmessage = ({data}:MessageEvent) => {
+      this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
-          
-        let setupQuery:SetupProfileObject = JSON.parse(data);
-        console.log("setupquery : " +data);
-        
-        if (data.indexOf('error') !== -1) {
-          resolve(data);
-        }
-        
-         else if (status == 'create') {
-          resolve(setupQuery.result.message)
-        }
+          let setupQuery: SetupProfileObject = JSON.parse(data);
+          console.log('setupquery : ' + data);
+
+          if (data.indexOf('error') !== -1) {
+            resolve(data);
+          } else if (status == 'create') {
+            resolve(setupQuery.result.message);
+          }
           if (setupQuery.id == SETUP_PROFILE_ID) {
             if (setupQuery.result.action == status) {
               resolve(data);
             }
           }
-
         } catch (error) {
-          resolve(error);
-          console.log("setup profile error: " + error);
-        }
-      }
-    })
-  }
-
-  //Returns the current profile loaded to the headseth.
-   getCurrentProfile = async (authToken: string, headsetId: string) => {
-    const SETUP_PROFILE_ID = 7;
-    let currentProfileRequest = {
-      "id": 1,
-      "jsonrpc": "2.0",
-      "method": "getCurrentProfile",
-      "params": {
-          "cortexToken": authToken,
-          "headset": headsetId,
-      }
-  }
-    return new Promise<string>((resolve) => {
-      this._socket.send(JSON.stringify(currentProfileRequest));
-      this._socket.onmessage = ({ data }: MessageEvent) => {
-        try {
-          if (data.indexOf('error') !== -1) {
-            console.log('was an error');
-            resolve(data);
-          } else {
-            resolve(data);
-          }
-        } catch (error) {
-          resolve('get current profile error');
+          resolve('setup profile error: ');
+          console.log('setup profile error: ' + error);
         }
       };
     });
-  }
+  };
+
+  //Returns the current profile loaded to the headseth.
+  getCurrentProfile = async (authToken: string, headsetId: string) => {
+    let currentProfileRequest = {
+      id: 1,
+      jsonrpc: '2.0',
+      method: 'getCurrentProfile',
+      params: {
+        cortexToken: authToken,
+        headset: headsetId,
+      },
+    };
+    return new Promise<string>((resolve, reject) => {
+      this._socket.send(JSON.stringify(currentProfileRequest));
+      this._socket.onmessage = ({ data }: MessageEvent) => {
+        try {
+          let dataString = JSON.stringify(data);
+          if (dataString.indexOf('error') === -1) {
+            resolve(data);
+          }
+        } catch (error) {
+          reject('Get current profile error');
+        }
+      };
+    });
+  };
 
   //Gets all the available profiles
-   queryProfileRequest = async (authToken: String) => {
+  queryProfileRequest = async (authToken: String) => {
     const QUERY_PROFILE_ID = 9;
     let queryProfileRequest = {
-      "jsonrpc": "2.0",
-      "method": "queryProfile",
-      "params": {
-        "cortexToken": authToken
+      jsonrpc: '2.0',
+      method: 'queryProfile',
+      params: {
+        cortexToken: authToken,
       },
-      "id": QUERY_PROFILE_ID
-    }
+      id: QUERY_PROFILE_ID,
+    };
 
     return new Promise<string[]>((resolve, reject) => {
       this._socket.send(JSON.stringify(queryProfileRequest));
@@ -394,10 +372,12 @@ class CortexDriver {
             }
             resolve(profileNames);
           }
-        } catch (error) {}
+        } catch (error) {
+          reject('Query all profiles error');
+        }
       };
     });
-  }
+  };
 }
 
 export { CortexDriver };
