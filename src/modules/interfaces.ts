@@ -84,15 +84,15 @@ interface CreateSessionResponse {
 }
 
 export {
-  RequestAccessResponse as RequestAccessObject,
+  RequestAccessResponse,
   RequestAccessResult,
   SetupProfileObject,
   SetupProfileResult,
-  QueryHeadsetIdResponse as QueryHeadsetIdObject,
+  QueryHeadsetIdResponse,
   QueryHeadsetIdResult,
-  QueryProfileResponse as QueryProfileObject,
+  QueryProfileResponse,
   QueryProfileResult,
-  ControlDeviceResponse as ControlDeviceObject,
+  ControlDeviceResponse,
   AuthorizeResponse,
   CreateSessionResponse
 };
