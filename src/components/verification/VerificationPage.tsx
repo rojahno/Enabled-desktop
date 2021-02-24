@@ -39,15 +39,12 @@ const VerificationPage = (_props: any) => {
           const requestAccess: string = await driver.requestAccess();
           setrequestAcceess(requestAccess);
         }
-        console.log('Før queryheadsetid');
         //-----------------------------
         const id: string = await driver.queryHeadsetId();
         setHeadsetID(id);
         //-----------------------------
-        console.log('før controldevice');
         const controlID: string = await driver.controlDevice(id);
         setDeviceData(controlID);
-        console.log('før authorize');
         //-----------------------------
         const authToken: string = await driver.authorize();
         //authToken = authToken.slice(0,20);
@@ -59,15 +56,14 @@ const VerificationPage = (_props: any) => {
         );
         setCurrentProfile(currentProfile);
       } catch (error) {
-        //if (typeof error === 'string') {
+        if (typeof error === 'string') {
           setErrorMsg(error);
-       // } else {
-        //  setErrorMsg('An error has occured');
-       // }
+        } else {
+          setErrorMsg('An error has occured');
+        }
       }
     };
   }, []);
-  
 
   return (
     <div className={classes.root}>
@@ -76,7 +72,7 @@ const VerificationPage = (_props: any) => {
         <p>Request access:{requestAcceess} </p>
         <p>Headset connected:{headsetID} </p>
         <p>Device data:{deviceData} </p>
-        <p>Token:{token} </p>
+        <p>Token:{} </p>
         <p>Current profile: {currentProfile}</p>
         <p>Error:{errorMsg} </p>
 

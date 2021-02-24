@@ -1,25 +1,26 @@
 import {
   AuthorizeResponse,
-  ControlDeviceObject,
+  ControlDeviceResponse,
   CreateSessionResponse,
-  QueryHeadsetIdObject,
-  QueryProfileObject,
-  RequestAccessObject,
+  QueryHeadsetIdResponse,
+  QueryProfileResponse,
+  RequestAccessResponse,
   SetupProfileObject,
 } from './interfaces';
 
-require('events').EventEmitter.defaultMaxListeners = 15;
-//TODO
-// - Handle rejects in async functions.
-// - Handle errors being thrown.
-//
-// ---------------------------------------------------------
 /**
- * This class handle:
- *  - create webthis._socket connection
- *  - handle request for : headset , request access, control headset ...
- *  - handle 2 main flows : sub and train flow
- *  - use async/await and Promise for request need to be run on sync
+ * @todo check out event emitter
+ */
+//require('events').EventEmitter.defaultMaxListeners = 15;
+
+/**
+ * This class works as a connection between an app and the Emotiv API. 
+ * 
+ * The class handles:
+ *  - Create socket connection
+ *  - Handles request for : headset, request access, control headset ...
+ *  - Handle sub main flow.
+ *  - Uses async/await and Promise for request need to be run on sync
  */
 class CortexDriver {
   private _socket: WebSocket;
@@ -40,7 +41,12 @@ class CortexDriver {
     return this._socket;
   }
 
-  // Find and connects a headset. If there are more than one headset it connects to the first headset.
+  /**
+   * Find and connects a headset. If there are more than one
+   * headset it connects to the first headset found.
+   *
+   * @returns the headseth id
+   */
   async queryHeadsetId() {
     const QUERY_HEADSET_ID = 2;
     let queryHeadsetRequest = {
@@ -54,7 +60,7 @@ class CortexDriver {
       this._socket.send(JSON.stringify(queryHeadsetRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
-          let headsetQuery: QueryHeadsetIdObject = JSON.parse(data);
+          let headsetQuery: QueryHeadsetIdResponse = JSON.parse(data);
           let queryHeadsetId: number = headsetQuery.id;
 
           if (queryHeadsetId == QUERY_HEADSET_ID) {
@@ -72,10 +78,13 @@ class CortexDriver {
       };
     });
   }
+  /**
+   * Requests acces to the emotive app. When the script calls this method for the first time
+   * a display message is shown in the Emotiv app.
+   * @returns true and a message string if the user accepts and false and a message string otherwise.
+   * @todo change return value
+   */
 
-  //Requests acces to the emotive app. When the script calls this method for the first time
-  //a display message is shown in the Emotiv app.
-  //Returns true and a message string if the user accepts and false and a message string otherwise.
   requestAccess = async (): Promise<string> => {
     return new Promise<string>((resolve, reject) => {
       const REQUEST_ACCESS_ID = 1;
@@ -91,8 +100,8 @@ class CortexDriver {
       this._socket.send(JSON.stringify(requestAccessRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
-          let parsed: RequestAccessObject = JSON.parse(data);
-          if (parsed['id'] == REQUEST_ACCESS_ID) {
+          let parsed: RequestAccessResponse = JSON.parse(data);
+          if (parsed.id == REQUEST_ACCESS_ID) {
             resolve(data);
           }
         } catch (error) {
@@ -102,7 +111,11 @@ class CortexDriver {
     });
   };
 
-  // Generates the Cortex token. The token can be used for 2 days.
+  /**
+   * Generates the Cortex token. The token can be used for 2 days.
+   *
+   * @returns the Cortex token
+   */
   authorize = async (): Promise<string> => {
     console.log('authorize is called');
     return new Promise<string>((resolve, reject) => {
@@ -132,7 +145,11 @@ class CortexDriver {
     });
   };
 
-  // Connects to the headset.
+  /** Connects to the headset.
+   *
+   * @returns an response object from the Emotive API.
+   * @todo change return value
+   * */
   controlDevice(headsetId: string) {
     const CONTROL_DEVICE_ID = 3;
     let controlDeviceRequest = {
@@ -148,7 +165,7 @@ class CortexDriver {
       this._socket.send(JSON.stringify(controlDeviceRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
-          let parsedData: ControlDeviceObject = JSON.parse(data);
+          let parsedData: ControlDeviceResponse = JSON.parse(data);
           if (parsedData.id == CONTROL_DEVICE_ID) {
             resolve(data);
           }
@@ -159,8 +176,11 @@ class CortexDriver {
     });
   }
 
-  // This method is to subscribe to one or more data strams. After you successfully subscribe
-  // Cortex will keep sending data sample objects.
+  /** This method is to subscribe to one or more data streams. After you successfully subscribe
+   * Cortex will keep sending data sample objects.
+   *
+   * @returns The data sample obejcts from the session.
+   */
   createSession = async (authToken: string, headsetId: string) => {
     const CREATE_SESSION_ID = 5;
     let createSessionRequest = {
@@ -213,9 +233,10 @@ class CortexDriver {
     };
   };
 
-  //This method is to get or set the active action for the mental command detection.
-  //If the status is "get" then the result is and array of strings.
-  //If the status is "set", then the result is an object with "action" and "message" as fields.
+  /** This method is to get or set the active action for the mental command detection.
+   *If the status is "get" then the result is and array of strings.
+   *If the status is "set", then the result is an object with "action" and "message" as fields.
+   */
   mentalCommandActiveActionRequest = (
     authToken: string,
     sessionId: string,
@@ -248,7 +269,11 @@ class CortexDriver {
       };
     });
   };
-
+/**
+ * Checks if ths application ahs access to the Emotiv App.
+ * 
+ * @returns true if it has access and rejects an error message if not.
+ */
   hasAccess = async () => {
     return new Promise<boolean>((resolve, reject) => {
       const REQUEST_ACCESS_ID = 1;
@@ -265,7 +290,7 @@ class CortexDriver {
       this._socket.send(JSON.stringify(requestAccessRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
-          let accessQuery: RequestAccessObject = JSON.parse(data);
+          let accessQuery: RequestAccessResponse = JSON.parse(data);
           if (accessQuery.id == REQUEST_ACCESS_ID) {
             resolve(accessQuery.result.accessGranted);
           }
@@ -276,6 +301,17 @@ class CortexDriver {
     });
   };
 
+  /**
+   * Sets the profile of the headset.
+   * 
+   * @param authToken The cortex token
+   * @param headsetId The headset id
+   * @param profileName The profile name you want to set
+   * @param status The status
+   * 
+   * @returns a response object from the Emotiv API.
+   * @todo change the return value.
+   */
   setupProfile = async (
     authToken: string,
     headsetId: string,
@@ -320,7 +356,16 @@ class CortexDriver {
     });
   };
 
-  //Returns the current profile loaded to the headseth.
+  /**
+   * 
+   * Gets the currently loaded profile.
+   * 
+   * @param authToken The cortex token.
+   * @param headsetId The headset id.
+   * 
+   * @returns an response object with the currently used profile.
+   * @todo change return value. 
+   */
   getCurrentProfile = async (authToken: string, headsetId: string) => {
     let currentProfileRequest = {
       id: 1,
@@ -346,7 +391,13 @@ class CortexDriver {
     });
   };
 
-  //Gets all the available profiles
+  /**
+   * Queries all the profiles saved on this user.
+   * 
+   * @param authToken The cortex token
+   * 
+   * @returns an array of strings with all the names of the profiles. 
+   */
   queryProfileRequest = async (authToken: String) => {
     const QUERY_PROFILE_ID = 9;
     let queryProfileRequest = {
@@ -362,7 +413,7 @@ class CortexDriver {
       this._socket.send(JSON.stringify(queryProfileRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
-          let profileQuery: QueryProfileObject = JSON.parse(data);
+          let profileQuery: QueryProfileResponse = JSON.parse(data);
           if (profileQuery.id == QUERY_PROFILE_ID) {
             let profiles = profileQuery.result;
             let profileNames = [];
