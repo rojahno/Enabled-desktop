@@ -67,10 +67,11 @@ const VerificationPage = (_props: any) => {
   const [token, setToken] = useState('');
   const [currentProfile, setCurrentProfile] = useState('');
 
-  let driver: CortexDriver = new CortexDriver();
-  let webSocket = driver.socket;
-
+  
   useEffect(() => {
+    let driver: CortexDriver = new CortexDriver();
+    let webSocket = driver.socket;
+
     webSocket.onopen = async () => {
       try {
         //-----------------------------
@@ -82,21 +83,25 @@ const VerificationPage = (_props: any) => {
           const requestAccess: string = await driver.requestAccess();
           setrequestAcceess(requestAccess);
         }
+        console.log("Før queryheadsetid")
         //-----------------------------
         const id: string = await driver.queryHeadsetId();
         setHeadsetID(id);
         //-----------------------------
-        const controlID: string = await driver.controlDevice(headsetID);
+        console.log("før controldevice")
+        const controlID: string = await driver.controlDevice(id);
         setDeviceData(controlID);
+        console.log("før authorize")
         //-----------------------------
         const authToken:string = await driver.authorize();
         //authToken = authToken.slice(0,20);
         setToken(authToken);
         //-----------------------------
-        //const currentProfile:string = await driver.getCurrentProfile(token, id);
-        //setCurrentProfile(currentProfile);
+        const currentProfile:string = await driver.getCurrentProfile(authToken, id);
+        setCurrentProfile(currentProfile);
         
 
+        
       } catch (error) {
         setErrorMsg(error);
       }

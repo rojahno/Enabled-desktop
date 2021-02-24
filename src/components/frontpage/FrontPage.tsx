@@ -36,7 +36,10 @@ export default function FrontPage(_props: any) {
         <CustomInput />
         <CustomDialog />
         <Link to="/verification">
-          <button>Connect</button>
+          <button>verification</button>
+        </Link>
+        <Link to="/main">
+          <button>Main</button>
         </Link>
       </SimplePaper>
     </div>
