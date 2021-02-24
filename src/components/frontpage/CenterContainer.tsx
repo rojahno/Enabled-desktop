@@ -1,24 +1,8 @@
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import React from 'react';
-import backgroundImage from './../../../assets/background.jpg'
 import FrontPage from './FrontPage';
 
-const useStyles = makeStyles(function (theme: Theme) {
-    return createStyles({
-      root: {
-        display: 'flex',
-        flexWrap: 'wrap',
-      },
-      margin: {
-        margin: theme.spacing(1),
-      },
-    });
-  }
-);
-
-class centerContainer extends React.Component {
-
-  render() {
+export default function centerContainer(_props: any) {
+ 
     return (
         <div className="frontpage-container">
           <h2>
@@ -28,6 +12,3 @@ class centerContainer extends React.Component {
         </div>
     );
   }
-}
-
-export default centerContainer;

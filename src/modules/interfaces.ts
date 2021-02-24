@@ -59,4 +59,15 @@ interface QueryProfileResult{
     name: string,
 }
 
-export {RequestAccessObject,RequestAccessResult,SetupProfileObject, SetupProfileResult,QueryHeadsetIdObject,QueryHeadsetIdResult, QueryProfileObject,QueryProfileResult} ;
+interface ControlDeviceObject{
+    
+        id: number,
+        jsonrpc: string,
+        result: {
+            command: string,
+            message: string
+        }
+    
+}
+
+export {RequestAccessObject,RequestAccessResult,SetupProfileObject, SetupProfileResult,QueryHeadsetIdObject,QueryHeadsetIdResult, QueryProfileObject,QueryProfileResult,ControlDeviceObject } ;

@@ -47,7 +47,7 @@ class Main extends React.Component {
     try {
       let accessGranted: boolean = await hasAccess(webSocket, user);
       console.log('bool' + accessGranted);
-      this.setState({ hasAccess: accessGranted });
+      this.setState({hasAccess: accessGranted });
 
       if (!accessGranted) {
         let access: string = await requestAccess(webSocket, user);

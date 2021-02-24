@@ -6,7 +6,6 @@ import {
   SetupProfileObject,
 } from './interfaces';
 
-//let WebSocket = require('isomorphic-ws');
 require('events').EventEmitter.defaultMaxListeners = 15;
 //TODO 
 // - Refactor the code for our use.
@@ -16,6 +15,7 @@ require('events').EventEmitter.defaultMaxListeners = 15;
 // - Create test classes.
 //
 // ---------------------------------------------------------    
+
 
 
   // Find and connects a headset. If there are more than one headset it connects to the first headset.
@@ -354,6 +354,8 @@ async function queryProfileRequest(socket:WebSocket,authToken:String) {
       }
     });
   }
+
+  
 
 export {
   queryHeadsetId,

@@ -2,8 +2,7 @@ import React from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import CustomInput from './customInput';
 import CustomDialog from './CustomDialog';
-import SimplePaper from './SimplePaper';
-import Main from '../Main';
+import SimplePaper from '../SimplePaper';
 import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -36,8 +35,11 @@ export default function FrontPage(_props: any) {
         <h3>Add the IP of your phone</h3>
         <CustomInput />
         <CustomDialog />
-        <Link to="/settings">
-          <button>Connect</button>
+        <Link to="/verification">
+          <button>verification</button>
+        </Link>
+        <Link to="/main">
+          <button>Main</button>
         </Link>
       </SimplePaper>
     </div>

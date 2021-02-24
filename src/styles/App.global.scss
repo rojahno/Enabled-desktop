@@ -12,14 +12,7 @@ body {
 
   font-family: sans-serif;
   overflow-y: hidden;
-
   width: 100vw;
-  // background: linear-gradient(
-  //   200.96deg,
-  //   #fedc2a -29.09%,
-  //   #dd5789 51.77%,
-  //   #7a2c9e 129.35%
-  // );
 
   background: url('../images/desktopappbackground.png') no-repeat center center fixed;
   background-size: cover;
@@ -66,6 +59,7 @@ button {
     0px 18px 88px -4px rgba(111, 117, 133, 0.14);
   transition: transform ease-in 0.1s;
 }
+p{margin:5px}
 
 button:hover {
   transform: scale(1.05);
