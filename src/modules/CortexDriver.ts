@@ -59,12 +59,13 @@ class CortexDriver {
             if (headsetQuery.result.length > 0) {
               let headsetId: string = headsetQuery.result[0].id;
               resolve(headsetId);
-            } 
+            }
           }
         } catch (error) {}
-        reject(
-          'Cant find any headset. Please connect a headset to your pc.'
-        );
+        const rejectString =
+          'Cant find any headset. Please connect a headset to your pc and ' +
+          'check if the headseth is connected to the Emotive app';
+        reject(rejectString);
       };
     });
   }
@@ -99,7 +100,8 @@ class CortexDriver {
   }
 
   // Generates the Cortex token. The token can be used for 2 days.
-  async authorize() {
+  async authorize(): Promise<string> {
+    console.log('authorize is called');
     return new Promise<string>((resolve, reject) => {
       const AUTHORIZE_ID = 4;
       let authorizeRequest = {
@@ -121,6 +123,7 @@ class CortexDriver {
             resolve(cortexToken);
           }
         } catch (error) {}
+        resolve('Authorize error');
       };
     });
   }
@@ -144,7 +147,9 @@ class CortexDriver {
           if (JSON.parse(data)['id'] == CONTROL_DEVICE_ID) {
             resolve(data);
           }
-        } catch (error) {}
+        } catch (error) {
+          reject('control device error');
+        }
       };
     });
   }
@@ -251,11 +256,10 @@ class CortexDriver {
         try {
           let accessQuery: RequestAccessObject = JSON.parse(data);
           if (accessQuery.id == REQUEST_ACCESS_ID) {
-            console.log('request parsed: ' + accessQuery);
             resolve(accessQuery.result.accessGranted);
           }
         } catch (error) {
-          reject(new Error("Can't access the Emotive App"));
+          reject("Can't access the Emotive App");
         }
       };
     });
@@ -284,8 +288,7 @@ class CortexDriver {
             resolve(data);
           }
         } catch (error) {
-          resolve(error);
-          console.log('current profile error: ' + error);
+          resolve("get current profile error");
         }
       };
     });
@@ -318,9 +321,7 @@ class CortexDriver {
 
             resolve(profileNames);
           }
-        } catch (error) {
-          console.log('Query profile request' + error);
-        }
+        } catch (error) {}
       };
     });
   }
