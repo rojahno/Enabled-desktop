@@ -15,12 +15,13 @@ import {
 
 /**
  * This class works as a connection between an app and the Emotiv API. 
+ * This class uses async/await and Promise for request and needs to be run on sync.
  * 
  * The class handles:
  *  - Create socket connection
  *  - Handles request for : headset, request access, control headset ...
  *  - Handle sub main flow.
- *  - Uses async/await and Promise for request need to be run on sync
+ *  
  */
 class CortexDriver {
   private _socket: WebSocket;

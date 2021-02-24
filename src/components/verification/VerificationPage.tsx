@@ -35,7 +35,6 @@ const VerificationPage = (_props: any) => {
         setAccess(accessGranted);
         //-----------------------------
         if (!accessGranted) {
-          //Maybe throw error, since they need to accept it on the emotive app???
           const requestAccess: string = await driver.requestAccess();
           setrequestAcceess(requestAccess);
         }
