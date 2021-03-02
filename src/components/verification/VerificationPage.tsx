@@ -3,6 +3,7 @@ import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import SimplePaper from '../SimplePaper';
 import { Link } from 'react-router-dom';
 import { CortexDriver } from '../../modules/CortexDriver';
+import { MobileDriver } from '../../modules/MobileDriver';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -14,6 +15,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+const mobileDriver = null;
 const VerificationPage = (_props: any) => {
   const classes = useStyles();
   const [access, setAccess] = useState(false);
@@ -27,7 +29,7 @@ const VerificationPage = (_props: any) => {
   useEffect(() => {
     let driver: CortexDriver = new CortexDriver();
     let webSocket = driver.socket;
-
+/*
     webSocket.onopen = async () => {
       try {
         //-----------------------------
@@ -62,6 +64,27 @@ const VerificationPage = (_props: any) => {
         }
       }
     };
+*/
+    let mobile: MobileDriver = new MobileDriver();
+    let mobileSocket = mobile.socket;
+    console.log(mobileSocket);
+    mobileSocket.onopen =async() =>{
+      console.log("er her");
+      try{
+        console.log("Før send something");
+         mobile.sendSomething("hei");
+         console.log("etter send something");
+      }
+      catch(error){
+        alert('fucked up');
+      }
+    }
+    mobileSocket.onerror = () =>{
+      console.log("on error");
+      
+    }
+    
+    
   }, []);
 
   return (
