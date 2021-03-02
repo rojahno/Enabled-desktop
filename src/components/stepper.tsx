@@ -1,5 +1,5 @@
 import React from 'react';
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
+import { makeStyles, Theme, createStyles,styled } from '@material-ui/core/styles';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
@@ -7,11 +7,18 @@ import StepContent from '@material-ui/core/StepContent';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
+import VerificationPage from './verification/VerificationPage';
+
+const StyledStepLabel = styled(StepLabel)({
+  '& .MuiStepLabel-label': {
+    color: '#fff'
+  }
+});
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      width: '100%',
+      width: '35%',
     },
     
     button: {
@@ -27,7 +34,7 @@ const useStyles = makeStyles((theme: Theme) =>
     text:{
         color: '#fff',
         backgroundColor: '#ffffff27'
-    }
+    },
   }),
 );
 
@@ -75,7 +82,7 @@ export default function VerticalLinearStepper() {
       <Stepper className={classes.text} activeStep={activeStep} orientation="vertical">
         {steps.map((label, index) => (
           <Step key={label}>
-            <StepLabel>{label}</StepLabel>
+            <StyledStepLabel>{label}</StyledStepLabel>
             <StepContent>
               <Typography>{getStepContent(index)}</Typography>
               <div className={classes.actionsContainer}>

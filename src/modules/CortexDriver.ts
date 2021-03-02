@@ -24,6 +24,7 @@ import {
  *  
  */
 class CortexDriver {
+  private static instance: CortexDriver;
   private _socket: WebSocket;
   private _user: any;
 
@@ -37,7 +38,13 @@ class CortexDriver {
       debit: 1,
     };
   }
-
+  static getInstance(){
+    if(CortexDriver.instance){
+      return CortexDriver.instance
+    }
+    CortexDriver.instance = new CortexDriver();
+    return CortexDriver.instance
+  }
   public get socket() {
     return this._socket;
   }

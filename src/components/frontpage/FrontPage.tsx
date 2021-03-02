@@ -4,6 +4,7 @@ import CustomInput from './customInput';
 import CustomDialog from './CustomDialog';
 import SimplePaper from '../SimplePaper';
 import { Link } from 'react-router-dom';
+import VerticalLinearStepper from '../stepper'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -22,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: 'center',
       backgroundColor: '#ffffff95',
     },
-  })
+    })
 );
 
 
