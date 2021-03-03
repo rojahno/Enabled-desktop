@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme: Theme) =>
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor:"#ffffff95"
+      backgroundColor:"#ffffffaa"
     },
   })
 );
