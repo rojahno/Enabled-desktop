@@ -28,7 +28,7 @@ class CortexDriver {
   private _socket: WebSocket;
   private _user: any;
 
-  constructor() {
+  private constructor() {
     this._socket = new WebSocket('wss://localhost:6868');
     this._user = {
       license: '',

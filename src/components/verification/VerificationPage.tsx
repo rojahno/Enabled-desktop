@@ -30,9 +30,9 @@ const VerificationPage = (_props: any) => {
   const [currentProfile, setCurrentProfile] = useState('');
 
   useEffect(() => {
-    let driver: CortexDriver = new CortexDriver();
+    let driver: CortexDriver = CortexDriver.getInstance();
     let webSocket = driver.socket;
-/*
+
     webSocket.onopen = async () => {
       try {
         //-----------------------------
@@ -67,7 +67,7 @@ const VerificationPage = (_props: any) => {
         }
       }
     };
-*/
+
     let mobile: MobileDriver = new MobileDriver();
     let mobileSocket = mobile.socket;
     console.log(mobileSocket);
