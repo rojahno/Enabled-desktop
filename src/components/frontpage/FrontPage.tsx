@@ -4,6 +4,7 @@ import CustomInput from './customInput';
 import CustomDialog from './CustomDialog';
 import SimplePaper from '../SimplePaper';
 import { Link } from 'react-router-dom';
+import VerticalLinearStepper from '../stepper'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -22,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: 'center',
       backgroundColor: '#ffffff95',
     },
-  })
+    })
 );
 
 
@@ -36,7 +37,10 @@ export default function FrontPage(_props: any) {
         <CustomInput />
         <CustomDialog />
         <Link to="/verification">
-          <button>Connect</button>
+          <button>verification</button>
+        </Link>
+        <Link to="/main">
+          <button>Main</button>
         </Link>
       </SimplePaper>
     </div>
