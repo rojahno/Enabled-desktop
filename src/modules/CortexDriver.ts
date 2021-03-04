@@ -359,7 +359,7 @@ class CortexDriver {
     this._socket.send(JSON.stringify(subRequest));
     this._socket.onmessage = ({ data }: MessageEvent) => {
       try {
-        console.log("stop stream: " + data);
+        //console.log("stop stream: " + data);
       } catch (error) {
         console.error('Sub request error');
       }
@@ -526,6 +526,37 @@ class CortexDriver {
     });
   };
 
+  public setSensitivity = async (
+    authToken: string,
+    profile: string,
+    session:string,
+    values:number[],
+  ): Promise<string> => {
+    let currentProfileRequest = {
+      id: 1,
+      jsonrpc: '2.0',
+      method: 'mentalCommandActionSensitivity',
+      params: {
+        cortexToken: authToken,
+        profile: profile,
+        session:session,
+        status:'set',
+        values:values,
+      },
+    };
+    return new Promise<string>((resolve, reject) => {
+      this._socket.send(JSON.stringify(currentProfileRequest));
+      this._socket.onmessage = ({ data }: MessageEvent) => {
+        try {
+            console.log(data);
+        
+        } catch (error) {
+          reject('set sensitivity profile error');
+        }
+      };
+    });
+  };
+
   /**
    * Queries all the profiles saved on this user.
    *
@@ -569,11 +600,16 @@ class CortexDriver {
     this.observers.push(observer);
   }
 
+  /**
+   * 
+   * @param observer the observer to remove
+   * @todo check if filter logic i correct??
+   */
   public unsubscribe(observer: StreamObserver) {
     let observerToRemove = observer;
-    this.observers = [];
-    //this.observers.filter((item) => item !== observerToRemove);
-    console.table(this.observers);
+    console.log(this.observers);
+    this.observers = this.observers.filter((item) => item !== observerToRemove);
+    console.log(this.observers);
   }
 
   private notify(streamCommand: string) {

@@ -43,7 +43,7 @@ const VerificationPage = (_props: any) => {
 
     const offLoad = () => {
     driver.unsubscribe(onStreamUpdated);
-    driver.stopStream(token,sessionId);
+    driver.stopStream();
     }
 
     const setup = async () => {
@@ -77,6 +77,12 @@ const VerificationPage = (_props: any) => {
           id
         );
         setCurrentProfile(currentProfile);
+
+        await driver.setupProfile(authToken,id,"D7","load");
+        let sensitivity = [10,10,10,10];
+        await driver.setSensitivity(authToken,"D7",sessionId, sensitivity);
+
+
 
         driver.startStream(authToken, sessionId);
       } catch (error) {
@@ -121,7 +127,7 @@ const VerificationPage = (_props: any) => {
         <p>Device data:{deviceData} </p>
         <p>Token:{} </p>
         <p>Current profile: {currentProfile}</p>
-        <p>Error:{stream} </p>
+        <p>Stream:{stream} </p>
         <p>Error:{errorMsg} </p>
         <button>Try again</button>
       </SimplePaper>
