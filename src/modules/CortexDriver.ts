@@ -13,23 +13,27 @@ import {
  */
 //require('events').EventEmitter.defaultMaxListeners = 15;
 
+const CONNECTION_RETRY_INTERVAL = 5000; // in ms
+const CONNECTION_RETRY_MAX_COUNT = 60; // 60 times to retry x 5s = 5min of total retries
 /**
- * This class works as a connection between an app and the Emotiv API. 
+ * This class works as a connection between an app and the Emotiv API.
  * This class uses async/await and Promise for request and needs to be run on sync.
- * 
+ *
  * The class handles:
  *  - Create socket connection
  *  - Handles request for : headset, request access, control headset ...
  *  - Handle sub main flow.
- *  
+ *
  */
 class CortexDriver {
   private static instance: CortexDriver;
-  private _socket: WebSocket;
+  private _socket!: WebSocket;
   private _user: any;
+  private retryCount: number = 0;
+  private canReconnect = true;
 
   private constructor() {
-    this._socket = new WebSocket('wss://localhost:6868');
+    this.connect();
     this._user = {
       license: '',
       clientId: '0wyWnYNd61cedWF0Bp7AbZ10ogKlpa6EvgsH4DCV',
@@ -38,13 +42,77 @@ class CortexDriver {
       debit: 1,
     };
   }
-  static getInstance(){
-    if(CortexDriver.instance){
-      return CortexDriver.instance
+  static getInstance() {
+    if (CortexDriver.instance) {
+      return CortexDriver.instance;
     }
     CortexDriver.instance = new CortexDriver();
-    return CortexDriver.instance
+    return CortexDriver.instance;
   }
+
+  connect = () => {
+    this._socket = new WebSocket('wss://localhost:6868');
+
+    this.socket.onopen = () => {
+      console.log('WS OPENED ✅');
+
+      // reset the total retries
+      this.retryCount = 0;
+    };
+
+    this.socket.onerror = (error) => {
+      if (!this.canRetry()) {
+        console.log('An error happened');
+      }
+    };
+
+    this.socket.onclose = (error) => {
+      // if we aren't retrying...
+      if (!this.canRetry()) {
+        console.log('Closing');
+      }
+
+      // Reconnects if canRetry is true
+      if (this.retryCount < CONNECTION_RETRY_MAX_COUNT) {
+        setTimeout(this.reconnect, CONNECTION_RETRY_INTERVAL);
+      } else {
+        // we passed the threshold for retries, let's abort
+        this.retryCount = 0;
+      }
+    };
+  };
+  isConnected = () => {
+    return this.getStatus() === 'OPEN';
+  };
+
+  reconnect = () => {
+    this.retryCount++;
+    this.connect();
+  };
+  canRetry() {
+    return this.retryCount > 0;
+  }
+
+ 
+
+  getStatus = () => {
+    if (!this._socket) {
+      return 'ERROR: no socket';
+    }
+
+    switch (this._socket.readyState) {
+      case this._socket.OPEN:
+        return 'OPEN';
+      case this._socket.CLOSED:
+        return 'CLOSED';
+      case this._socket.CLOSING:
+        return 'CLOSING';
+      case this._socket.CONNECTING:
+        return 'CONNECTING';
+    }
+    return 'Unknown error';
+  };
+
   public get socket() {
     return this._socket;
   }
@@ -277,11 +345,11 @@ class CortexDriver {
       };
     });
   };
-/**
- * Checks if ths application ahs access to the Emotiv App.
- * 
- * @returns true if it has access and rejects an error message if not.
- */
+  /**
+   * Checks if ths application ahs access to the Emotiv App.
+   *
+   * @returns true if it has access and rejects an error message if not.
+   */
   hasAccess = async () => {
     return new Promise<boolean>((resolve, reject) => {
       const REQUEST_ACCESS_ID = 1;
@@ -311,12 +379,12 @@ class CortexDriver {
 
   /**
    * Sets the profile of the headset.
-   * 
+   *
    * @param authToken The cortex token
    * @param headsetId The headset id
    * @param profileName The profile name you want to set
    * @param status The status
-   * 
+   *
    * @returns a response object from the Emotiv API.
    * @todo change the return value.
    */
@@ -365,14 +433,14 @@ class CortexDriver {
   };
 
   /**
-   * 
+   *
    * Gets the currently loaded profile.
-   * 
+   *
    * @param authToken The cortex token.
    * @param headsetId The headset id.
-   * 
+   *
    * @returns an response object with the currently used profile.
-   * @todo change return value. 
+   * @todo change return value.
    */
   getCurrentProfile = async (authToken: string, headsetId: string) => {
     let currentProfileRequest = {
@@ -401,10 +469,10 @@ class CortexDriver {
 
   /**
    * Queries all the profiles saved on this user.
-   * 
+   *
    * @param authToken The cortex token
-   * 
-   * @returns an array of strings with all the names of the profiles. 
+   *
+   * @returns an array of strings with all the names of the profiles.
    */
   queryProfileRequest = async (authToken: String) => {
     const QUERY_PROFILE_ID = 9;

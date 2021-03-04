@@ -10,7 +10,7 @@ import {
   queryProfileRequest,
   requestAccess,
   setupProfile,
-} from './../modules/cortex copy';
+} from './../modules/CortexDriver';
 
 const webSocket = new WebSocket('wss://localhost:6868');
 const user = {

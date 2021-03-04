@@ -67,7 +67,7 @@ const VerificationPage = (_props: any) => {
         }
       }
     };
-
+/*
     let mobile: MobileDriver = new MobileDriver();
     let mobileSocket = mobile.socket;
     console.log(mobileSocket);
@@ -86,6 +86,7 @@ const VerificationPage = (_props: any) => {
       console.log("on error");
       
     }
+    */
     
     
   }, []);
