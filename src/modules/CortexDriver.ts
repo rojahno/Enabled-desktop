@@ -29,8 +29,7 @@ class CortexDriver {
   private static instance: CortexDriver;
   private _socket!: WebSocket;
   private _user: any;
-  private retryCount: number = 0;
-  private canReconnect = true;
+  private _retryCount: number = 0;
 
   private constructor() {
     this.connect();
@@ -42,7 +41,7 @@ class CortexDriver {
       debit: 1,
     };
   }
-  static getInstance() {
+  static getInstance():CortexDriver {
     if (CortexDriver.instance) {
       return CortexDriver.instance;
     }
@@ -50,52 +49,69 @@ class CortexDriver {
     return CortexDriver.instance;
   }
 
-  connect = () => {
+  /**
+   * Creates a connection to the websocket and sets the events.
+   */
+  private connect = () => {
     this._socket = new WebSocket('wss://localhost:6868');
 
     this.socket.onopen = () => {
       console.log('WS OPENED ✅');
 
       // reset the total retries
-      this.retryCount = 0;
+      this._retryCount = 0;
     };
 
-    this.socket.onerror = (error) => {
+    this.socket.onerror = (_error) => {
       if (!this.canRetry()) {
         console.log('An error happened');
       }
     };
 
-    this.socket.onclose = (error) => {
+    this.socket.onclose = (_error) => {
       // if we aren't retrying...
       if (!this.canRetry()) {
         console.log('Closing');
       }
 
       // Reconnects if canRetry is true
-      if (this.retryCount < CONNECTION_RETRY_MAX_COUNT) {
+      if (this._retryCount < CONNECTION_RETRY_MAX_COUNT) {
         setTimeout(this.reconnect, CONNECTION_RETRY_INTERVAL);
       } else {
         // we passed the threshold for retries, let's abort
-        this.retryCount = 0;
+        this._retryCount = 0;
       }
     };
   };
-  isConnected = () => {
+
+  /**
+   * Checks if the socket status is open
+   * @returns true if open.
+   */
+  isConnected = ():boolean => {
     return this.getStatus() === 'OPEN';
   };
 
-  reconnect = () => {
-    this.retryCount++;
+  /**
+   * Makes an attempt to reconect to the server.
+   **/
+  private reconnect = () => {
+    this._retryCount++;
     this.connect();
   };
-  canRetry() {
-    return this.retryCount > 0;
+
+  /**
+   * Checks if we can reconnect or we have reaches our maximun amount of tries.
+   **/
+  private canRetry(): boolean {
+    return this._retryCount > 0;
   }
 
- 
-
-  getStatus = () => {
+  /**
+   * Returns the socket status or an error string if no socket is found.
+   * @returns The socket status
+   */
+  public getStatus = (): string => {
     if (!this._socket) {
       return 'ERROR: no socket';
     }
@@ -123,7 +139,7 @@ class CortexDriver {
    *
    * @returns the headseth id
    */
-  async queryHeadsetId() {
+  public queryHeadsetId = async ():Promise<string> => {
     const QUERY_HEADSET_ID = 2;
     let queryHeadsetRequest = {
       jsonrpc: '2.0',
@@ -149,19 +165,19 @@ class CortexDriver {
         } catch (error) {}
         const rejectString =
           'Cant find any headset. Please connect a headset to your pc and ' +
-          'check if the headseth is connected to the Emotive app';
+          'check if the headseth is connected to the Emotiv app';
         reject(rejectString);
       };
     });
-  }
+  };
   /**
-   * Requests acces to the emotive app. When the script calls this method for the first time
+   * Requests acces to the emotiv app. When the script calls this method for the first time
    * a display message is shown in the Emotiv app.
    * @returns true and a message string if the user accepts and false and a message string otherwise.
    * @todo change return value
    */
 
-  requestAccess = async (): Promise<string> => {
+  public requestAccess = async (): Promise<string> => {
     return new Promise<string>((resolve, reject) => {
       const REQUEST_ACCESS_ID = 1;
       let requestAccessRequest = {
@@ -181,7 +197,7 @@ class CortexDriver {
             resolve(data);
           }
         } catch (error) {
-          reject("Can't access the Emotive application");
+          reject("Can't access the Emotiv application");
         }
       };
     });
@@ -192,7 +208,7 @@ class CortexDriver {
    *
    * @returns the Cortex token
    */
-  authorize = async (): Promise<string> => {
+  public authorize = async (): Promise<string> => {
     console.log('authorize is called');
     return new Promise<string>((resolve, reject) => {
       const AUTHORIZE_ID = 4;
@@ -223,10 +239,10 @@ class CortexDriver {
 
   /** Connects to the headset.
    *
-   * @returns an response object from the Emotive API.
+   * @returns an response object from the Emotiv API.
    * @todo change return value
    * */
-  controlDevice(headsetId: string) {
+  public controlDevice = (headsetId: string):Promise<string> => {
     const CONTROL_DEVICE_ID = 3;
     let controlDeviceRequest = {
       jsonrpc: '2.0',
@@ -237,7 +253,7 @@ class CortexDriver {
         headset: headsetId,
       },
     };
-    return new Promise<any>((resolve, reject) => {
+    return new Promise<string>((resolve, reject) => {
       this._socket.send(JSON.stringify(controlDeviceRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
@@ -250,14 +266,14 @@ class CortexDriver {
         }
       };
     });
-  }
+  };
 
   /** This method is to subscribe to one or more data streams. After you successfully subscribe
    * Cortex will keep sending data sample objects.
    *
    * @returns The data sample obejcts from the session.
    */
-  createSession = async (authToken: string, headsetId: string) => {
+  public createSession = async (authToken: string, headsetId: string):Promise<string> => {
     const CREATE_SESSION_ID = 5;
     let createSessionRequest = {
       jsonrpc: '2.0',
@@ -286,7 +302,11 @@ class CortexDriver {
   };
 
   //Unused method??
-  subRequest = (stream: string[], authToken: string, sessionId: string) => {
+  public subRequest = (
+    stream: string[],
+    authToken: string,
+    sessionId: string
+  ) => {
     const SUB_REQUEST_ID = 6;
     let subRequest = {
       jsonrpc: '2.0',
@@ -313,7 +333,7 @@ class CortexDriver {
    *If the status is "get" then the result is and array of strings.
    *If the status is "set", then the result is an object with "action" and "message" as fields.
    */
-  mentalCommandActiveActionRequest = (
+  public mentalCommandActiveActionRequest = (
     authToken: string,
     sessionId: string,
     profile: string,
@@ -350,7 +370,7 @@ class CortexDriver {
    *
    * @returns true if it has access and rejects an error message if not.
    */
-  hasAccess = async () => {
+  public hasAccess = async ():Promise<boolean> => {
     return new Promise<boolean>((resolve, reject) => {
       const REQUEST_ACCESS_ID = 1;
       let requestAccessRequest = {
@@ -371,7 +391,7 @@ class CortexDriver {
             resolve(accessQuery.result.accessGranted);
           }
         } catch (error) {
-          reject("Can't access the Emotive App");
+          reject("Can't access the Emotiv App");
         }
       };
     });
@@ -388,12 +408,12 @@ class CortexDriver {
    * @returns a response object from the Emotiv API.
    * @todo change the return value.
    */
-  setupProfile = async (
+  public setupProfile = async (
     authToken: string,
     headsetId: string,
     profileName: string,
     status: string
-  ) => {
+  ):Promise<string> => {
     const SETUP_PROFILE_ID = 7;
     let setupProfileRequest = {
       jsonrpc: '2.0',
@@ -442,7 +462,7 @@ class CortexDriver {
    * @returns an response object with the currently used profile.
    * @todo change return value.
    */
-  getCurrentProfile = async (authToken: string, headsetId: string) => {
+  public getCurrentProfile = async (authToken: string, headsetId: string):Promise<string> => {
     let currentProfileRequest = {
       id: 1,
       jsonrpc: '2.0',
@@ -474,7 +494,7 @@ class CortexDriver {
    *
    * @returns an array of strings with all the names of the profiles.
    */
-  queryProfileRequest = async (authToken: String) => {
+  public queryProfileRequest = async (authToken: string) => {
     const QUERY_PROFILE_ID = 9;
     let queryProfileRequest = {
       jsonrpc: '2.0',

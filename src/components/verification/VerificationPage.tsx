@@ -6,7 +6,7 @@ import { CortexDriver } from '../../modules/CortexDriver';
 import VerticalLinearStepper from '../stepper';
 import { MobileDriver } from '../../modules/MobileDriver';
 
-useState
+useState;
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -33,9 +33,9 @@ const VerificationPage = (_props: any) => {
     let driver: CortexDriver = CortexDriver.getInstance();
     let webSocket = driver.socket;
 
-      const setup = async() =>{
-        console.log("setup called");
-        try{
+    const setup = async () => {
+      console.log('setup called');
+      try {
         //-----------------------------
         const accessGranted: boolean = await driver.hasAccess();
         setAccess(accessGranted);
@@ -67,7 +67,7 @@ const VerificationPage = (_props: any) => {
         }
       }
     };
-/*
+    /*
     let mobile: MobileDriver = new MobileDriver();
     let mobileSocket = mobile.socket;
     console.log(mobileSocket);
@@ -87,7 +87,7 @@ const VerificationPage = (_props: any) => {
       
     }
     */
-    
+
     setup();
   }, []);
 
