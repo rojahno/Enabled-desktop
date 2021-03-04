@@ -1,3 +1,4 @@
+import { resolve } from 'path';
 import {
   AuthorizeResponse,
   ControlDeviceResponse,
@@ -15,6 +16,8 @@ import {
 
 const CONNECTION_RETRY_INTERVAL = 5000; // in ms
 const CONNECTION_RETRY_MAX_COUNT = 60; // 60 times to retry x 5s = 5min of total retries
+
+type StreamObserver = (streamCommand: string) => void;
 /**
  * This class works as a connection between an app and the Emotiv API.
  * This class uses async/await and Promise for request and needs to be run on sync.
@@ -30,6 +33,10 @@ class CortexDriver {
   private _socket!: WebSocket;
   private _user: any;
   private _retryCount: number = 0;
+  private observers: StreamObserver[] = [];
+
+  private cortexToken:string = "";
+  private sessionId:string = "";
 
   private constructor() {
     this.connect();
@@ -41,7 +48,7 @@ class CortexDriver {
       debit: 1,
     };
   }
-  static getInstance():CortexDriver {
+  static getInstance(): CortexDriver {
     if (CortexDriver.instance) {
       return CortexDriver.instance;
     }
@@ -88,7 +95,7 @@ class CortexDriver {
    * Checks if the socket status is open
    * @returns true if open.
    */
-  isConnected = ():boolean => {
+  public isConnected = (): boolean => {
     return this.getStatus() === 'OPEN';
   };
 
@@ -139,7 +146,7 @@ class CortexDriver {
    *
    * @returns the headseth id
    */
-  public queryHeadsetId = async ():Promise<string> => {
+  public queryHeadsetId = async (): Promise<string> => {
     const QUERY_HEADSET_ID = 2;
     let queryHeadsetRequest = {
       jsonrpc: '2.0',
@@ -225,10 +232,12 @@ class CortexDriver {
       };
       this._socket.send(JSON.stringify(authorizeRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
+        console.log('auth data: ' + data);
         try {
           let parsed: AuthorizeResponse = JSON.parse(data);
           if (parsed.id == AUTHORIZE_ID) {
             let cortexToken: string = parsed.result.cortexToken;
+            this.cortexToken = cortexToken;
             resolve(cortexToken);
           }
         } catch (error) {}
@@ -242,7 +251,7 @@ class CortexDriver {
    * @returns an response object from the Emotiv API.
    * @todo change return value
    * */
-  public controlDevice = (headsetId: string):Promise<string> => {
+  public controlDevice = (headsetId: string): Promise<string> => {
     const CONTROL_DEVICE_ID = 3;
     let controlDeviceRequest = {
       jsonrpc: '2.0',
@@ -273,7 +282,10 @@ class CortexDriver {
    *
    * @returns The data sample obejcts from the session.
    */
-  public createSession = async (authToken: string, headsetId: string):Promise<string> => {
+  public createSession = async (
+    authToken: string,
+    headsetId: string
+  ): Promise<string> => {
     const CREATE_SESSION_ID = 5;
     let createSessionRequest = {
       jsonrpc: '2.0',
@@ -292,6 +304,7 @@ class CortexDriver {
           let parsed: CreateSessionResponse = JSON.parse(data);
           if (parsed.id == CREATE_SESSION_ID) {
             let sessionId: string = parsed.result.id;
+            this.sessionId = sessionId;
             resolve(sessionId);
           }
         } catch (error) {
@@ -301,12 +314,13 @@ class CortexDriver {
     });
   };
 
-  //Unused method??
-  public subRequest = (
-    stream: string[],
-    authToken: string,
-    sessionId: string
-  ) => {
+  /**
+   *
+   * @param authToken
+   * @param sessionId
+   * Starts the stream and notifies the observers.
+   */
+  public startStream = (authToken: string, sessionId: string) => {
     const SUB_REQUEST_ID = 6;
     let subRequest = {
       jsonrpc: '2.0',
@@ -314,7 +328,7 @@ class CortexDriver {
       params: {
         cortexToken: authToken,
         session: sessionId,
-        streams: stream,
+        streams: ['com'],
       },
       id: SUB_REQUEST_ID,
     };
@@ -322,13 +336,35 @@ class CortexDriver {
     this._socket.send(JSON.stringify(subRequest));
     this._socket.onmessage = ({ data }: MessageEvent) => {
       try {
-        console.log(data);
+        this.notify(data);
       } catch (error) {
         console.error('Sub request error');
       }
     };
   };
 
+  public stopStream = async () => {
+    const SUB_REQUEST_ID = 6;
+    let subRequest = {
+      jsonrpc: '2.0',
+      method: 'updateSession',
+      params: {
+        cortexToken: this.cortexToken,
+        session: this.sessionId,
+        status: 'close',
+      },
+      id: SUB_REQUEST_ID,
+    };
+      if(this.cortexToken)
+    this._socket.send(JSON.stringify(subRequest));
+    this._socket.onmessage = ({ data }: MessageEvent) => {
+      try {
+        console.log("stop stream: " + data);
+      } catch (error) {
+        console.error('Sub request error');
+      }
+    };
+  };
   /** This method is to get or set the active action for the mental command detection.
    *If the status is "get" then the result is and array of strings.
    *If the status is "set", then the result is an object with "action" and "message" as fields.
@@ -370,7 +406,7 @@ class CortexDriver {
    *
    * @returns true if it has access and rejects an error message if not.
    */
-  public hasAccess = async ():Promise<boolean> => {
+  public hasAccess = async (): Promise<boolean> => {
     return new Promise<boolean>((resolve, reject) => {
       const REQUEST_ACCESS_ID = 1;
       let requestAccessRequest = {
@@ -413,7 +449,7 @@ class CortexDriver {
     headsetId: string,
     profileName: string,
     status: string
-  ):Promise<string> => {
+  ): Promise<string> => {
     const SETUP_PROFILE_ID = 7;
     let setupProfileRequest = {
       jsonrpc: '2.0',
@@ -462,7 +498,10 @@ class CortexDriver {
    * @returns an response object with the currently used profile.
    * @todo change return value.
    */
-  public getCurrentProfile = async (authToken: string, headsetId: string):Promise<string> => {
+  public getCurrentProfile = async (
+    authToken: string,
+    headsetId: string
+  ): Promise<string> => {
     let currentProfileRequest = {
       id: 1,
       jsonrpc: '2.0',
@@ -525,6 +564,21 @@ class CortexDriver {
       };
     });
   };
+
+  public async subscribe(observer: StreamObserver) {
+    this.observers.push(observer);
+  }
+
+  public unsubscribe(observer: StreamObserver) {
+    let observerToRemove = observer;
+    this.observers = [];
+    //this.observers.filter((item) => item !== observerToRemove);
+    console.table(this.observers);
+  }
+
+  private notify(streamCommand: string) {
+    this.observers.forEach((observer) => observer(streamCommand));
+  }
 }
 
-export { CortexDriver };
+export { CortexDriver, StreamObserver };
