@@ -7,8 +7,14 @@ import centerContainer from './components/frontpage/CenterContainer';
 import SettingsDialogue from './components/settings/SettingsDialogue';
 import VerificationContainer from './components/verification/VerificationContainer';
 import Main from './components/Main';
+import { useEffect } from 'react';
+import { CortexDriver } from './modules/CortexDriver';
 
 export default function App() {
+
+  useEffect(() => {
+  CortexDriver.getInstance();
+  });
   return (
     <Router>
       <Switch>

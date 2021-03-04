@@ -33,8 +33,9 @@ const VerificationPage = (_props: any) => {
     let driver: CortexDriver = CortexDriver.getInstance();
     let webSocket = driver.socket;
 
-    webSocket.onopen = async () => {
-      try {
+      const setup = async() =>{
+        console.log("setup called");
+        try{
         //-----------------------------
         const accessGranted: boolean = await driver.hasAccess();
         setAccess(accessGranted);
@@ -51,7 +52,6 @@ const VerificationPage = (_props: any) => {
         setDeviceData(controlID);
         //-----------------------------
         const authToken: string = await driver.authorize();
-        //authToken = authToken.slice(0,20);
         setToken(authToken);
         //-----------------------------
         const currentProfile: string = await driver.getCurrentProfile(
@@ -88,7 +88,7 @@ const VerificationPage = (_props: any) => {
     }
     */
     
-    
+    setup();
   }, []);
 
   return (
