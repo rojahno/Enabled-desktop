@@ -283,6 +283,7 @@ class CortexDriver {
  * @returns true if it has access and rejects an error message if not.
  */
   hasAccess = async () => {
+    console.log('HUR')
     return new Promise<boolean>((resolve, reject) => {
       const REQUEST_ACCESS_ID = 1;
       let requestAccessRequest = {
