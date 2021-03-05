@@ -1,8 +1,7 @@
-<<<<<<< Updated upstream
-=======
+
 import { rejects } from 'assert';
 import { resolve } from 'path';
->>>>>>> Stashed changes
+
 import {
   AuthorizeResponse,
   ControlDeviceResponse,
@@ -36,14 +35,13 @@ class CortexDriver {
   private static instance: CortexDriver;
   private _socket!: WebSocket;
   private _user: any;
-<<<<<<< Updated upstream
-=======
+
   private _retryCount: number = 0;
   private observers: StreamObserver[] = [];
 
   private cortexToken: string = '';
   private sessionId: string = '';
->>>>>>> Stashed changes
+
 
   constructor() {
     this._socket = new WebSocket('wss://localhost:6868');
@@ -351,8 +349,6 @@ class CortexDriver {
     };
   };
 
-<<<<<<< Updated upstream
-=======
   public stopStream = async () => {
     const SUB_REQUEST_ID = 6;
     let subRequest = {
@@ -374,7 +370,7 @@ class CortexDriver {
       }
     };
   };
->>>>>>> Stashed changes
+
   /** This method is to get or set the active action for the mental command detection.
    *If the status is "get" then the result is and array of strings.
    *If the status is "set", then the result is an object with "action" and "message" as fields.
@@ -537,8 +533,6 @@ class CortexDriver {
     });
   };
 
-<<<<<<< Updated upstream
-=======
   public setSensitivity = async (
     authToken: string,
     profile: string,
@@ -561,7 +555,7 @@ class CortexDriver {
     this._socket.send(JSON.stringify(currentProfileRequest));
   };
 
->>>>>>> Stashed changes
+
   /**
    * Queries all the profiles saved on this user.
    *
@@ -600,8 +594,6 @@ class CortexDriver {
       };
     });
   };
-<<<<<<< Updated upstream
-=======
 
   public async subscribe(observer: StreamObserver) {
     this.observers.push(observer);
@@ -622,7 +614,7 @@ class CortexDriver {
   private notify(streamCommand: string) {
     this.observers.forEach((observer) => observer(streamCommand));
   }
->>>>>>> Stashed changes
+
 }
 
 export { CortexDriver, StreamObserver };

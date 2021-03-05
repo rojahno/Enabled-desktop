@@ -77,8 +77,7 @@ const VerificationPage = (_props: any) => {
           id
         );
         setCurrentProfile(currentProfile);
-<<<<<<< Updated upstream
-=======
+
 
         let sensitivity = [10,10,10,10];
         await driver.setupProfile(authToken,id,"D7","load");
@@ -86,7 +85,6 @@ const VerificationPage = (_props: any) => {
         await driver.setSensitivity(authToken,"D7",sessionId, sensitivity);
         console.log("before stream");
 
->>>>>>> Stashed changes
       } catch (error) {
         if (typeof error === 'string') {
           setErrorMsg(error);
