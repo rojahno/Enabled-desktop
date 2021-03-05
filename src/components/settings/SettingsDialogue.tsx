@@ -13,16 +13,18 @@ import MuiDialogContent from '@material-ui/core/DialogContent';
 import MuiDialogActions from '@material-ui/core/DialogActions';
 import IconButton from '@material-ui/core/IconButton';
 import Link from '@material-ui/core/Link';
-//import CloseIcon from '@material-ui/icons/Close';
+import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
-import DiscreteSlider from './SettingSlider';
+import SettingSlider from './SettingSlider';
+import LoadingCircle from '../LoadingCircle';
+
 
 const styles = (theme: Theme) =>
   createStyles({
     root: {
       margin: 0,
       padding: theme.spacing(2),
-      backgroundColor: '#3c3c3c80',
+      backgroundColor: '#fff',
     },
     closeButton: {
       position: 'absolute',
@@ -31,7 +33,7 @@ const styles = (theme: Theme) =>
       color: theme.palette.grey[500],
     },
     openButton: {
-      color: '#ffffff80',
+      color: '#ffffff',
       textDecoration: 'underline',
       fontSize: '4',
     },
@@ -41,7 +43,7 @@ const styles = (theme: Theme) =>
 const useStyles = makeStyles(function (theme: Theme) {
   return createStyles({
     root: {
-      color: '#ffffff80',
+      color: '#ffffff',
       textDecoration: 'underline',
       fontSize: '4',
     },
@@ -73,7 +75,7 @@ const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
 const DialogContent = withStyles((theme: Theme) => ({
   root: {
     padding: theme.spacing(2),
-    backgroundColor: '#3c3c3c80',
+    backgroundColor: '#fff',
   },
 }))(MuiDialogContent);
 
@@ -81,7 +83,7 @@ const DialogActions = withStyles((theme: Theme) => ({
   root: {
     margin: 0,
     padding: theme.spacing(1),
-    backgroundColor: '#3c3c3c80',
+    backgroundColor: '#fff',
   },
 }))(MuiDialogActions);
 
@@ -117,13 +119,14 @@ export default function SettingsDialogue(_props: any) {
           Settings
         </DialogTitle>
         <DialogContent dividers>
-          <DiscreteSlider />
+          <SettingSlider/>
           <br/>
           <br/>
           <br/>
           <br/>
           <br/>
         </DialogContent>
+        <LoadingCircle load={true}/>
       
         <DialogActions>
           <Button autoFocus onClick={handleClose} color="primary">

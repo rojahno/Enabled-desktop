@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
+=======
+import { rejects } from 'assert';
 import { resolve } from 'path';
+>>>>>>> Stashed changes
 import {
   AuthorizeResponse,
   ControlDeviceResponse,
@@ -32,14 +36,17 @@ class CortexDriver {
   private static instance: CortexDriver;
   private _socket!: WebSocket;
   private _user: any;
+<<<<<<< Updated upstream
+=======
   private _retryCount: number = 0;
   private observers: StreamObserver[] = [];
 
-  private cortexToken:string = "";
-  private sessionId:string = "";
+  private cortexToken: string = '';
+  private sessionId: string = '';
+>>>>>>> Stashed changes
 
-  private constructor() {
-    this.connect();
+  constructor() {
+    this._socket = new WebSocket('wss://localhost:6868');
     this._user = {
       license: '',
       clientId: '0wyWnYNd61cedWF0Bp7AbZ10ogKlpa6EvgsH4DCV',
@@ -332,6 +339,7 @@ class CortexDriver {
       },
       id: SUB_REQUEST_ID,
     };
+    console.log('start stream');
 
     this._socket.send(JSON.stringify(subRequest));
     this._socket.onmessage = ({ data }: MessageEvent) => {
@@ -343,6 +351,8 @@ class CortexDriver {
     };
   };
 
+<<<<<<< Updated upstream
+=======
   public stopStream = async () => {
     const SUB_REQUEST_ID = 6;
     let subRequest = {
@@ -355,8 +365,7 @@ class CortexDriver {
       },
       id: SUB_REQUEST_ID,
     };
-      if(this.cortexToken)
-    this._socket.send(JSON.stringify(subRequest));
+    if (this.cortexToken) this._socket.send(JSON.stringify(subRequest));
     this._socket.onmessage = ({ data }: MessageEvent) => {
       try {
         //console.log("stop stream: " + data);
@@ -365,6 +374,7 @@ class CortexDriver {
       }
     };
   };
+>>>>>>> Stashed changes
   /** This method is to get or set the active action for the mental command detection.
    *If the status is "get" then the result is and array of strings.
    *If the status is "set", then the result is an object with "action" and "message" as fields.
@@ -475,14 +485,15 @@ class CortexDriver {
           } else if (status == 'create') {
             resolve(setupQuery.result.message);
           }
+
           if (setupQuery.id == SETUP_PROFILE_ID) {
             if (setupQuery.result.action == status) {
               resolve(data);
             }
           }
         } catch (error) {
-          resolve('setup profile error: ');
-          console.log('setup profile error: ' + error);
+          //rejects("Can't access the Emotiv App");
+          console.log(error);
         }
       };
     });
@@ -526,12 +537,14 @@ class CortexDriver {
     });
   };
 
+<<<<<<< Updated upstream
+=======
   public setSensitivity = async (
     authToken: string,
     profile: string,
-    session:string,
-    values:number[],
-  ): Promise<string> => {
+    session: string,
+    values: number[]
+  ) => {
     let currentProfileRequest = {
       id: 1,
       jsonrpc: '2.0',
@@ -539,24 +552,16 @@ class CortexDriver {
       params: {
         cortexToken: authToken,
         profile: profile,
-        session:session,
-        status:'set',
-        values:values,
+        session: session,
+        status: 'set',
+        values: values,
       },
     };
-    return new Promise<string>((resolve, reject) => {
-      this._socket.send(JSON.stringify(currentProfileRequest));
-      this._socket.onmessage = ({ data }: MessageEvent) => {
-        try {
-            console.log(data);
-        
-        } catch (error) {
-          reject('set sensitivity profile error');
-        }
-      };
-    });
+
+    this._socket.send(JSON.stringify(currentProfileRequest));
   };
 
+>>>>>>> Stashed changes
   /**
    * Queries all the profiles saved on this user.
    *
@@ -595,13 +600,15 @@ class CortexDriver {
       };
     });
   };
+<<<<<<< Updated upstream
+=======
 
   public async subscribe(observer: StreamObserver) {
     this.observers.push(observer);
   }
 
   /**
-   * 
+   *
    * @param observer the observer to remove
    * @todo check if filter logic i correct??
    */
@@ -615,6 +622,7 @@ class CortexDriver {
   private notify(streamCommand: string) {
     this.observers.forEach((observer) => observer(streamCommand));
   }
+>>>>>>> Stashed changes
 }
 
 export { CortexDriver, StreamObserver };

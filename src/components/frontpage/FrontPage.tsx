@@ -5,6 +5,7 @@ import CustomDialog from './CustomDialog';
 import SimplePaper from '../SimplePaper';
 import { Link } from 'react-router-dom';
 import VerticalLinearStepper from '../stepper'
+import SettingsDialogue from '../settings/SettingsDialogue';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -32,6 +33,7 @@ export default function FrontPage(_props: any) {
 
   return (
     <div className={classes.root}>
+      <SettingsDialogue/>
       <SimplePaper>
         <h3>Add the IP of your phone</h3>
         <CustomInput />
