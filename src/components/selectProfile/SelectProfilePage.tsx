@@ -4,6 +4,8 @@ import SimplePaper from '../SimplePaper';
 import { Link } from 'react-router-dom';
 import { useEffect } from 'react';
 import { CortexDriver } from '../../modules/CortexDriver';
+import ListItem from '@material-ui/core/ListItem';
+import List from '@material-ui/core/List';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -37,11 +39,21 @@ const useStyles = makeStyles((theme: Theme) =>
       overflow: 'auto',
       width: '100%',
     },
-    buttons:{
+    buttons: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      width: '100%',
+      padding: '3px',
+    },
+    listItems:{
+      padding:'10px 20px',
+      //backgroundColor:'white',
       display:'flex',
-      justifyContent:'space-between',
-      width:'100%',
-      padding:'3px',
+      justifyContent:'center',
+      transition: 'transform ease-in 0.1s',
+      fontSize:'16px',
+      //boxShadow:'0px 8px 28px -6px rgba(24, 39, 75, 0.12)',
+
     }
   })
 );
@@ -49,6 +61,19 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function SelectProfilePage(_props: any) {
   const classes = useStyles();
   const [profiles, setProfiles] = useState(['']);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedProfile, setSelectedProfile] = useState("");
+  const [hasSelected, setHasSelected] = useState(false);
+
+  const handleListItemClick = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    index: number,
+    profile:string,
+  ) => {
+    setSelectedIndex(index);
+    setSelectedProfile(profile);
+    setHasSelected(true);
+  };
 
   useEffect(() => {
     const getProfiles = async () => {
@@ -61,27 +86,41 @@ export default function SelectProfilePage(_props: any) {
     };
 
     getProfiles();
-  },[]);
+  }, []);
 
   return (
     <div className={classes.root}>
       <div className={classes.container}>
         <SimplePaper>
-          <h3>Select profile</h3>
+          <h3>Select profile {selectedProfile}</h3>
 
           <div className={classes.profileList}>
+            <List>
             {profiles.map((profile, index) => (
-              <button key={index}>{profile}</button>
+              <ListItem
+              className={classes.listItems}
+                key={index}
+                button
+                selected={selectedIndex === index}
+                onClick={(event) => handleListItemClick(event, index, profile)}
+              >
+                {profile}
+              </ListItem>
             ))}
+            </List>
           </div>
 
           <div className={classes.buttons}>
-            <Link  to="/">
+            <Link to="/">
               <button>back</button>
             </Link>
+
+            { 
             <Link to="/ip">
-              <button>Next</button>
+              <button
+              disabled={!hasSelected}>Next</button>
             </Link>
+}
           </div>
         </SimplePaper>
       </div>
