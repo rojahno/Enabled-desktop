@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import SimplePaper from '../SimplePaper';
 import { Link } from 'react-router-dom';
-import { CortexDriver } from '../../modules/CortexDriver';
+import { CortexDriver, StreamObserver } from '../../modules/CortexDriver';
 import VerticalLinearStepper from '../stepper';
+import { MobileDriver } from '../../modules/MobileDriver';
 
-useState
+useState;
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -17,6 +18,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+const mobileDriver = null;
 const VerificationPage = (_props: any) => {
   const classes = useStyles();
   const [access, setAccess] = useState(false);
@@ -25,14 +27,29 @@ const VerificationPage = (_props: any) => {
   const [requestAcceess, setrequestAcceess] = useState('');
   const [deviceData, setDeviceData] = useState('');
   const [token, setToken] = useState('');
+  const [sessionId, setSessionId] = useState('');
   const [currentProfile, setCurrentProfile] = useState('');
+  const [stream, setStream] = useState('');
+
+  const onStreamUpdated: StreamObserver = (streamCommand: string) => {
+    setStream(streamCommand);
+  };
+
+  
 
   useEffect(() => {
-    let driver: CortexDriver = new CortexDriver();
-    let webSocket = driver.socket;
+    let driver: CortexDriver = CortexDriver.getInstance();
 
-    webSocket.onopen = async () => {
+
+    const offLoad = () => {
+    driver.unsubscribe(onStreamUpdated);
+    driver.stopStream();
+    }
+
+    const setup = async () => {
+      console.log('setup called');
       try {
+        driver.subscribe(onStreamUpdated);
         //-----------------------------
         const accessGranted: boolean = await driver.hasAccess();
         setAccess(accessGranted);
@@ -49,14 +66,25 @@ const VerificationPage = (_props: any) => {
         setDeviceData(controlID);
         //-----------------------------
         const authToken: string = await driver.authorize();
-        //authToken = authToken.slice(0,20);
         setToken(authToken);
         //-----------------------------
+
+        const sessionId: string = await driver.createSession(authToken, id);
+        setSessionId(sessionId);
+
         const currentProfile: string = await driver.getCurrentProfile(
           authToken,
           id
         );
         setCurrentProfile(currentProfile);
+
+        await driver.setupProfile(authToken,id,"D7","load");
+        let sensitivity = [10,10,10,10];
+        await driver.setSensitivity(authToken,"D7",sessionId, sensitivity);
+
+
+
+        driver.startStream(authToken, sessionId);
       } catch (error) {
         if (typeof error === 'string') {
           setErrorMsg(error);
@@ -65,6 +93,29 @@ const VerificationPage = (_props: any) => {
         }
       }
     };
+    /*
+    let mobile: MobileDriver = new MobileDriver();
+    let mobileSocket = mobile.socket;
+    console.log(mobileSocket);
+    mobileSocket.onopen =async() =>{
+      console.log("er her");
+      try{
+        console.log("Før send something");
+         mobile.sendSomething("hei");
+         console.log("etter send something");
+      }
+      catch(error){
+        alert('fucked up');
+      }
+    }
+    mobileSocket.onerror = () =>{
+      console.log("on error");
+      
+    }
+    */
+    setup();
+
+    return () => offLoad();
   }, []);
 
   return (
@@ -76,8 +127,8 @@ const VerificationPage = (_props: any) => {
         <p>Device data:{deviceData} </p>
         <p>Token:{} </p>
         <p>Current profile: {currentProfile}</p>
+        <p>Stream:{stream} </p>
         <p>Error:{errorMsg} </p>
-
         <button>Try again</button>
       </SimplePaper>
     </div>
