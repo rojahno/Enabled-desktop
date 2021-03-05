@@ -9,9 +9,8 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import VerificationPage from './verification/VerificationPage';
 import { CortexDriver } from '../modules/CortexDriver';
+import { FacadeTest } from '../FacadeTest';
 
-const driver = CortexDriver.getInstance();
-const webSocket = driver.socket;
 
 const StyledStepLabel = styled(StepLabel)({
   '& .MuiStepLabel-label': {
@@ -19,6 +18,7 @@ const StyledStepLabel = styled(StepLabel)({
   }
 });
 
+const facade = new FacadeTest
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -42,15 +42,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   }),
 );
-function test(){
-  webSocket.onopen = async () => {
-    try{
-     let accessGranted = await driver.hasAccess();
-     return accessGranted
-    }
-    catch(error){}
-  }
-}
+
 
 function getSteps() {
   return ['Request permission from the emotiv app', 'Create an ad group', 'Create an ad'];
@@ -59,7 +51,9 @@ function getSteps() {
 function getStepContent(step: number) {
   switch (step) {
     case 0:
-    return test()
+      facade.setInformation()
+      let hasAccess = facade._hasAccess
+    return hasAccess
     case 1:
       return 'An ad group contains one or more ads which target a shared set of keywords.';
     case 2:

@@ -36,3 +36,4 @@ class FacadeTest {
     }
     
 } 
+export {FacadeTest}
