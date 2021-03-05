@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display:'flex',
       justifyContent:'center',
       transition: 'transform ease-in 0.1s',
-      fontSize:'16px',
+      fontSize:'18px',
       //boxShadow:'0px 8px 28px -6px rgba(24, 39, 75, 0.12)',
 
     }
@@ -75,14 +75,33 @@ export default function SelectProfilePage(_props: any) {
     setHasSelected(true);
   };
 
+  const handleNextClick = async () => {
+
+    try{
+    let driver:CortexDriver = CortexDriver.getInstance();
+    let authoken:string = await driver.authorize();
+    let headsetId:string = await driver.queryHeadsetId();
+    await driver.setupProfile(authoken, headsetId,'', 'unload');
+    await driver.setupProfile(authoken,headsetId,selectedProfile,'load');
+    }
+    catch(error){
+      console.log(error);
+    }
+  }
+
   useEffect(() => {
     const getProfiles = async () => {
+      try{
       let driver = CortexDriver.getInstance();
 
+      
       let authToken = await driver.authorize();
       let allProfiles = await driver.queryProfileRequest(authToken);
-
+      
       setProfiles(allProfiles);
+    }catch(error){
+      console.log(error);
+    }
     };
 
     getProfiles();
@@ -118,7 +137,9 @@ export default function SelectProfilePage(_props: any) {
             { 
             <Link to="/ip">
               <button
-              disabled={!hasSelected}>Next</button>
+              disabled={!hasSelected}
+              onClick={handleNextClick}
+              >Next</button>
             </Link>
 }
           </div>
