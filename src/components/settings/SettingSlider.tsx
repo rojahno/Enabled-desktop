@@ -2,7 +2,7 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/core/Slider';
-import { LoadingCircle } from '../LoadingCircle';
+
 
 const useStyles = makeStyles({
   root: {
@@ -82,7 +82,6 @@ export default function SettingSlider() {
         max={10}
         valueLabelDisplay="auto"
       />
-      <LoadingCircle load={true}/>
     </div>
   );
 }
