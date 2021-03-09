@@ -92,6 +92,14 @@ interface GetCurrentProfileResponse {
   };
 }
 
+interface DataSample{
+  com:[command:string],
+  sid:string,
+  time:number
+
+
+}
+
 export {
   RequestAccessResponse,
   RequestAccessResult,
@@ -105,4 +113,5 @@ export {
   AuthorizeResponse,
   CreateSessionResponse,
   GetCurrentProfileResponse,
+  DataSample,
 };

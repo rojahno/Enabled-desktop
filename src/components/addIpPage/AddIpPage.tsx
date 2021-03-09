@@ -5,7 +5,7 @@ import CustomDialog from './CustomDialog';
 import SimplePaper from '../SimplePaper';
 import { Link } from 'react-router-dom';
 import { CortexDriver } from '../../modules/CortexDriver';
-import { MobileDriver } from '../../modules/MobileDriver';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -48,7 +48,6 @@ const hasValidIPaddress = (ipAdress: string) => {
   ) {
     return true;
   }
-  alert('You have entered an invalid IP address!');
   return false;
 };
 
@@ -57,11 +56,14 @@ export default function AddIpPage(_props: any) {
   const [ipAdress, setIpAdress] = useState('No input');
   const [validIpAdress, setValidIpAdress] = useState(false);
 
+  const history = useHistory();
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIpAdress(event.target.value);
   };
 
   const handleNextClick = async () => {
+    
     try {
       let driver: CortexDriver = CortexDriver.getInstance();
       let authoken: string = await driver.authorize();
@@ -77,8 +79,10 @@ export default function AddIpPage(_props: any) {
         setValidIpAdress(validIpAdress);
         if (validIpAdress) {
           alert('success');
-          let mobileDriver: MobileDriver = MobileDriver.getInstance();
-          mobileDriver.startSocket(ipAdress);
+          
+          history.push({pathname:'/stream',state:{ipAdress:ipAdress}});
+        } else {
+          alert('You have entered an invalid IP address!');
         }
       }
     } catch (error) {
@@ -91,9 +95,10 @@ export default function AddIpPage(_props: any) {
     console.log(validIpAdress);
     setValidIpAdress(validIpAdress);
     if (validIpAdress) {
-      alert('success: ' + 'ipAdress');
+      alert('success: ' + ipAdress);
     }
   };
+
   return (
     <div className={classes.root}>
       <div className={classes.container}>
@@ -102,25 +107,17 @@ export default function AddIpPage(_props: any) {
           <h3>Add the IP of your phone</h3>
           <CustomInput handleChange={handleChange} />
           <CustomDialog />
-          <button onClick={checkIp}>Check ip</button>
-
           <div className={classes.buttons}>
             <Link to="/select">
               <button>Back</button>
             </Link>
 
-            <Link
-              to={{
-                pathname: '/stream',
-                state: {
-                  ipAdress: ipAdress,
-                },
-              }}
+            <button
+              //disabled={!validIpAdress}
+              onClick={handleNextClick}
             >
-              <button disabled={!validIpAdress}>
-                Next
-              </button>
-            </Link>
+              Next
+            </button>
           </div>
         </SimplePaper>
       </div>

@@ -40,40 +40,23 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function StreamPage(props: any) {
   const classes = useStyles();
-  const [streamCommand, setStreamCommand] = useState('No command yet');
+  const [streamCommand, setStreamCommand] = useState('');
   const onStreamUpdated: StreamObserver = (streamCommand: string) => {
     setStreamCommand(streamCommand);
   };
 
   useEffect(() => {
-    let ip:string = props.location.state.ipAdress;
-    console.log("ip: " + ip);
-    let mobileDriver:MobileDriver = MobileDriver.getInstance();
+    let ip: string = props.location.state.ipAdress;
+    console.log('ip: ' + ip);
+    let mobileDriver: MobileDriver = MobileDriver.getInstance();
     mobileDriver.startSocket(ip);
     let driver: CortexDriver = CortexDriver.getInstance();
-
     const offLoad = () => {
-      driver.unsubscribe(onStreamUpdated);
+      //driver.unsubscribe(onStreamUpdated);
       driver.stopStream();
-      }
-    const startStream = async () => {
-
-      try{
-      driver.subscribe(onStreamUpdated);
-      let authoken: string = await driver.authorize();
-      let headsetId: string = await driver.queryHeadsetId();
-      let hasLoadedProfile = await driver.hasCurrentProfile(authoken,headsetId);
-      let sessionId = await driver.createSession(authoken, headsetId);
-      await driver.startStream(authoken, sessionId);
-      }
-      catch(error){
-        console.log(error + '');
-      }
     };
 
-    startStream();
-
-    return () => offLoad()
+    return () => offLoad();
   }, []);
   return (
     <div className={classes.root}>
@@ -86,8 +69,6 @@ export default function StreamPage(props: any) {
             <Link to="/ip">
               <button>Back</button>
             </Link>
-
-            
           </div>
         </SimplePaper>
       </div>

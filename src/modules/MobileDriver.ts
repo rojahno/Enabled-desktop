@@ -1,13 +1,22 @@
+import { CortexDriver, IObserver, StreamObserver } from "./CortexDriver";
+
 const CONNECTION_RETRY_INTERVAL = 5000; // in ms
 const CONNECTION_RETRY_MAX_COUNT = 60; // 60 times to retry x 5s = 5min of total retries
 
-class MobileDriver {
+
+class MobileDriver implements IObserver {
   private _socket!: WebSocket;
   private static instance: MobileDriver;
   private _retryCount: number = 0;
   private ipAdress: string = '';
+  public observer!:StreamObserver;
 
   private constructor() {}
+  
+  sendCommand(command:string): void {
+    console.log("The command: " + command);
+    this.sendSomething(command);
+  }
 
   static getInstance(): MobileDriver {
     if (MobileDriver.instance) {
@@ -29,19 +38,23 @@ class MobileDriver {
   public setip(ipAdress: string) {
     this.ipAdress = ipAdress;
   }
+ 
 
   /**
    * Creates a connection to the websocket and sets the events.
+   * @todo implements start stream logic when facade is ready.
    */
   private connect = () => {
-    this._socket = new WebSocket('wss://' + this.ipAdress + ':6868');
+    this._socket = new WebSocket('ws://' + this.ipAdress + ':9000');
 
-    this.socket.onopen = () => {
+    this.socket.onopen = async () => {
       console.log('WS OPENED ✅');
 
       // reset the total retries
       this._retryCount = 0;
+      await this.startCortexStream();
     };
+
 
     this.socket.onerror = (_error) => {
       if (!this.canRetry()) {
@@ -73,10 +86,28 @@ class MobileDriver {
     this.connect();
   };
 
+  startCortexStream = async() => {
+    let driver:CortexDriver = CortexDriver.getInstance();
+    driver.subscribe(this);
+    let authoken: string = await driver.authorize();
+    let headsetId: string = await driver.queryHeadsetId();
+    let sessionId = await driver.createSession(authoken, headsetId);
+    driver.startStream(authoken, sessionId);
+  }
+
   getRandomInt(max: number) {
     return Math.floor(Math.random() * Math.floor(max));
   }
 
+  unsubscribeToCortexStream = async() =>{
+    let driver:CortexDriver = CortexDriver.getInstance();
+    driver.unsubscribe(this);
+    await driver.stopStream();
+  }
+
+  clear() {
+  clearInterval();
+  }
   /**
    * Checks if we can reconnect or we have reaches our maximun amount of tries.
    **/
@@ -84,12 +115,10 @@ class MobileDriver {
     return this._retryCount > 0;
   }
 
-  sendSomething = async (text: string) => {
-    setInterval(() => {
-      let command: string = '';
+  sendSomething =async (text: string) => {
 
+      let command: string = '';
       let state: number = this.getRandomInt(4) + 1;
-      console.log(state);
       switch (state) {
         case 1:
           command = 'right';
@@ -106,10 +135,15 @@ class MobileDriver {
         case 4:
           command = 'pull';
           break;
+
+        default:
+          {
+            command = 'neutral';
+          }
+          break;
       }
-      console.log(command);
-      this._socket.send('right');
-    }, 1500);
+      this._socket.send(command);
+
   };
 }
 
