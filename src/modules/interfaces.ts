@@ -79,7 +79,16 @@ interface CreateSessionResponse {
   id: number;
   jsonrpc: string;
   result: {
-      id:string
+    id: string;
+  };
+}
+
+interface GetCurrentProfileResponse {
+  id: number,
+  jsonrpc: string,
+  result: {
+    name: string;
+    loadedByThisApp: boolean,
   };
 }
 
@@ -94,5 +103,6 @@ export {
   QueryProfileResult,
   ControlDeviceResponse,
   AuthorizeResponse,
-  CreateSessionResponse
+  CreateSessionResponse,
+  GetCurrentProfileResponse,
 };
