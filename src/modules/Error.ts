@@ -39,3 +39,5 @@ class CortexError {
     return 'undefined error';
   }
 }
+
+export default CortexError;

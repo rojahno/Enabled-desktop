@@ -1,6 +1,4 @@
-
-import { rejects } from 'assert';
-import { resolve } from 'path';
+import CortexError from './Error';
 
 import {
   AuthorizeResponse,

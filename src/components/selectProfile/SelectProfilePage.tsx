@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import SimplePaper from '../SimplePaper';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { useEffect } from 'react';
 import { CortexDriver } from '../../modules/CortexDriver';
 import ListItem from '@material-ui/core/ListItem';
@@ -88,6 +88,7 @@ export default function SelectProfilePage(_props: any) {
       console.log(error);
     }
   }
+
 
   useEffect(() => {
     const getProfiles = async () => {
