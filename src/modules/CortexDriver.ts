@@ -1,4 +1,5 @@
-import { resolve } from 'path';
+import CortexError from './Error';
+
 import {
   AuthorizeResponse,
   ControlDeviceResponse,
@@ -33,14 +34,16 @@ class CortexDriver {
   private static instance: CortexDriver;
   private _socket!: WebSocket;
   private _user: any;
+
   private _retryCount: number = 0;
   private observers: StreamObserver[] = [];
 
   private cortexToken: string = '';
   private sessionId: string = '';
 
-  private constructor() {
-    this.connect();
+
+  constructor() {
+    this._socket = new WebSocket('wss://localhost:6868');
     this._user = {
       license: '',
       clientId: '0wyWnYNd61cedWF0Bp7AbZ10ogKlpa6EvgsH4DCV',
@@ -333,6 +336,7 @@ class CortexDriver {
       },
       id: SUB_REQUEST_ID,
     };
+    console.log('start stream');
 
     this._socket.send(JSON.stringify(subRequest));
     this._socket.onmessage = ({ data }: MessageEvent) => {
@@ -365,6 +369,7 @@ class CortexDriver {
       }
     };
   };
+
   /** This method is to get or set the active action for the mental command detection.
    *If the status is "get" then the result is and array of strings.
    *If the status is "set", then the result is an object with "action" and "message" as fields.
@@ -475,14 +480,15 @@ class CortexDriver {
           } else if (status == 'create') {
             resolve(setupQuery.result.message);
           }
+
           if (setupQuery.id == SETUP_PROFILE_ID) {
             if (setupQuery.result.action == status) {
               resolve(data);
             }
           }
         } catch (error) {
-          resolve('setup profile error: ');
-          console.log('setup profile error: ' + error);
+          //rejects("Can't access the Emotiv App");
+          console.log(error);
         }
       };
     });
@@ -604,6 +610,7 @@ class CortexDriver {
     });
   };
 
+
   /**
    * Queries all the profiles saved on this user.
    *
@@ -662,6 +669,7 @@ class CortexDriver {
   private notify(streamCommand: string) {
     this.observers.forEach((observer) => observer(streamCommand));
   }
+
 }
 
 export { CortexDriver, StreamObserver };

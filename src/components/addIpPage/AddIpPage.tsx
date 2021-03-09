@@ -4,15 +4,17 @@ import CustomInput from './customInput';
 import CustomDialog from './CustomDialog';
 import SimplePaper from '../SimplePaper';
 import { Link } from 'react-router-dom';
-import VerticalLinearStepper from '../stepper'
+import VerticalLinearStepper from '../stepper';
 import SettingsDialogue from '../settings/SettingsDialogue';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      margin: theme.spacing(2),
-      display: 'flex',
-      justifyContent: 'center',
+      minHeight: "100vh",
+      display:'flex',
+      justifyContent:'center',
+      flexDirection:'row',
+      alignItems:'center',
     },
     paper: {
       margin: theme.spacing(3),
@@ -24,27 +26,30 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: 'center',
       backgroundColor: '#ffffff95',
     },
-    })
+    container:{
+      margin: theme.spacing(2),
+      display: 'flex',
+      justifyContent: 'center',
+    
+    }
+  })
 );
 
-
-export default function FrontPage(_props: any) {
+export default function AddIpPage(_props: any) {
   const classes = useStyles();
 
   return (
     <div className={classes.root}>
-      <SettingsDialogue/>
-      <SimplePaper>
-        <h3>Add the IP of your phone</h3>
-        <CustomInput />
-        <CustomDialog />
-        <Link to="/select">
-          <button>Select profile</button>
-        </Link>
-        <Link to="/ip">
-          <button>Main</button>
-        </Link>
-      </SimplePaper>
+      <div className={classes.container}>
+        <SimplePaper>
+          <h3>Add the IP of your phone</h3>
+          <CustomInput />
+          <CustomDialog />
+          <Link to="/verification">
+            <button>Add ip</button>
+          </Link>
+        </SimplePaper>
+      </div>
     </div>
   );
 }
