@@ -2,26 +2,17 @@
 import { CortexDriver } from "./modules/CortexDriver";
 
 class FacadeTest {
-    private hasAccess: string = 'false';
-    private headsetID: string =''
-    private device: string = ''
-    private authToken: string = ''
-    private currentProfile: string = ''
-    public errorMsg: string = ''
+    private authToken : string = ''
+    private headsetID: string = ''
     private driver = CortexDriver.getInstance();
-    constructor() {
-    }
     
     
     async getHasAccess() {
         try{
-            this.hasAccess= await this.driver.hasAccess().valueOf().toString()
-            // console.log(this.hasAccess)
-            // return this.hasAccess
+            return await this.driver.hasAccess()
         }
         catch(error){
-            this.errorMsg = this.errorHandling(error)
-            console.log(this.errorMsg)
+            return this.errorHandling(error)  
         }
         
         
@@ -29,7 +20,6 @@ class FacadeTest {
     async getheadsetID() {
         try{
             this.headsetID = await this.driver.queryHeadsetId()
-            console.log("DUH")
             return this.headsetID
         }
         catch(error){
@@ -38,8 +28,8 @@ class FacadeTest {
     }
     async getDevice() {
         try{
-            this.device = await this.driver.controlDevice(this.headsetID)
-            return this.device
+            return await this.driver.controlDevice(this.headsetID)
+            
         }
         catch(error){
             return this.errorHandling(error)
@@ -56,8 +46,8 @@ class FacadeTest {
     }
     async getCurrentProfile() {
         try{
-            this.currentProfile = await this.driver.getCurrentProfile(this.authToken,this.headsetID)
-            return this.currentProfile
+            return await this.driver.getCurrentProfile(this.authToken,this.headsetID)
+        
         }
         catch(error){
             return this.errorHandling(error)
@@ -66,18 +56,16 @@ class FacadeTest {
     
     errorHandling(error : string){
         if(typeof error === 'string') {
-            this.errorMsg = error;
-            return this.errorMsg
+            return error
         }
         else{
             return 'An error has occured'
         }        
     }
-    async facadeFunction(i:number){
+    async facadeFunction(i:number){ 
         let f = await[this.getHasAccess(),this.getheadsetID(),this.getDevice()]
         return f[i]
     }
-    facaFields = [this.hasAccess,this.headsetID,this.driver]
     
 } 
 export {FacadeTest}

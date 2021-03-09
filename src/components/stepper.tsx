@@ -55,22 +55,18 @@ function getSteps() {
 export default function VerticalLinearStepper() {
   //let lol:string =''
 
-  const [hasAccess,setAccess] = useState('')
-  async function test(i: number){
-    try{
-     
-      await facade.facadeFunction(i)
-      if(facade.facaFields[i] === ''){
-        setAccess(facade.errorMsg)
-      }else{
-        setAccess(facade.facaFields[i])
-      }
-      console.log(hasAccess)
-      handleNext()
-    }
-    catch(error){
-      console.log(error)
-    }
+  
+  const [text,setText] = useState('')
+
+  async function hasAccess(){
+    let b :boolean = await facade.getHasAccess()
+    if(b){setText('You are connected to the app')}
+    else {setText('Could not connect to emotiv app, make sure to give access in emotiv app')}
+  }
+
+  async function getHeadsetID(){
+    let s = await facade.getheadsetID()
+    setText(s)
   }
 
 
@@ -78,15 +74,13 @@ export default function VerticalLinearStepper() {
   function getStepContent(step: number) {
     switch (step) {
       case 0:  
-      console.log(hasAccess)
-      return hasAccess
+      hasAccess()
+      return text
       case 1:
-        console.log(hasAccess)
-        console.log(facade.errorMsg)
-        return hasAccess
+        getHeadsetID()
+        return text
       case 2:
-        console.log(hasAccess)
-        return hasAccess
+        return text
       default:
         return 'Unknown step';
     
@@ -128,7 +122,7 @@ export default function VerticalLinearStepper() {
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={()=>{test(1)}}
+                    onClick={()=>{handleNext()}}
                     className={classes.button}
                   >
                     {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
