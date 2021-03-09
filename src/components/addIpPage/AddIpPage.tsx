@@ -78,7 +78,7 @@ export default function AddIpPage(_props: any) {
         if (validIpAdress) {
           alert('success');
           let mobileDriver: MobileDriver = MobileDriver.getInstance();
-          mobileDriver.startSocket(ipAdress);
+          history.pushState(validIpAdress,'/stream');
         }
       }
     } catch (error) {
@@ -91,7 +91,7 @@ export default function AddIpPage(_props: any) {
     console.log(validIpAdress);
     setValidIpAdress(validIpAdress);
     if (validIpAdress) {
-      alert('success: ' + 'ipAdress');
+      alert('success: ' + ipAdress);
     }
   };
   return (
@@ -117,7 +117,8 @@ export default function AddIpPage(_props: any) {
                 },
               }}
             >
-              <button disabled={!validIpAdress}>
+              <button disabled={!validIpAdress}
+             >
                 Next
               </button>
             </Link>
