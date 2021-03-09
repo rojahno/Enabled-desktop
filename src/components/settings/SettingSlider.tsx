@@ -3,14 +3,16 @@ import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/core/Slider';
 
+
 const useStyles = makeStyles({
   root: {
     width: 300,
+
   },
 });
 
 function valuetext(value: number) {
-  return `${value}°C`;
+  return `${value}`;
 }
 
 const marks = [
@@ -56,8 +58,13 @@ const marks = [
       },
   ];
 
-export default function DiscreteSlider() {
+export default function SettingSlider() {
   const classes = useStyles();
+
+  const handleChange = async (value:number) =>{
+
+
+  }
 
   return (
     <div className={classes.root}>
@@ -65,6 +72,7 @@ export default function DiscreteSlider() {
         Headseth sensitivity
       </Typography>
       <Slider
+      onChangeCommitted={(event,value) => console.log(value)}
         defaultValue={1}
         getAriaValueText={valuetext}
         aria-labelledby="discrete-slider-small-steps"

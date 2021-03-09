@@ -78,13 +78,13 @@ const VerificationPage = (_props: any) => {
         );
         setCurrentProfile(currentProfile);
 
-        await driver.setupProfile(authToken,id,"D7","load");
+
         let sensitivity = [10,10,10,10];
-        await driver.setSensitivity(authToken,"D7",sessionId, sensitivity);
-
-
-
+        await driver.setupProfile(authToken,id,"D7","load");
         driver.startStream(authToken, sessionId);
+        await driver.setSensitivity(authToken,"D7",sessionId, sensitivity);
+        console.log("before stream");
+
       } catch (error) {
         if (typeof error === 'string') {
           setErrorMsg(error);
