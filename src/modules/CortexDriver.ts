@@ -324,7 +324,7 @@ class CortexDriver {
    * @param sessionId
    * Starts the stream and notifies the observers.
    */
-  public startStream = (authToken: string, sessionId: string) => {
+  public startStream = async (authToken: string, sessionId: string) => {
     const SUB_REQUEST_ID = 6;
     let subRequest = {
       jsonrpc: '2.0',
@@ -341,6 +341,7 @@ class CortexDriver {
     this._socket.send(JSON.stringify(subRequest));
     this._socket.onmessage = ({ data }: MessageEvent) => {
       try {
+        console.log(data);
         this.notify(data);
       } catch (error) {
         console.error('Sub request error');
