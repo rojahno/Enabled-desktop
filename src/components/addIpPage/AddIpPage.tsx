@@ -58,7 +58,6 @@ export default function AddIpPage(_props: any) {
   const [validIpAdress, setValidIpAdress] = useState(false);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('here');
     setIpAdress(event.target.value);
   };
 
@@ -78,14 +77,23 @@ export default function AddIpPage(_props: any) {
         setValidIpAdress(validIpAdress);
         if (validIpAdress) {
           alert('success');
+          let mobileDriver: MobileDriver = MobileDriver.getInstance();
+          mobileDriver.startSocket(ipAdress);
         }
-        //let mobileDriver: MobileDriver = MobileDriver.getInstance();
       }
     } catch (error) {
       console.log(error);
     }
   };
 
+  const checkIp = () => {
+    let validIpAdress = hasValidIPaddress(ipAdress);
+    console.log(validIpAdress);
+    setValidIpAdress(validIpAdress);
+    if (validIpAdress) {
+      alert('success: ' + 'ipAdress');
+    }
+  };
   return (
     <div className={classes.root}>
       <div className={classes.container}>
@@ -94,20 +102,25 @@ export default function AddIpPage(_props: any) {
           <h3>Add the IP of your phone</h3>
           <CustomInput handleChange={handleChange} />
           <CustomDialog />
-          <button onClick={handleNextClick}>Check ip</button>
+          <button onClick={checkIp}>Check ip</button>
 
           <div className={classes.buttons}>
             <Link to="/select">
               <button>Back</button>
             </Link>
 
-            {
-              <Link to="/verification">
-                <button disabled={!validIpAdress} onClick={handleNextClick}>
-                  Next
-                </button>
-              </Link>
-            }
+            <Link
+              to={{
+                pathname: '/stream',
+                state: {
+                  ipAdress: ipAdress,
+                },
+              }}
+            >
+              <button disabled={!validIpAdress}>
+                Next
+              </button>
+            </Link>
           </div>
         </SimplePaper>
       </div>

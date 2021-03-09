@@ -1,17 +1,13 @@
-
 const CONNECTION_RETRY_INTERVAL = 5000; // in ms
 const CONNECTION_RETRY_MAX_COUNT = 60; // 60 times to retry x 5s = 5min of total retries
 
 class MobileDriver {
-  private _socket: WebSocket;
+  private _socket!: WebSocket;
   private static instance: MobileDriver;
-  private _retryCount:number = 0;
-  private ipAdress:string = "";
+  private _retryCount: number = 0;
+  private ipAdress: string = '';
 
-  private constructor() {
-      //The phone server only supports unsecure connections.
-    this._socket = new WebSocket('ws://192.168.86.27:9000');
-  }
+  private constructor() {}
 
   static getInstance(): MobileDriver {
     if (MobileDriver.instance) {
@@ -21,19 +17,24 @@ class MobileDriver {
     return MobileDriver.instance;
   }
 
+  public startSocket(ipAdress: string) {
+    this.setip(ipAdress);
+    this.connect();
+  }
+
   public get socket() {
     return this._socket;
   }
 
-  public set ip(ipAdress:string){
-  this.ipAdress = ipAdress;
+  public setip(ipAdress: string) {
+    this.ipAdress = ipAdress;
   }
 
   /**
    * Creates a connection to the websocket and sets the events.
    */
   private connect = () => {
-    this._socket = new WebSocket('wss://localhost:6868');
+    this._socket = new WebSocket('wss://' + this.ipAdress + ':6868');
 
     this.socket.onopen = () => {
       console.log('WS OPENED ✅');
@@ -64,7 +65,7 @@ class MobileDriver {
     };
   };
 
-    /**
+  /**
    * Makes an attempt to reconect to the server.
    **/
   private reconnect = () => {
@@ -72,44 +73,43 @@ class MobileDriver {
     this.connect();
   };
 
-   getRandomInt(max:number) {
+  getRandomInt(max: number) {
     return Math.floor(Math.random() * Math.floor(max));
   }
 
-    /**
+  /**
    * Checks if we can reconnect or we have reaches our maximun amount of tries.
    **/
   private canRetry(): boolean {
     return this._retryCount > 0;
   }
-  
 
-  sendSomething = async (text:string) => {
+  sendSomething = async (text: string) => {
     setInterval(() => {
-        let command:string = "";
+      let command: string = '';
 
-        let state: number =  this.getRandomInt(4)+1;
-        console.log(state);
-        switch(state){
-            case 1:
-            command = "right";
-            break;
-           
-            case 2:
-                command = "left";
-            break;
+      let state: number = this.getRandomInt(4) + 1;
+      console.log(state);
+      switch (state) {
+        case 1:
+          command = 'right';
+          break;
 
-            case 3:
-                command = "push";
-            break;
+        case 2:
+          command = 'left';
+          break;
 
-            case 4:
-                command = "pull";
-            break;
-        }
-        console.log(command);
-      this._socket.send("right");
-    },1500);
+        case 3:
+          command = 'push';
+          break;
+
+        case 4:
+          command = 'pull';
+          break;
+      }
+      console.log(command);
+      this._socket.send('right');
+    }, 1500);
   };
 }
 
