@@ -7,6 +7,7 @@ import {
   QueryProfileResponse,
   RequestAccessResponse,
   SetupProfileObject,
+  GetCurrentProfileResponse
 } from './interfaces';
 
 /**
@@ -35,8 +36,8 @@ class CortexDriver {
   private _retryCount: number = 0;
   private observers: StreamObserver[] = [];
 
-  private cortexToken:string = "";
-  private sessionId:string = "";
+  private cortexToken: string = '';
+  private sessionId: string = '';
 
   private constructor() {
     this.connect();
@@ -355,8 +356,7 @@ class CortexDriver {
       },
       id: SUB_REQUEST_ID,
     };
-      if(this.cortexToken)
-    this._socket.send(JSON.stringify(subRequest));
+    if (this.cortexToken) this._socket.send(JSON.stringify(subRequest));
     this._socket.onmessage = ({ data }: MessageEvent) => {
       try {
         //console.log("stop stream: " + data);
@@ -489,6 +489,54 @@ class CortexDriver {
   };
 
   /**
+   * Sets the profile of the headset.
+   *
+   * @param authToken The cortex token
+   * @param headsetId The headset id
+   * @param profileName The profile name you want to set
+   * @param status The status
+   *
+   * @returns a response object from the Emotiv API.
+   * @todo change the return value.
+   */
+  public hasCurrentProfile = async (
+    authToken: string,
+    headsetId: string
+  ): Promise<boolean> => {
+    const SETUP_PROFILE_ID = 7;
+    let getCurrentProfileRequest = {
+      id: 1,
+      jsonrpc: "2.0",
+      method: 'getCurrentProfile',
+      params: {
+          cortexToken: authToken,
+            headset: headsetId
+      }
+  }
+
+    return new Promise<boolean>((resolve) => {
+      this._socket.send(JSON.stringify(getCurrentProfileRequest));
+      this._socket.onmessage = ({ data }: MessageEvent) => {
+        try {
+          let currentProfileResponse: GetCurrentProfileResponse = JSON.parse(data);
+
+          if(currentProfileResponse.result.name == null){
+            console.log('No loaded profile' + currentProfileResponse);
+            resolve(false);
+          }
+          else{
+            console.log('Loaded profile: ' + currentProfileResponse.result.name);
+            resolve(true);
+          }
+          
+        } catch (error) {
+          resolve(false);
+          console.log('setup profile error: ' + error);
+        }
+      };
+    });
+  };
+  /**
    *
    * Gets the currently loaded profile.
    *
@@ -529,8 +577,8 @@ class CortexDriver {
   public setSensitivity = async (
     authToken: string,
     profile: string,
-    session:string,
-    values:number[],
+    session: string,
+    values: number[]
   ): Promise<string> => {
     let currentProfileRequest = {
       id: 1,
@@ -539,17 +587,16 @@ class CortexDriver {
       params: {
         cortexToken: authToken,
         profile: profile,
-        session:session,
-        status:'set',
-        values:values,
+        session: session,
+        status: 'set',
+        values: values,
       },
     };
     return new Promise<string>((resolve, reject) => {
       this._socket.send(JSON.stringify(currentProfileRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
-            console.log(data);
-        
+          console.log(data);
         } catch (error) {
           reject('set sensitivity profile error');
         }
@@ -601,7 +648,7 @@ class CortexDriver {
   }
 
   /**
-   * 
+   *
    * @param observer the observer to remove
    * @todo check if filter logic i correct??
    */
