@@ -12,7 +12,7 @@ class FacadeTest {
             return await this.driver.hasAccess()
         }
         catch(error){
-            return this.errorHandling(error)  
+       return
         }
         
         

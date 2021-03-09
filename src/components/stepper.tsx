@@ -1,4 +1,4 @@
-import React, {useState,useEffect} from 'react';
+import React, {useState} from 'react';
 import { makeStyles, Theme, createStyles,styled } from '@material-ui/core/styles';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
@@ -7,8 +7,6 @@ import StepContent from '@material-ui/core/StepContent';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import VerificationPage from './verification/VerificationPage';
-import { CortexDriver } from '../modules/CortexDriver';
 import { FacadeTest } from '../FacadeTest';
 
 
@@ -59,7 +57,7 @@ export default function VerticalLinearStepper() {
   const [text,setText] = useState('')
 
   async function hasAccess(){
-    let b :boolean = await facade.getHasAccess()
+    let b = await facade.getHasAccess()
     if(b){setText('You are connected to the app')}
     else {setText('Could not connect to emotiv app, make sure to give access in emotiv app')}
   }
