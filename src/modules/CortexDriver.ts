@@ -154,14 +154,13 @@ class CortexDriver {
       method: 'queryHeadsets',
       params: {},
     };
-
     return new Promise<string>((resolve, reject) => {
       this._socket.send(JSON.stringify(queryHeadsetRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
           let headsetQuery: QueryHeadsetIdResponse = JSON.parse(data);
           let queryHeadsetId: number = headsetQuery.id;
-
+          
           if (queryHeadsetId == QUERY_HEADSET_ID) {
             if (headsetQuery.result.length > 0) {
               let headsetId: string = headsetQuery.result[0].id;
@@ -171,8 +170,8 @@ class CortexDriver {
           }
         } catch (error) {}
         const rejectString =
-          'Cant find any headset. Please connect a headset to your pc and ' +
-          'check if the headseth is connected to the Emotiv app';
+        'Cant find any headset. Please connect a headset to your pc and ' +
+        'check if the headseth is connected to the Emotiv app';
         reject(rejectString);
       };
     });

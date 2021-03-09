@@ -20,54 +20,78 @@ const StyledStepLabel = styled(StepLabel)({
 
 const facade = new FacadeTest
 
+
+
 const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: '35%',
-    },
-    
-    button: {
-      marginTop: theme.spacing(1),
-      marginRight: theme.spacing(1),
-    },
-    actionsContainer: {
-      marginBottom: theme.spacing(2),
-    },
-    resetContainer: {
-      padding: theme.spacing(3),
-    },
-    text:{
-        color: '#fff',
-        backgroundColor: '#ffffff27'
-    },
-  }),
+createStyles({
+  root: {
+    width: '35%',
+  },
+  
+  button: {
+    marginTop: theme.spacing(1),
+    marginRight: theme.spacing(1),
+  },
+  actionsContainer: {
+    marginBottom: theme.spacing(2),
+  },
+  resetContainer: {
+    padding: theme.spacing(3),
+  },
+  text:{
+    color: '#fff',
+    backgroundColor: '#ffffff27'
+  },
+}),
 );
+
 
 
 function getSteps() {
   return ['Request permission from the emotiv app', 'Create an ad group', 'Create an ad'];
 }
 
-function getStepContent(step: number) {
-  switch (step) {
-    case 0:
-      facade.setInformation()
-      let hasAccess = facade._hasAccess
-    return hasAccess
-    case 1:
-      return 'An ad group contains one or more ads which target a shared set of keywords.';
-    case 2:
-      return `Try out different ad text to see what brings in the most customers,
-              and learn how to enhance your ads using features like ad extensions.
-              If you run into any problems with your ads, find out how to tell if
-              they're running and how to resolve approval issues.`;
-    default:
-      return 'Unknown step';
-  
-  }
-}
 
 export default function VerticalLinearStepper() {
+  //let lol:string =''
+
+  const [hasAccess,setAccess] = useState('')
+  async function test(i: number){
+    try{
+     
+      await facade.facadeFunction(i)
+      if(facade.facaFields[i] === ''){
+        setAccess(facade.errorMsg)
+      }else{
+        setAccess(facade.facaFields[i])
+      }
+      console.log(hasAccess)
+      handleNext()
+    }
+    catch(error){
+      console.log(error)
+    }
+  }
+
+
+
+  function getStepContent(step: number) {
+    switch (step) {
+      case 0:  
+      console.log(hasAccess)
+      return hasAccess
+      case 1:
+        console.log(hasAccess)
+        console.log(facade.errorMsg)
+        return hasAccess
+      case 2:
+        console.log(hasAccess)
+        return hasAccess
+      default:
+        return 'Unknown step';
+    
+    }
+  }
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
@@ -104,7 +128,7 @@ export default function VerticalLinearStepper() {
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={handleNext}
+                    onClick={()=>{test(1)}}
                     className={classes.button}
                   >
                     {activeStep === steps.length - 1 ? 'Finish' : 'Next'}

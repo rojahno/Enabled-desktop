@@ -2,38 +2,82 @@
 import { CortexDriver } from "./modules/CortexDriver";
 
 class FacadeTest {
-    private hasAccess: boolean = false;
+    private hasAccess: string = 'false';
     private headsetID: string =''
     private device: string = ''
     private authToken: string = ''
     private currentProfile: string = ''
-
-
-    async setInformation() {
-        let driver = CortexDriver.getInstance();
-        this.hasAccess = await driver.hasAccess()
-        this.headsetID = await driver.queryHeadsetId()
-        this.device = await driver.controlDevice(this.headsetID)
-        this.authToken = await driver.authorize()
-        this.currentProfile = await driver.getCurrentProfile(this.authToken,this.headsetID)
-
-        }
+    public errorMsg: string = ''
+    private driver = CortexDriver.getInstance();
+    constructor() {
+    }
     
-    public get _hasAccess() : boolean {
-        return this.hasAccess
+    
+    async getHasAccess() {
+        try{
+            this.hasAccess= await this.driver.hasAccess().valueOf().toString()
+            // console.log(this.hasAccess)
+            // return this.hasAccess
+        }
+        catch(error){
+            this.errorMsg = this.errorHandling(error)
+            console.log(this.errorMsg)
+        }
+        
+        
     }
-    public get _headsetID() : string {
-        return this.headsetID
+    async getheadsetID() {
+        try{
+            this.headsetID = await this.driver.queryHeadsetId()
+            console.log("DUH")
+            return this.headsetID
+        }
+        catch(error){
+            return this.errorHandling(error)
+        }
     }
-    public get _device() : string {
-        return this.device
+    async getDevice() {
+        try{
+            this.device = await this.driver.controlDevice(this.headsetID)
+            return this.device
+        }
+        catch(error){
+            return this.errorHandling(error)
+        }
     }
-    public get _authToken() : string {
-        return this.authToken
+    async getAuthToken() {
+        try{
+            this.authToken = await this.driver.authorize()
+            return this.authToken
+        }
+        catch(error){
+            return this.errorHandling(error)
+        }
     }
-    public get _currentProfile() : string{
-        return this.currentProfile
+    async getCurrentProfile() {
+        try{
+            this.currentProfile = await this.driver.getCurrentProfile(this.authToken,this.headsetID)
+            return this.currentProfile
+        }
+        catch(error){
+            return this.errorHandling(error)
+        }
     }
+    
+    errorHandling(error : string){
+        if(typeof error === 'string') {
+            this.errorMsg = error;
+            return this.errorMsg
+        }
+        else{
+            return 'An error has occured'
+        }        
+    }
+    async facadeFunction(i:number){
+        let f = await[this.getHasAccess(),this.getheadsetID(),this.getDevice()]
+        return f[i]
+    }
+    facaFields = [this.hasAccess,this.headsetID,this.driver]
     
 } 
 export {FacadeTest}
