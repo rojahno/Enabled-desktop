@@ -1,6 +1,11 @@
-import {createStyles, makeStyles, Theme, withStyles } from '@material-ui/core/styles';
+import {
+  createStyles,
+  makeStyles,
+  Theme,
+  withStyles,
+} from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import React from 'react';
+import React, { useState } from 'react';
 
 const CssTextField = withStyles({
   root: {
@@ -19,30 +24,41 @@ const CssTextField = withStyles({
       },
       '&.Mui-focused fieldset': {
         borderColor: 'green',
-        '&.MuiTextField-root':{
-        }
+        '&.MuiTextField-root': {},
       },
     },
   },
 })(TextField);
 
-
 //Change the style of the element
 const useStyles = makeStyles(function (theme: Theme) {
-    return createStyles({
-      root: {
-        margin: theme.spacing(2),
-        width:theme.spacing(23),
-        textAlign:"center",
-      },
-    });
-  },
-);
+  return createStyles({
+    root: {
+      margin: theme.spacing(2),
+      width: theme.spacing(23),
+      textAlign: 'center',
+    },
+  });
+});
 
-export default function CustomInput() {
+interface handleInputChange{
+  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+ const CustomInput = ({handleChange}:handleInputChange) => {
   const classes = useStyles();
 
+
   return (
-      <CssTextField className={classes.root} error={false} hiddenLabel={true} inputProps={{min: 0, style: { textAlign: 'center' }}} placeholder="127.0.0.1" label=" " />
+    <CssTextField
+      className={classes.root}
+      error={false}
+      hiddenLabel={true}
+      inputProps={{ min: 0, style: { textAlign: 'center' }}}
+      placeholder="127.0.0.1"
+      label=" "
+      onChange={handleChange}
+    />
   );
 }
+export default CustomInput;

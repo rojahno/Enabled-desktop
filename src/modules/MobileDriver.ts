@@ -4,16 +4,29 @@ const CONNECTION_RETRY_MAX_COUNT = 60; // 60 times to retry x 5s = 5min of total
 
 class MobileDriver {
   private _socket: WebSocket;
+  private static instance: MobileDriver;
   private _retryCount:number = 0;
   private ipAdress:string = "";
 
-  constructor() {
+  private constructor() {
       //The phone server only supports unsecure connections.
     this._socket = new WebSocket('ws://192.168.86.27:9000');
   }
 
+  static getInstance(): MobileDriver {
+    if (MobileDriver.instance) {
+      return MobileDriver.instance;
+    }
+    MobileDriver.instance = new MobileDriver();
+    return MobileDriver.instance;
+  }
+
   public get socket() {
     return this._socket;
+  }
+
+  public set ip(ipAdress:string){
+  this.ipAdress = ipAdress;
   }
 
   /**
