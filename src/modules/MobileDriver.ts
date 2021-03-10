@@ -60,8 +60,8 @@ class MobileDriver implements IObserver {
     };
 
     this.socket.onerror = (_error) => {
+      console.log('An error happened');
       if (!this.canRetry()) {
-        console.log('An error happened');
       }
     };
 

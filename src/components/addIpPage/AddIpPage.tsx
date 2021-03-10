@@ -59,11 +59,16 @@ export default function AddIpPage(_props: any) {
   const history = useHistory();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIpAdress(event.target.value);
+    let ip: string = event.target.value;
+    setIpAdress(ip);
+    if (hasValidIPaddress(ip)) {
+      setValidIpAdress(true);
+    } else {
+      setValidIpAdress(false);
+    }
   };
 
   const handleNextClick = async () => {
-    
     try {
       let driver: CortexDriver = CortexDriver.getInstance();
       let authoken: string = await driver.authorize();
@@ -79,8 +84,8 @@ export default function AddIpPage(_props: any) {
         setValidIpAdress(validIpAdress);
         if (validIpAdress) {
           alert('success');
-          
-          history.push({pathname:'/stream',state:{ipAdress:ipAdress}});
+
+          history.push({ pathname: '/stream', state: { ipAdress: ipAdress } });
         } else {
           alert('You have entered an invalid IP address!');
         }
@@ -90,20 +95,10 @@ export default function AddIpPage(_props: any) {
     }
   };
 
-  const checkIp = () => {
-    let validIpAdress = hasValidIPaddress(ipAdress);
-    console.log(validIpAdress);
-    setValidIpAdress(validIpAdress);
-    if (validIpAdress) {
-      alert('success: ' + ipAdress);
-    }
-  };
-
   return (
     <div className={classes.root}>
       <div className={classes.container}>
         <SimplePaper>
-          <p>{ipAdress}</p>
           <h3>Add the IP of your phone</h3>
           <CustomInput handleChange={handleChange} />
           <CustomDialog />
@@ -112,10 +107,7 @@ export default function AddIpPage(_props: any) {
               <button>Back</button>
             </Link>
 
-            <button
-              //disabled={!validIpAdress}
-              onClick={handleNextClick}
-            >
+            <button disabled={!validIpAdress} onClick={handleNextClick}>
               Next
             </button>
           </div>
