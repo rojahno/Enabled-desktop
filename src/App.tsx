@@ -6,9 +6,13 @@ import centerContainer from './components/frontpage/CenterContainer';
 import VerificationContainer from './components/verification/VerificationContainer';
 import { useEffect } from 'react';
 import { CortexDriver } from './modules/CortexDriver';
+<<<<<<< HEAD
 import AddIpPage from './components/addIpPage/AddIpPage';
 import SelectProfilePage from './components/selectProfile/SelectProfilePage';
 import StreamPage from './components/streamPage/StreamPage';
+=======
+import StartPage from './components/StartPage/StartPage'
+>>>>>>> Design-Eskil
 
 export default function App() {
   useEffect(() => {
@@ -18,6 +22,7 @@ export default function App() {
   return (
     <Router>
       <Switch>
+        <Route path = "/" exact component = {StartPage} />
         <Route path="/" exact component={centerContainer} />
         <Route path="/verification" exact component={VerificationContainer} />
         <Route path="/select" exact component={SelectProfilePage} />
