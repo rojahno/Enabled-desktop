@@ -105,8 +105,8 @@ class MobileDriver implements IObserver {
     await driver.stopStream();
   }
 
-  clear() {
-  clearInterval();
+  closeSocket() {
+  this._socket.close();
   }
   /**
    * Checks if we can reconnect or we have reaches our maximun amount of tries.
@@ -114,6 +114,8 @@ class MobileDriver implements IObserver {
   private canRetry(): boolean {
     return this._retryCount > 0;
   }
+
+
 
   sendSomething =async (text: string) => {
 

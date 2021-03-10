@@ -467,7 +467,7 @@ class CortexDriver {
       id: SETUP_PROFILE_ID,
     };
 
-    return new Promise<string>((resolve) => {
+    return new Promise<string>((resolve, reject) => {
       this._socket.send(JSON.stringify(setupProfileRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
@@ -475,18 +475,16 @@ class CortexDriver {
 
           if (data.indexOf('error') !== -1) {
             resolve(data);
-          } else if (status == 'create') {
-            resolve(setupQuery.result.message);
-          }
 
-          if (setupQuery.id == SETUP_PROFILE_ID) {
-            if (setupQuery.result.action == status) {
-              resolve(data);
+            if (setupQuery.id == SETUP_PROFILE_ID) {
+              if (setupQuery.result.action == status) {
+                resolve(data);
+              }
             }
           }
         } catch (error) {
-          //rejects("Can't access the Emotiv App");
           console.log(error);
+          reject('No headset connected');
         }
       };
     });
