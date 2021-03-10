@@ -55,6 +55,8 @@ export default function VerticalLinearStepper() {
 
   
   const [text,setText] = useState('')
+  const [text1,setText1] = useState('')
+  
 
   async function hasAccess(){
     let b = await facade.getHasAccess()
@@ -62,10 +64,10 @@ export default function VerticalLinearStepper() {
     else {setText('Could not connect to emotiv app, make sure to give access in emotiv app')}
   }
 
-  async function getHeadsetID(){
-    let s = await facade.getheadsetID()
-    setText(s)
-  }
+   async function getHeadsetID(){
+     let s = await facade.getheadsetID()
+     setText1(s)
+   }
 
 
 
@@ -76,7 +78,7 @@ export default function VerticalLinearStepper() {
       return text
       case 1:
         getHeadsetID()
-        return text
+        return text1
       case 2:
         return text
       default:
