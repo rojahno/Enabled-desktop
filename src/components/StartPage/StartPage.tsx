@@ -35,7 +35,9 @@ export default function StartPage(_props: any) {
          <div className="frontpage-container">
          <VerticalLinearStepper/>
       <SimplePaper>
+        <Link to = '/select'>
         <Button variant="contained">Default</Button>
+        </Link>
       </SimplePaper>
          </div>
     </div>
