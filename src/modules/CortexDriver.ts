@@ -659,6 +659,7 @@ class CortexDriver {
   public unsubscribe(observer: IObserver) {
     let observerToRemove = observer;
     console.table(this.observers);
+    
     this.observers = this.observers.filter((item) => item !== observerToRemove);
     console.table(this.observers);
   }

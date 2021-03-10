@@ -19,7 +19,6 @@ class MobileDriver implements IObserver {
     console.log('The command: ' + command);
     this.currentTime = Date.now();
     if (this.currentTime - this.previousTriggerTime >= this.commandInterval) {
-      this.previousTriggerTime = this.currentTime;
       this.sendSomething(command);
     }
   }
@@ -77,6 +76,7 @@ class MobileDriver implements IObserver {
         setTimeout(this.reconnect, CONNECTION_RETRY_INTERVAL);
       } else {
         // we passed the threshold for retries, let's abort
+        this.unsubscribeToCortexStream();
         this._retryCount = 0;
       }
     };
@@ -103,14 +103,18 @@ class MobileDriver implements IObserver {
     return Math.floor(Math.random() * Math.floor(max));
   }
 
-  unsubscribeToCortexStream = async () => {
+  unsubscribeToCortexStream = () => {
     let driver: CortexDriver = CortexDriver.getInstance();
     driver.unsubscribe(this);
-    await driver.stopStream();
+    driver.stopStream();
   };
 
   closeSocket() {
-  this._socket.close();
+    this.socket.onclose = (_error) => {
+      this.unsubscribeToCortexStream();
+      console.log('closing stream');
+    };
+    this._socket.close();
   }
   /**
    * Checks if we can reconnect or we have reaches our maximun amount of tries.
@@ -125,23 +129,28 @@ class MobileDriver implements IObserver {
     switch (state) {
       case 1:
         command = 'right';
+        this.previousTriggerTime = this.currentTime;
         break;
 
       case 2:
         command = 'left';
+        this.previousTriggerTime = this.currentTime;
         break;
 
       case 3:
         command = 'push';
+        this.previousTriggerTime = this.currentTime;
         break;
 
       case 4:
         command = 'pull';
+        this.previousTriggerTime = this.currentTime;
         break;
 
       default:
         {
           command = 'neutral';
+          this.previousTriggerTime = this.currentTime;
         }
         break;
     }
