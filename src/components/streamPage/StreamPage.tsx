@@ -52,11 +52,11 @@ export default function StreamPage(props: any) {
     mobileDriver.startSocket(ip);
     let driver: CortexDriver = CortexDriver.getInstance();
     const offLoad = () => {
-      //driver.unsubscribe(onStreamUpdated);
       driver.stopStream();
+      mobileDriver.closeSocket();
     };
 
-    return () => offLoad();
+    return() => offLoad();
   }, []);
   return (
     <div className={classes.root}>
