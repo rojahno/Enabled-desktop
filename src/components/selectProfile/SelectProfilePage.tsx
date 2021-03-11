@@ -92,20 +92,19 @@ export default function SelectProfilePage(_props: any) {
       console.log(error);
     }
   }
-
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
+   
     const getProfiles = async () => {
       try{
       let driver = CortexDriver.getInstance();
-
-      
       let authToken = await driver.authorize();
       let allProfiles = await driver.queryProfileRequest(authToken);
-      
+      setErrorMessage('');
       setProfiles(allProfiles);
     }catch(error){
-      console.log(error);
+      setErrorMessage(error);
     }
     };
 
@@ -117,6 +116,7 @@ export default function SelectProfilePage(_props: any) {
       <div className={classes.container}>
         <SimplePaper>
           <h3>Select profile {selectedProfile}</h3>
+          <p>{errorMessage}</p>
 
           <div className={classes.profileList}>
             <List>
