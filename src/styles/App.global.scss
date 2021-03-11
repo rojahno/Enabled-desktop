@@ -24,6 +24,10 @@ body {
   display: flex;
 }
 
+.img{
+  max-width: 100%;
+}
+
 .profileButtons {
   display: flex;
   flex-direction: column;
@@ -70,10 +74,6 @@ p{margin:5px}
 
 button:hover {
   transform: scale(1.05);
-}
-
-li {
-  list-style: none;
 }
 
 a {
