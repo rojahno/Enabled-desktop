@@ -5,7 +5,7 @@ import CustomDialog from './CustomDialog';
 import SimplePaper from '../SimplePaper';
 import { Link } from 'react-router-dom';
 import VerticalLinearStepper from '../stepper'
-import SettingsDialogue from '../settings/SettingsDialogue';
+import Button from '@material-ui/core/Button'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -27,24 +27,19 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 );
 
-
-export default function FrontPage(_props: any) {
+export default function StartPage(_props: any) {
   const classes = useStyles();
 
   return (
     <div className={classes.root}>
-      <SettingsDialogue/>
+         <div className="frontpage-container">
+         <VerticalLinearStepper/>
       <SimplePaper>
-        <h3>Add the IP of your phone</h3>
-        <CustomInput />
-        <CustomDialog />
-        <Link to="/select">
-          <button>Select profile</button>
-        </Link>
-        <Link to="/ip">
-          <button>Main</button>
+        <Link to = '/select'>
+        <Button variant="contained">Default</Button>
         </Link>
       </SimplePaper>
+         </div>
     </div>
   );
 }

@@ -8,6 +8,8 @@ import {
   QueryProfileResponse,
   RequestAccessResponse,
   SetupProfileObject,
+  GetCurrentProfileResponse,
+  DataSample,
 } from './interfaces';
 
 /**
@@ -35,11 +37,10 @@ class CortexDriver {
   private _user: any;
 
   private _retryCount: number = 0;
-  private observers: StreamObserver[] = [];
+  private observers: IObserver[] = [];
 
   private cortexToken: string = '';
   private sessionId: string = '';
-
 
   constructor() {
     this._socket = new WebSocket('wss://localhost:6868');
@@ -157,25 +158,23 @@ class CortexDriver {
       method: 'queryHeadsets',
       params: {},
     };
-
     return new Promise<string>((resolve, reject) => {
       this._socket.send(JSON.stringify(queryHeadsetRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
           let headsetQuery: QueryHeadsetIdResponse = JSON.parse(data);
           let queryHeadsetId: number = headsetQuery.id;
-
+          
           if (queryHeadsetId == QUERY_HEADSET_ID) {
             if (headsetQuery.result.length > 0) {
               let headsetId: string = headsetQuery.result[0].id;
-              console.log('query id' + headsetId);
               resolve(headsetId);
             }
           }
         } catch (error) {}
         const rejectString =
-          'Cant find any headset. Please connect a headset to your pc and ' +
-          'check if the headseth is connected to the Emotiv app';
+        'Cant find any headset. Please connect a headset to your pc and ' +
+        'check if the headseth is connected to the Emotiv app';
         reject(rejectString);
       };
     });
@@ -219,7 +218,6 @@ class CortexDriver {
    * @returns the Cortex token
    */
   public authorize = async (): Promise<string> => {
-    console.log('authorize is called');
     return new Promise<string>((resolve, reject) => {
       const AUTHORIZE_ID = 4;
       let authorizeRequest = {
@@ -235,7 +233,6 @@ class CortexDriver {
       };
       this._socket.send(JSON.stringify(authorizeRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
-        console.log('auth data: ' + data);
         try {
           let parsed: AuthorizeResponse = JSON.parse(data);
           if (parsed.id == AUTHORIZE_ID) {
@@ -323,7 +320,7 @@ class CortexDriver {
    * @param sessionId
    * Starts the stream and notifies the observers.
    */
-  public startStream = (authToken: string, sessionId: string) => {
+  public startStream = async (authToken: string, sessionId: string) => {
     const SUB_REQUEST_ID = 6;
     let subRequest = {
       jsonrpc: '2.0',
@@ -340,7 +337,10 @@ class CortexDriver {
     this._socket.send(JSON.stringify(subRequest));
     this._socket.onmessage = ({ data }: MessageEvent) => {
       try {
-        this.notify(data);
+        if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
+          let parsed: DataSample = JSON.parse(data);
+          this.notify(parsed.com[0]);
+        }
       } catch (error) {
         console.error('Sub request error');
       }
@@ -362,7 +362,6 @@ class CortexDriver {
     if (this.cortexToken) this._socket.send(JSON.stringify(subRequest));
     this._socket.onmessage = ({ data }: MessageEvent) => {
       try {
-        //console.log("stop stream: " + data);
       } catch (error) {
         console.error('Sub request error');
       }
@@ -467,32 +466,79 @@ class CortexDriver {
       id: SETUP_PROFILE_ID,
     };
 
-    return new Promise<string>((resolve) => {
+    return new Promise<string>((resolve, reject) => {
       this._socket.send(JSON.stringify(setupProfileRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
           let setupQuery: SetupProfileObject = JSON.parse(data);
-          console.log('setupquery : ' + data);
 
           if (data.indexOf('error') !== -1) {
             resolve(data);
-          } else if (status == 'create') {
-            resolve(setupQuery.result.message);
-          }
 
-          if (setupQuery.id == SETUP_PROFILE_ID) {
-            if (setupQuery.result.action == status) {
-              resolve(data);
+            if (setupQuery.id == SETUP_PROFILE_ID) {
+              if (setupQuery.result.action == status) {
+                resolve(data);
+              }
             }
           }
         } catch (error) {
-          //rejects("Can't access the Emotiv App");
           console.log(error);
+          reject('No headset connected');
         }
       };
     });
   };
 
+  /**
+   * Sets the profile of the headset.
+   *
+   * @param authToken The cortex token
+   * @param headsetId The headset id
+   * @param profileName The profile name you want to set
+   * @param status The status
+   *
+   * @returns a response object from the Emotiv API.
+   * @todo change the return value.
+   */
+  public hasCurrentProfile = async (
+    authToken: string,
+    headsetId: string
+  ): Promise<boolean> => {
+    const SETUP_PROFILE_ID = 7;
+    let getCurrentProfileRequest = {
+      id: 1,
+      jsonrpc: '2.0',
+      method: 'getCurrentProfile',
+      params: {
+        cortexToken: authToken,
+        headset: headsetId,
+      },
+    };
+
+    return new Promise<boolean>((resolve) => {
+      this._socket.send(JSON.stringify(getCurrentProfileRequest));
+      this._socket.onmessage = ({ data }: MessageEvent) => {
+        try {
+          let currentProfileResponse: GetCurrentProfileResponse = JSON.parse(
+            data
+          );
+
+          if (currentProfileResponse.result.name == null) {
+            console.log('No loaded profile' + currentProfileResponse);
+            resolve(false);
+          } else {
+            console.log(
+              'Loaded profile: ' + currentProfileResponse.result.name
+            );
+            resolve(true);
+          }
+        } catch (error) {
+          resolve(false);
+          console.log('setup profile error: ' + error);
+        }
+      };
+    });
+  };
   /**
    *
    * Gets the currently loaded profile.
@@ -536,7 +582,7 @@ class CortexDriver {
     profile: string,
     session: string,
     values: number[]
-  ) => {
+  ): Promise<string> => {
     let currentProfileRequest = {
       id: 1,
       jsonrpc: '2.0',
@@ -549,10 +595,17 @@ class CortexDriver {
         values: values,
       },
     };
-
-    this._socket.send(JSON.stringify(currentProfileRequest));
+    return new Promise<string>((resolve, reject) => {
+      this._socket.send(JSON.stringify(currentProfileRequest));
+      this._socket.onmessage = ({ data }: MessageEvent) => {
+        try {
+          console.log(data);
+        } catch (error) {
+          reject('set sensitivity profile error');
+        }
+      };
+    });
   };
-
 
   /**
    * Queries all the profiles saved on this user.
@@ -593,7 +646,7 @@ class CortexDriver {
     });
   };
 
-  public async subscribe(observer: StreamObserver) {
+  public async subscribe(observer: IObserver) {
     this.observers.push(observer);
   }
 
@@ -602,17 +655,22 @@ class CortexDriver {
    * @param observer the observer to remove
    * @todo check if filter logic i correct??
    */
-  public unsubscribe(observer: StreamObserver) {
+
+  public unsubscribe(observer: IObserver) {
     let observerToRemove = observer;
-    console.log(this.observers);
+    console.table(this.observers);
+    
     this.observers = this.observers.filter((item) => item !== observerToRemove);
-    console.log(this.observers);
+    console.table(this.observers);
   }
 
   private notify(streamCommand: string) {
-    this.observers.forEach((observer) => observer(streamCommand));
+    this.observers.forEach((observer) => observer.sendCommand(streamCommand));
   }
-
 }
 
-export { CortexDriver, StreamObserver };
+interface IObserver {
+  sendCommand(command: string): void;
+}
+
+export { CortexDriver, StreamObserver, IObserver };
