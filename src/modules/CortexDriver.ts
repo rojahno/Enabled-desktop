@@ -1,4 +1,5 @@
-import CortexError from './Error';
+import { rejects } from 'assert';
+import CortexError from './CortexError';
 
 import {
   AuthorizeResponse,
@@ -164,18 +165,16 @@ class CortexDriver {
         try {
           let headsetQuery: QueryHeadsetIdResponse = JSON.parse(data);
           let queryHeadsetId: number = headsetQuery.id;
-          
+
           if (queryHeadsetId == QUERY_HEADSET_ID) {
             if (headsetQuery.result.length > 0) {
               let headsetId: string = headsetQuery.result[0].id;
               resolve(headsetId);
             }
           }
-        } catch (error) {}
-        const rejectString =
-        'Cant find any headset. Please connect a headset to your pc and ' +
-        'check if the headseth is connected to the Emotiv app';
-        reject(rejectString);
+        } catch (error) {
+          reject(new CortexError(2, error));
+        }
       };
     });
   };
@@ -186,8 +185,8 @@ class CortexDriver {
    * @todo change return value
    */
 
-  public requestAccess = async (): Promise<string> => {
-    return new Promise<string>((resolve, reject) => {
+  public requestAccess = async (): Promise<boolean> => {
+    return new Promise<boolean>((resolve, reject) => {
       const REQUEST_ACCESS_ID = 1;
       let requestAccessRequest = {
         id: REQUEST_ACCESS_ID,
@@ -198,15 +197,16 @@ class CortexDriver {
           clientSecret: this._user.clientSecret,
         },
       };
+
       this._socket.send(JSON.stringify(requestAccessRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
           let parsed: RequestAccessResponse = JSON.parse(data);
           if (parsed.id == REQUEST_ACCESS_ID) {
-            resolve(data);
+            resolve(parsed.result.accessGranted);
           }
         } catch (error) {
-          reject("Can't access the Emotiv application");
+          reject(new CortexError(3, error));
         }
       };
     });
@@ -240,8 +240,9 @@ class CortexDriver {
             this.cortexToken = cortexToken;
             resolve(cortexToken);
           }
-        } catch (error) {}
-        reject('Authorize error');
+        } catch (error) {
+          reject(new CortexError(3, error));
+        }
       };
     });
   };
@@ -471,19 +472,16 @@ class CortexDriver {
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
           let setupQuery: SetupProfileObject = JSON.parse(data);
-
-          if (data.indexOf('error') !== -1) {
-            resolve(data);
-
-            if (setupQuery.id == SETUP_PROFILE_ID) {
-              if (setupQuery.result.action == status) {
-                resolve(data);
-              }
+          console.log(data);
+          
+          if (data.indexOf('error') === -1) {
+            if (setupQuery.result.action == status) {
+              resolve(data);
             }
           }
         } catch (error) {
           console.log(error);
-          reject('No headset connected');
+          reject(new CortexError(2, error));
         }
       };
     });
@@ -515,7 +513,7 @@ class CortexDriver {
       },
     };
 
-    return new Promise<boolean>((resolve) => {
+    return new Promise<boolean>((resolve, reject) => {
       this._socket.send(JSON.stringify(getCurrentProfileRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
@@ -533,8 +531,8 @@ class CortexDriver {
             resolve(true);
           }
         } catch (error) {
-          resolve(false);
-          console.log('setup profile error: ' + error);
+          console.log('has current profile error: ' + error);
+          reject(new CortexError(2, error));
         }
       };
     });
@@ -646,6 +644,14 @@ class CortexDriver {
     });
   };
 
+  private hasErrorInString(data: string) {
+    if (data.indexOf('error') !== -1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   public async subscribe(observer: IObserver) {
     this.observers.push(observer);
   }
@@ -659,7 +665,7 @@ class CortexDriver {
   public unsubscribe(observer: IObserver) {
     let observerToRemove = observer;
     console.table(this.observers);
-    
+
     this.observers = this.observers.filter((item) => item !== observerToRemove);
     console.table(this.observers);
   }

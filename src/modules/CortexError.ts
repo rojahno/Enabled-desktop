@@ -28,15 +28,26 @@ class CortexError {
 
       case 2:
         {
-          return 'case 2';
+          return 'Cant find any headset. Please connect a headset to your pc and ' +
+          'check if the headseth is connected to the Emotiv app';
         }
+        break;
+
+        case 3:
+          {
+            return 'Access to the Emotiv application was denied';
+          }
+        break;
+        case 4:
+          {
+            return '';
+          }
         break;
 
       default: {
         return 'undefined error';
       }
     }
-    return 'undefined error';
   }
 }
 
