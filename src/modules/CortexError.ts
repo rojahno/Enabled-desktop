@@ -40,9 +40,17 @@ class CortexError {
         break;
         case 4:
           {
-            return '';
+            return 'Unable to create a session with the Emotiv servers';
           }
         break;
+
+        case 5:
+          {
+            return ' "Headset has been disconnected due to connection timeout';
+          }
+        break;
+
+       
 
       default: {
         return 'undefined error';

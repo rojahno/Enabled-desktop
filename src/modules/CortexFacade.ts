@@ -24,6 +24,9 @@ class CortexFacade {
 
   handleSetProfile = async (selectedProfile: string) => {
     try {
+        if(!this.driver.isConnected()){
+            await this.driver.awaitSocketOpening();
+        }
       let authoken: string = await this.driver.authorize();
       let headsetId: string = await this.driver.queryHeadsetId();
       let hasLoadedProfile = await this.driver.hasCurrentProfile(
@@ -40,15 +43,15 @@ class CortexFacade {
           selectedProfile,
           'load'
           );
-          console.log('is here');
       
       return;
     } catch (error) {
       console.log(error);
-      return this.errorHandling(error); //Refactort errorHandling to hadle rejects
+      return this.errorHandling(error); 
     }
   };
-
+  
+//Refactort errorHandling to handle rejects
   errorHandling(error: any) {
     if (error instanceof CortexError) {
       return error;

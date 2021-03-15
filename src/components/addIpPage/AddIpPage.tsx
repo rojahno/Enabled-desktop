@@ -6,6 +6,7 @@ import SimplePaper from '../SimplePaper';
 import { Link } from 'react-router-dom';
 import { CortexDriver } from '../../modules/CortexDriver';
 import { useHistory } from 'react-router-dom';
+import { MobileDriver } from '../../modules/MobileDriver';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -80,18 +81,21 @@ export default function AddIpPage(_props: any) {
 
       if (hasLoadedProfile) {
         let validIpAdress = hasValidIPaddress(ipAdress);
-        console.log(validIpAdress);
+        console.log('valid ip: ' + validIpAdress);
         setValidIpAdress(validIpAdress);
         if (validIpAdress) {
-          alert('success');
-
+          let mobileDriver = MobileDriver.getInstance();
+          let connected = await mobileDriver.awaitSocketOpening(ipAdress);
+          if(connected){
           history.push({ pathname: '/stream', state: { ipAdress: ipAdress } });
-        } else {
-          alert('You have entered an invalid IP address!');
+          }
+          else{
+            alert('Cant connect to the phone. Check the ip adress and that the application is running');
+          }
         }
       }
     } catch (error) {
-      console.log(error);
+      console.log('handle click: ' + error);
     }
   };
 

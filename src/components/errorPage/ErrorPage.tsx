@@ -1,11 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import SimplePaper from '../SimplePaper';
-import { Link, useHistory } from 'react-router-dom';
 import { useEffect } from 'react';
-import { CortexDriver } from '../../modules/CortexDriver';
-import ListItem from '@material-ui/core/ListItem';
-import List from '@material-ui/core/List';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

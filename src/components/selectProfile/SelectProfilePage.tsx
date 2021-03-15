@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import SimplePaper from '../SimplePaper';
 import { Link, useHistory } from 'react-router-dom';
@@ -7,7 +7,6 @@ import { CortexDriver } from '../../modules/CortexDriver';
 import ListItem from '@material-ui/core/ListItem';
 import List from '@material-ui/core/List';
 import { CortexFacade } from '../../modules/CortexFacade';
-import ErrorPage from '../errorPage/ErrorPage';
 import CortexError from '../../modules/CortexError';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -66,7 +65,7 @@ const useStyles = makeStyles((theme: Theme) =>
  */
 export default function SelectProfilePage(_props: any) {
   const classes = useStyles();
-  const [profiles, setProfiles] = useState(['']);
+  const [profiles, setProfiles] = useState<string[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [selectedProfile, setSelectedProfile] = useState('');
   const [hasSelected, setHasSelected] = useState(false);
@@ -87,11 +86,10 @@ export default function SelectProfilePage(_props: any) {
   const handleNextClick = async () => {
     let cortexfacade: CortexFacade = new CortexFacade();
     let setProfileStatus = await cortexfacade.handleSetProfile(selectedProfile);
-    console.log('reaches');
     if (setProfileStatus instanceof CortexError) {
-      setHasError(true);
+      alert(setProfileStatus.errMessage);
     } else {
-    setHasError(false);
+      setHasError(false);
       history.push({ pathname: '/ip' });
     }
   };
@@ -152,7 +150,8 @@ export default function SelectProfilePage(_props: any) {
         </div>
       </div>
     );
-  } else {
-    return <ErrorPage  handleRetry={handleNextClick}/>;
   }
+  //  else {
+  //   return <ErrorPage  handleRetry={handleNextClick}/>;
+  // }
 }

@@ -51,6 +51,10 @@ class MobileDriver implements IObserver {
   private connect = () => {
     this._socket = new WebSocket('ws://' + this.ipAdress + ':9000');
 
+    this.setupSocketEvents();
+  };
+
+  private setupSocketEvents = () => {
     this.socket.onopen = async () => {
       console.log('WS OPENED ✅');
 
@@ -80,6 +84,34 @@ class MobileDriver implements IObserver {
         this._retryCount = 0;
       }
     };
+  };
+
+
+  public awaitSocketOpening = async (ipAdress:string) => {
+    this.setip(ipAdress);
+    this._socket = new WebSocket('ws://' + this.ipAdress + ':9000');
+
+    console.log(ipAdress + 'ya boi')
+    return new Promise<boolean>((resolve, reject) => {
+      let wait = setTimeout(() => {
+        clearTimeout(wait);
+        resolve(false);
+      }, 5000)
+      
+      this.socket.onopen = async () => {
+        this._retryCount = 0;
+        try{
+        await this.startCortexStream();
+        this.setupSocketEvents();
+        resolve(true);
+        }
+        catch(error){
+          console.log('await socket error');
+        }
+
+      };
+      
+    });
   };
 
   /**

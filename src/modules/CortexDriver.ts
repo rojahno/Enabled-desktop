@@ -1,4 +1,3 @@
-import { rejects } from 'assert';
 import CortexError from './CortexError';
 
 import {
@@ -64,13 +63,36 @@ class CortexDriver {
   /**
    * Creates a connection to the websocket and sets the events.
    */
-  private connect = () => {
+  private connect = async () => {
     this._socket = new WebSocket('wss://localhost:6868');
 
-    this.socket.onopen = () => {
+    this.setupSocketEvents();
+
+    // Reconnects if canRetry is true
+    if (this._retryCount < CONNECTION_RETRY_MAX_COUNT) {
+      setTimeout(this.reconnect, CONNECTION_RETRY_INTERVAL);
+    } else {
+      // we passed the threshold for retries, let's abort
+      this._retryCount = 0;
+    }
+  };
+
+  public awaitSocketOpening = async () => {
+    this._socket = new WebSocket('wss://localhost:6868');
+
+    return new Promise<boolean>((resolve, reject) => {
+      this.socket.onopen = () => {
+        this._retryCount = 0;
+        this.setupSocketEvents();
+        resolve(true);
+      };
+    });
+  };
+
+  private setupSocketEvents = () => {
+    this._socket.onopen = () => {
       console.log('WS OPENED ✅');
 
-      // reset the total retries
       this._retryCount = 0;
     };
 
@@ -84,14 +106,6 @@ class CortexDriver {
       // if we aren't retrying...
       if (!this.canRetry()) {
         console.log('Closing');
-      }
-
-      // Reconnects if canRetry is true
-      if (this._retryCount < CONNECTION_RETRY_MAX_COUNT) {
-        setTimeout(this.reconnect, CONNECTION_RETRY_INTERVAL);
-      } else {
-        // we passed the threshold for retries, let's abort
-        this._retryCount = 0;
       }
     };
   };
@@ -309,7 +323,7 @@ class CortexDriver {
             resolve(sessionId);
           }
         } catch (error) {
-          reject('Create session error');
+          reject(new CortexError(4, error));
         }
       };
     });
@@ -431,7 +445,7 @@ class CortexDriver {
             resolve(accessQuery.result.accessGranted);
           }
         } catch (error) {
-          reject("Can't access the Emotiv App");
+          reject(new CortexError(3, error));
         }
       };
     });
@@ -471,12 +485,16 @@ class CortexDriver {
       this._socket.send(JSON.stringify(setupProfileRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
-          let setupQuery: SetupProfileObject = JSON.parse(data);
-          console.log(data);
-          
-          if (data.indexOf('error') === -1) {
-            if (setupQuery.result.action == status) {
-              resolve(data);
+          if (data.indexOf('error') !== -1) {
+            reject(new CortexError(5, data));
+          } else {
+            let setupQuery: SetupProfileObject = JSON.parse(data);
+            console.log(data);
+
+            if (data.indexOf('error') === -1) {
+              if (setupQuery.result.action == status) {
+                resolve(data);
+              }
             }
           }
         } catch (error) {
@@ -569,7 +587,7 @@ class CortexDriver {
             resolve(data);
           }
         } catch (error) {
-          reject('Get current profile error');
+          reject(new CortexError(2, error));
         }
       };
     });
@@ -598,6 +616,7 @@ class CortexDriver {
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
           console.log(data);
+          resolve(data);
         } catch (error) {
           reject('set sensitivity profile error');
         }
