@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import SimplePaper from '../SimplePaper';
-import { CortexDriver, StreamObserver } from '../../modules/CortexDriver';
+import { CortexDriver } from '../../modules/CortexDriver';
 import { Link } from 'react-router-dom';
 import { MobileDriver } from '../../modules/MobileDriver';
 
@@ -31,8 +31,10 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     buttons: {
       display: 'flex',
-      justifyContent: 'space-between',
+      justifyContent: 'flex-start',
+      alignItems:'flex-end',
       width: '100%',
+      height:'100%',
       padding: '3px',
     },
   })
@@ -41,15 +43,11 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function StreamPage(props: any) {
   const classes = useStyles();
   const [streamCommand, setStreamCommand] = useState('');
-  const onStreamUpdated: StreamObserver = (streamCommand: string) => {
-    setStreamCommand(streamCommand);
-  };
 
   useEffect(() => {
     let ip: string = props.location.state.ipAdress;
-    console.log('ip: ' + ip);
     let mobileDriver: MobileDriver = MobileDriver.getInstance();
-    mobileDriver.startSocket(ip);
+    //mobileDriver.startSocket(ip);
     let driver: CortexDriver = CortexDriver.getInstance();
     const offLoad = () => {
       driver.stopStream();
@@ -62,7 +60,7 @@ export default function StreamPage(props: any) {
     <div className={classes.root}>
       <div className={classes.container}>
         <SimplePaper>
-          <h3>Stream</h3>
+          <h3>Stream:</h3>
           <p>{streamCommand} </p>
 
           <div className={classes.buttons}>

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import SimplePaper from '../SimplePaper';
 import { Link, useHistory } from 'react-router-dom';
@@ -6,6 +6,8 @@ import { useEffect } from 'react';
 import { CortexDriver } from '../../modules/CortexDriver';
 import ListItem from '@material-ui/core/ListItem';
 import List from '@material-ui/core/List';
+import { CortexFacade } from '../../modules/CortexFacade';
+import CortexError from '../../modules/CortexError';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -45,30 +47,36 @@ const useStyles = makeStyles((theme: Theme) =>
       width: '100%',
       padding: '3px',
     },
-    listItems:{
-      padding:'10px 20px',
+    listItems: {
+      padding: '10px 20px',
       //backgroundColor:'white',
-      display:'flex',
-      justifyContent:'center',
+      display: 'flex',
+      justifyContent: 'center',
       transition: 'transform ease-in 0.1s',
-      fontSize:'18px',
+      fontSize: '18px',
       //boxShadow:'0px 8px 28px -6px rgba(24, 39, 75, 0.12)',
-
-    }
+    },
   })
 );
-
+/**
+ * @todo Refactor the return into smaller components
+ * @param _props
+ * @returns
+ */
 export default function SelectProfilePage(_props: any) {
   const classes = useStyles();
-  const [profiles, setProfiles] = useState(['']);
+  const [profiles, setProfiles] = useState<string[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [selectedProfile, setSelectedProfile] = useState("");
+  const [selectedProfile, setSelectedProfile] = useState('');
   const [hasSelected, setHasSelected] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const history = useHistory();
 
   const handleListItemClick = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
     index: number,
-    profile:string,
+    profile: string
   ) => {
     setSelectedIndex(index);
     setSelectedProfile(profile);
@@ -76,80 +84,74 @@ export default function SelectProfilePage(_props: any) {
   };
 
   const handleNextClick = async () => {
-
-    try{
-    let driver:CortexDriver = CortexDriver.getInstance();
-    let authoken:string = await driver.authorize();
-    let headsetId:string = await driver.queryHeadsetId();
-    let hasLoadedProfile = await driver.hasCurrentProfile(authoken, headsetId);
-
-    if(hasLoadedProfile){
-    await driver.setupProfile(authoken, headsetId,'', 'unload');
+    let cortexfacade: CortexFacade = new CortexFacade();
+    let setProfileStatus = await cortexfacade.handleSetProfile(selectedProfile);
+    if (setProfileStatus instanceof CortexError) {
+      alert(setProfileStatus.errMessage);
+    } else {
+      setHasError(false);
+      history.push({ pathname: '/ip' });
     }
-    await driver.setupProfile(authoken,headsetId,selectedProfile,'load');
-    }
-    catch(error){
-      console.log(error);
-    }
-  }
-  const [errorMessage, setErrorMessage] = useState("");
+  };
 
   useEffect(() => {
-   
     const getProfiles = async () => {
-      try{
-      let driver = CortexDriver.getInstance();
-      let authToken = await driver.authorize();
-      let allProfiles = await driver.queryProfileRequest(authToken);
-      setErrorMessage('');
-      setProfiles(allProfiles);
-    }catch(error){
-      setErrorMessage(error);
-    }
+      try {
+        let driver = CortexDriver.getInstance();
+        let authToken = await driver.authorize();
+        let allProfiles = await driver.queryProfileRequest(authToken);
+        setErrorMessage('');
+        setProfiles(allProfiles);
+      } catch (error) {
+        setErrorMessage(error);
+        setHasError(true);
+      }
     };
 
     getProfiles();
   }, []);
 
-  return (
-    <div className={classes.root}>
-      <div className={classes.container}>
-        <SimplePaper>
-          <h3>Select profile {selectedProfile}</h3>
-          <p>{errorMessage}</p>
+  if (!hasError) {
+    return (
+      <div className={classes.root}>
+        <div className={classes.container}>
+          <SimplePaper>
+            <h3>Select profile {selectedProfile}</h3>
+            <p>{errorMessage}</p>
 
-          <div className={classes.profileList}>
-            <List>
-            {profiles.map((profile, index) => (
-              <ListItem
-              className={classes.listItems}
-                key={index}
-                button
-                selected={selectedIndex === index}
-                onClick={(event) => handleListItemClick(event, index, profile)}
-              >
-                {profile}
-              </ListItem>
-            ))}
-            </List>
-          </div>
+            <div className={classes.profileList}>
+              <List>
+                {profiles.map((profile, index) => (
+                  <ListItem
+                    className={classes.listItems}
+                    key={index}
+                    button
+                    selected={selectedIndex === index}
+                    onClick={(event) =>
+                      handleListItemClick(event, index, profile)
+                    }
+                  >
+                    {profile}
+                  </ListItem>
+                ))}
+              </List>
+            </div>
 
-          <div className={classes.buttons}>
-            <Link to="/">
-              <button>back</button>
-            </Link>
+            <div className={classes.buttons}>
+              <Link to="/">
+                <button>back</button>
+              </Link>
 
-            { 
-            <Link to="/ip">
-              <button
-              disabled={!hasSelected}
-              onClick={handleNextClick}
-              >Next</button>
-            </Link>
-}
-          </div>
-        </SimplePaper>
+              <button disabled={!hasSelected} onClick={handleNextClick}>
+                Next
+              </button>
+            </div>
+          </SimplePaper>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+  //  else {
+  //   return <ErrorPage  handleRetry={handleNextClick}/>;
+  // }
 }
