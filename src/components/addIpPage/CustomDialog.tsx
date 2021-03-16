@@ -136,16 +136,16 @@ export default function CustomDialog(_props: any) {
           How to find ip
         </DialogTitle>
         <DialogContent dividers className={classes.dialogContent}>
-          <Typography gutterBottom>On enabled app:</Typography>
-          <DialogContentText>
+          <h3>On enabled app:</h3>
+          <div>
             <ol>
               <li>Open the enabled app</li>
               <li>Press the ip button</li>
             </ol>
-          </DialogContentText>
+          </div>
           <Divider className={classes.divider} />
-          <Typography gutterBottom>On iphone:</Typography>
-          <DialogContentText>
+          <h3>On iphone:</h3>
+          <div >
             <ol>
               <li>Open settings</li>
               <li>Press the 'Wi-Fi' tab</li>
@@ -161,17 +161,17 @@ export default function CustomDialog(_props: any) {
                 <img className={classes.image} src={iphoneAbout} />
               </div>
             </ol>
-          </DialogContentText>
+          </div>
           <Divider className={classes.divider} />
-          <Typography gutterBottom>On android :</Typography>
-          <DialogContentText>
+          <h3>On android :</h3>
+          <div>
             <ol>
               <li>Open settings</li>
               <li>Navigate to "about phone" and select it</li>
               <li>Navigate to "status" and select it</li>
               <li>That's it. You can now read your IP Adress</li>
             </ol>
-          </DialogContentText>
+          </div>
         </DialogContent>
 
         <DialogActions>

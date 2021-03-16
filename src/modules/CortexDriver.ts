@@ -81,6 +81,10 @@ class CortexDriver {
     this._socket = new WebSocket('wss://localhost:6868');
 
     return new Promise<boolean>((resolve, reject) => {
+      let wait = setTimeout(() => {
+        clearTimeout(wait);
+        resolve(false);
+      }, 5000);
       this.socket.onopen = () => {
         this._retryCount = 0;
         this.setupSocketEvents();
@@ -177,11 +181,17 @@ class CortexDriver {
       this._socket.send(JSON.stringify(queryHeadsetRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
-          let headsetQuery: QueryHeadsetIdResponse = JSON.parse(data);
-          let queryHeadsetId: number = headsetQuery.id;
+          if (data.indexOf('error') !== -1) {
+            reject(new CortexError(2, data));
+          } else {
+            let headsetQuery: QueryHeadsetIdResponse = JSON.parse(data);
+            let queryHeadsetId: number = headsetQuery.id;
 
-          if (queryHeadsetId == QUERY_HEADSET_ID) {
-            if (headsetQuery.result.length > 0) {
+            if (headsetQuery.result.length < 0) {
+              reject(new CortexError(2, data));
+            }
+
+            if (queryHeadsetId == QUERY_HEADSET_ID) {
               let headsetId: string = headsetQuery.result[0].id;
               resolve(headsetId);
             }
@@ -489,7 +499,6 @@ class CortexDriver {
             reject(new CortexError(5, data));
           } else {
             let setupQuery: SetupProfileObject = JSON.parse(data);
-            console.log(data);
 
             if (data.indexOf('error') === -1) {
               if (setupQuery.result.action == status) {
