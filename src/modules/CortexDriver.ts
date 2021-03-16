@@ -10,6 +10,7 @@ import {
   SetupProfileObject,
   GetCurrentProfileResponse,
   DataSample,
+  Warning
 } from './interfaces';
 
 /**
@@ -181,7 +182,10 @@ class CortexDriver {
       this._socket.send(JSON.stringify(queryHeadsetRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
+          
           if (data.indexOf('error') !== -1) {
+            let parsed:Warning = JSON.parse(data);
+            console.log(parsed.warning.message);
             reject(new CortexError(2, data));
           } else {
             let headsetQuery: QueryHeadsetIdResponse = JSON.parse(data);
@@ -258,6 +262,11 @@ class CortexDriver {
       this._socket.send(JSON.stringify(authorizeRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
+          if (data.indexOf('error') !== -1) {
+            let parsed:Warning = JSON.parse(data);
+            console.log(parsed.warning.message);
+            reject(new CortexError(1, data));
+          }
           let parsed: AuthorizeResponse = JSON.parse(data);
           if (parsed.id == AUTHORIZE_ID) {
             let cortexToken: string = parsed.result.cortexToken;
@@ -495,6 +504,7 @@ class CortexDriver {
       this._socket.send(JSON.stringify(setupProfileRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
+          
           if (data.indexOf('error') !== -1) {
             reject(new CortexError(5, data));
           } else {
