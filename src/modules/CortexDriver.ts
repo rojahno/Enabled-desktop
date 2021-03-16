@@ -523,7 +523,6 @@ class CortexDriver {
    * @param status The status
    *
    * @returns a response object from the Emotiv API.
-   * @todo change the return value.
    */
   public hasCurrentProfile = async (
     authToken: string,
