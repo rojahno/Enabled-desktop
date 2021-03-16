@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import CustomInput from './customInput';
 import CustomDialog from './CustomDialog';
 import SimplePaper from '../SimplePaper';
-import { Link } from 'react-router-dom';
 import { CortexDriver } from '../../modules/CortexDriver';
 import { useHistory } from 'react-router-dom';
 import { MobileDriver } from '../../modules/MobileDriver';
+import NavigationButtons from '../selectProfile/NavigationButtons';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -17,26 +17,10 @@ const useStyles = makeStyles((theme: Theme) =>
       flexDirection: 'row',
       alignItems: 'center',
     },
-    paper: {
-      margin: theme.spacing(3),
-      width: theme.spacing(50),
-      height: theme.spacing(50),
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#ffffff95',
-    },
     container: {
       margin: theme.spacing(2),
       display: 'flex',
       justifyContent: 'center',
-    },
-    buttons: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      width: '100%',
-      padding: '3px',
     },
   })
 );
@@ -106,15 +90,9 @@ export default function AddIpPage(_props: any) {
           <h3>Add the IP of your phone</h3>
           <CustomInput handleChange={handleChange} />
           <CustomDialog />
-          <div className={classes.buttons}>
-            <Link to="/select">
-              <button>Back</button>
-            </Link>
-
-            <button disabled={!validIpAdress} onClick={handleNextClick}>
-              Next
-            </button>
-          </div>
+          <NavigationButtons canNavigateForward={validIpAdress}
+          handleNextClick={handleNextClick}
+          backNavigation ={'/select'} />
         </SimplePaper>
       </div>
     </div>
