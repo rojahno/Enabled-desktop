@@ -41,7 +41,7 @@ const useStyles = makeStyles(function (theme: Theme) {
   });
 });
 
-interface handleInputChange{
+export interface handleInputChange{
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
