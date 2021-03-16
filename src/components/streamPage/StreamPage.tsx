@@ -14,16 +14,6 @@ const useStyles = makeStyles((theme: Theme) =>
       flexDirection: 'row',
       alignItems: 'center',
     },
-    paper: {
-      margin: theme.spacing(3),
-      width: theme.spacing(50),
-      height: theme.spacing(50),
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#ffffff95',
-    },
     container: {
       margin: theme.spacing(2),
       display: 'flex',
@@ -42,12 +32,12 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function StreamPage(props: any) {
   const classes = useStyles();
-  const [streamCommand, setStreamCommand] = useState('');
+  const [ip, setIp] = useState('');
 
   useEffect(() => {
     let ip: string = props.location.state.ipAdress;
+    setIp(ip);
     let mobileDriver: MobileDriver = MobileDriver.getInstance();
-    //mobileDriver.startSocket(ip);
     let driver: CortexDriver = CortexDriver.getInstance();
     const offLoad = () => {
       driver.stopStream();
@@ -61,7 +51,7 @@ export default function StreamPage(props: any) {
       <div className={classes.container}>
         <SimplePaper>
           <h3>Stream:</h3>
-          <p>{streamCommand} </p>
+          <p>{'Connected to: ' + ip} </p>
 
           <div className={classes.buttons}>
             <Link to="/ip">

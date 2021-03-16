@@ -548,7 +548,7 @@ class CortexDriver {
           );
 
           if (currentProfileResponse.result.name == null) {
-            console.log('No loaded profile' + currentProfileResponse);
+            console.log('No previously loaded profile' + currentProfileResponse);
             resolve(false);
           } else {
             console.log(
