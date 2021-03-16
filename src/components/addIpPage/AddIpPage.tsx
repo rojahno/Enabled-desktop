@@ -90,12 +90,12 @@ export default function AddIpPage(_props: any) {
           history.push({ pathname: '/stream', state: { ipAdress: ipAdress } });
           }
           else{
-            alert('Cant connect to the phone. Check the ip adress and that the application is running');
+            alert('Can\'t connect to the phone. Check the ip adress and that the application is running');
           }
         }
       }
     } catch (error) {
-      console.log('handle click: ' + error);
+      console.log('Handle click: ' + error);
     }
   };
 

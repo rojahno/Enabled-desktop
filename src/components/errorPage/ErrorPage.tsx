@@ -43,12 +43,10 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     listItems: {
       padding: '10px 20px',
-      //backgroundColor:'white',
       display: 'flex',
       justifyContent: 'center',
       transition: 'transform ease-in 0.1s',
       fontSize: '18px',
-      //boxShadow:'0px 8px 28px -6px rgba(24, 39, 75, 0.12)',
     },
   })
 );

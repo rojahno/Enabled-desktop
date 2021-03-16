@@ -86,31 +86,27 @@ class MobileDriver implements IObserver {
     };
   };
 
-
-  public awaitSocketOpening = async (ipAdress:string) => {
+  public awaitSocketOpening = async (ipAdress: string) => {
     this.setip(ipAdress);
     this._socket = new WebSocket('ws://' + this.ipAdress + ':9000');
 
-    console.log(ipAdress + 'ya boi')
+    console.log('Connecting to: ' + ipAdress);
     return new Promise<boolean>((resolve, reject) => {
       let wait = setTimeout(() => {
         clearTimeout(wait);
         resolve(false);
-      }, 5000)
-      
+      }, 5000);
+
       this.socket.onopen = async () => {
         this._retryCount = 0;
-        try{
-        await this.startCortexStream();
-        this.setupSocketEvents();
-        resolve(true);
-        }
-        catch(error){
+        try {
+          await this.startCortexStream();
+          this.setupSocketEvents();
+          resolve(true);
+        } catch (error) {
           console.log('await socket error');
         }
-
       };
-      
     });
   };
 

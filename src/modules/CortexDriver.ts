@@ -499,7 +499,6 @@ class CortexDriver {
             reject(new CortexError(5, data));
           } else {
             let setupQuery: SetupProfileObject = JSON.parse(data);
-            console.log(data);
 
             if (data.indexOf('error') === -1) {
               if (setupQuery.result.action == status) {
