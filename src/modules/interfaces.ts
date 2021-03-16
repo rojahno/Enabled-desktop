@@ -96,8 +96,13 @@ interface DataSample{
   com:[command:string],
   sid:string,
   time:number
-
-
+}
+interface Warning{
+  jsonrpc:string,
+  warning:{
+    code:number,
+    message:any
+  }
 }
 
 export {
@@ -114,4 +119,5 @@ export {
   CreateSessionResponse,
   GetCurrentProfileResponse,
   DataSample,
+  Warning,
 };
