@@ -69,7 +69,6 @@ export default function SelectProfilePage(_props: any) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [selectedProfile, setSelectedProfile] = useState('');
   const [hasSelected, setHasSelected] = useState(false);
-  const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const history = useHistory();
 
@@ -84,14 +83,20 @@ export default function SelectProfilePage(_props: any) {
   };
 
   const handleNextClick = async () => {
+    
     let cortexfacade: CortexFacade = new CortexFacade();
-    let setProfileStatus = await cortexfacade.handleSetProfile(selectedProfile);
+    try{
+      let setProfileStatus = await cortexfacade.handleSetProfile(selectedProfile);
+      
     if (setProfileStatus instanceof CortexError) {
       alert(setProfileStatus.errMessage);
     } else {
-      setHasError(false);
       history.push({ pathname: '/ip' });
     }
+    }catch(error){
+      alert(error);
+    }
+    
   };
 
   useEffect(() => {
@@ -104,54 +109,48 @@ export default function SelectProfilePage(_props: any) {
         setProfiles(allProfiles);
       } catch (error) {
         setErrorMessage(error);
-        setHasError(true);
       }
     };
 
     getProfiles();
   }, []);
 
-  if (!hasError) {
-    return (
-      <div className={classes.root}>
-        <div className={classes.container}>
-          <SimplePaper>
-            <h3>Select profile {selectedProfile}</h3>
-            <p>{errorMessage}</p>
+  return (
+    <div className={classes.root}>
+      <div className={classes.container}>
+        <SimplePaper>
+          <h3>Select profile {selectedProfile}</h3>
+          <p>{errorMessage}</p>
 
-            <div className={classes.profileList}>
-              <List>
-                {profiles.map((profile, index) => (
-                  <ListItem
-                    className={classes.listItems}
-                    key={index}
-                    button
-                    selected={selectedIndex === index}
-                    onClick={(event) =>
-                      handleListItemClick(event, index, profile)
-                    }
-                  >
-                    {profile}
-                  </ListItem>
-                ))}
-              </List>
-            </div>
+          <div className={classes.profileList}>
+            <List>
+              {profiles.map((profile, index) => (
+                <ListItem
+                  className={classes.listItems}
+                  key={index}
+                  button
+                  selected={selectedIndex === index}
+                  onClick={(event) =>
+                    handleListItemClick(event, index, profile)
+                  }
+                >
+                  {profile}
+                </ListItem>
+              ))}
+            </List>
+          </div>
 
-            <div className={classes.buttons}>
-              <Link to="/">
-                <button>back</button>
-              </Link>
+          <div className={classes.buttons}>
+            <Link to="/">
+              <button>back</button>
+            </Link>
 
-              <button disabled={!hasSelected} onClick={handleNextClick}>
-                Next
-              </button>
-            </div>
-          </SimplePaper>
-        </div>
+            <button disabled={!hasSelected} onClick={handleNextClick}>
+              Next
+            </button>
+          </div>
+        </SimplePaper>
       </div>
-    );
-  }
-  //  else {
-  //   return <ErrorPage  handleRetry={handleNextClick}/>;
-  // }
+    </div>
+  );
 }

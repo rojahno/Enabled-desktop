@@ -50,6 +50,12 @@ class CortexError {
           }
         break;
 
+        case 6:
+          {
+            return 'Unable to create a connection with the Emotiv servers';
+          }
+        break;
+
        
 
       default: {
