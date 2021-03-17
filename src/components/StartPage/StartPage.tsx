@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import CustomInput from './customInput';
 import CustomDialog from './CustomDialog';
@@ -30,12 +30,15 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function StartPage(_props: any) {
   const classes = useStyles();
 
+
   return (
     <div className={classes.root}>
          <div className="frontpage-container">
          <VerticalLinearStepper/>
       <SimplePaper>
-        <Button variant="contained">Default</Button>
+         <h3>Give access through the emotiv application</h3>
+         <h3>Connect your headset to the emotiv application</h3>
+        <Button variant="contained">Next</Button>
       </SimplePaper>
          </div>
     </div>

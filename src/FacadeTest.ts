@@ -3,7 +3,7 @@ import { CortexDriver } from "./modules/CortexDriver";
 
 class FacadeTest {
     private authToken : string = ''
-    private headsetID: string = ''
+    headsetID: string = ''
     private driver = CortexDriver.getInstance();
     
     

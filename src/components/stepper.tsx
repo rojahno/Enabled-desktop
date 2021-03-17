@@ -8,7 +8,9 @@ import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import { FacadeTest } from '../FacadeTest';
-
+import {Error,CheckBox, Adjust} from '@material-ui/icons'
+import { StepIconProps } from '@material-ui/core';
+import clsx from 'clsx';
 
 const StyledStepLabel = styled(StepLabel)({
   '& .MuiStepLabel-label': {
@@ -23,9 +25,8 @@ const facade = new FacadeTest
 const useStyles = makeStyles((theme: Theme) =>
 createStyles({
   root: {
-    width: '35%',
+    width: '15vw',
   },
-  
   button: {
     marginTop: theme.spacing(1),
     marginRight: theme.spacing(1),
@@ -40,6 +41,9 @@ createStyles({
     color: '#fff',
     backgroundColor: '#ffffff27'
   },
+  stepIcon: {
+    color: 'red'
+  }
 }),
 );
 
@@ -51,53 +55,107 @@ function getSteps() {
 
 
 export default function VerticalLinearStepper() {
-  //let lol:string =''
 
   
-  const [text,setText] = useState('')
-  const [text1,setText1] = useState('')
-  
-
-  async function hasAccess(){
-    let b = await facade.getHasAccess()
-    if(b){setText('You are connected to the app')}
-    else {setText('Could not connect to emotiv app, make sure to give access in emotiv app')}
-  }
-
-   async function getHeadsetID(){
-     let s = await facade.getheadsetID()
-     setText1(s)
-   }
-
-
-
-  function getStepContent(step: number) {
-    switch (step) {
-      case 0:  
+  // function trueFalseStepIcon(bool: string){
+    //   let iconArray = icons.slice()
+    //   if(bool === 'true'){iconArray.push(CheckBox)}
+    
+    
+    // }
+    
+    async function hasAccess(){
+      let b = await facade.getHasAccess()
+      if(b){
+        setText('You are connected to the app') 
+        setHasAccessError(false)
+      }
+      else {
+        setText('Could not connect to emotiv app, make sure to give access in emotiv app')
+        setHasAccessError(true)
+      }
+    }
+    
+    async function getHeadsetID(){
+      let s = await facade.getheadsetID()
+      setHeadsetID(s)
+      setHeadSetIdError(true)
+    }
+    
+    async function getDevice(){
+      let s = await facade.getDevice()
+      setDevice(s)
+      setDeviceError(true)
+    }
+    
+    function getStepContent(step: number) {
+      switch (step) {
+        case 0:  
       hasAccess()
       return text
       case 1:
         getHeadsetID()
-        return text1
+        return headsetID
       case 2:
-        return text
+        getDevice()
+        return device
       default:
         return 'Unknown step';
-    
-    }
-  }
-  const classes = useStyles();
-  const [activeStep, setActiveStep] = React.useState(0);
-  const steps = getSteps();
+            
+          }
+        }
+        const [text,setText] = useState('')
+        const [headsetID,setHeadsetID] = useState('')
+        const [device,setDevice] = useState('')
+        const [hasAccessError, setHasAccessError] = useState(false)
+        const [headsetIdError, setHeadSetIdError] = useState(false)
+        const [deviceError, setDeviceError] = useState(false)
+        
+        const handleChange = (text: string) => (event: React.ChangeEvent<{}>) => {
+          setText(text)
+        }
+      
+      
+        
+        function trueFalseStepIcon(props: StepIconProps){
 
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
+        let firstIcon = <Adjust/>
+        let secondIcon = <Adjust/>
+        let thirdIcon = <Adjust/>
+        if(props.active || props.completed){
+          firstIcon = hasAccessError ? <Error/> : <CheckBox/>
+          secondIcon = headsetIdError ? <Error/> : <CheckBox/>
+          thirdIcon = deviceError ? <Error/> : <CheckBox/>
+        }
+        const icons:{[index: string]: React.ReactElement} = {
+          1:firstIcon,
+          2:secondIcon,
+          3:thirdIcon
+        }
+        return(
+          
+          <div>
+             {/* className={clsx(classes.root, {
+        [classes.active]: active,
+        [classes.completed]: completed,
+      })} */}
+          {icons[String(props.icon)]}
+          </div>
+        )
+      
+      }
+        const classes = useStyles();
+        const [activeStep, setActiveStep] = React.useState(0);
+        const steps = getSteps();
+        
+        const handleNext = () => {
+          setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        };
+        
+        const handleBack = () => {
+          setActiveStep((prevActiveStep) => prevActiveStep - 1);
+        };
+        
   const handleReset = () => {
     setActiveStep(0);
   };
@@ -107,7 +165,7 @@ export default function VerticalLinearStepper() {
       <Stepper className={classes.text} activeStep={activeStep} orientation="vertical">
         {steps.map((label, index) => (
           <Step key={label}>
-            <StyledStepLabel>{label}</StyledStepLabel>
+            <StyledStepLabel StepIconProps ={{classes: {root:classes.stepIcon}}} StepIconComponent = {trueFalseStepIcon}>{label}</StyledStepLabel>
             <StepContent>
               <Typography>{getStepContent(index)}</Typography>
               <div className={classes.actionsContainer}>
