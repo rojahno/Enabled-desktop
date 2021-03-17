@@ -60,7 +60,7 @@ class MobileDriver implements IObserver {
 
       // reset the total retries
       this._retryCount = 0;
-      await this.startCortexStream();
+      this.subscribeToCortexStream();
     };
 
     this.socket.onerror = (_error) => {
@@ -100,7 +100,7 @@ class MobileDriver implements IObserver {
       this.socket.onopen = async () => {
         this._retryCount = 0;
         try {
-          await this.startCortexStream();
+          this.subscribeToCortexStream();
           this.setupSocketEvents();
           resolve(true);
         } catch (error) {
@@ -118,13 +118,10 @@ class MobileDriver implements IObserver {
     this.connect();
   };
 
-  startCortexStream = async () => {
+  subscribeToCortexStream = () => {
     let driver: CortexDriver = CortexDriver.getInstance();
     driver.subscribe(this);
-    let authoken: string = await driver.authorize();
-    let headsetId: string = await driver.queryHeadsetId();
-    let sessionId = await driver.createSession(authoken, headsetId);
-    driver.startStream(authoken, sessionId);
+ 
   };
 
   getRandomInt(max: number) {
@@ -134,7 +131,6 @@ class MobileDriver implements IObserver {
   unsubscribeToCortexStream = () => {
     let driver: CortexDriver = CortexDriver.getInstance();
     driver.unsubscribe(this);
-    driver.stopStream();
   };
 
   closeSocket() {

@@ -43,6 +43,18 @@ interface QueryHeadsetIdResult {
   };
   status: string;
 }
+interface getSensitivityResponse{
+
+    id: number;
+    jsonrpc: string;
+    result: number[];
+
+}
+interface getCommandResponse{
+  id: number;
+  jsonrpc: string;
+  result: string[  ]
+}
 
 interface QueryProfileResponse {
   id: number;
@@ -114,4 +126,6 @@ export {
   CreateSessionResponse,
   GetCurrentProfileResponse,
   DataSample,
+  getSensitivityResponse,
+  getCommandResponse,
 };

@@ -4,6 +4,8 @@ import SimplePaper from '../SimplePaper';
 import { CortexDriver } from '../../modules/CortexDriver';
 import { Link } from 'react-router-dom';
 import { MobileDriver } from '../../modules/MobileDriver';
+import SettingSlider from '../settings/SettingSlider';
+import CortexError from '../../modules/CortexError';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -32,17 +34,71 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function StreamPage(props: any) {
   const classes = useStyles();
+  const [headsetId, setHeadsetId] = useState('');
+  const [authToken, setAuthToken] = useState('');
+  const [sessionId, setsessionId] = useState('');
+  const [profile, setProfile] = useState('');
   const [ip, setIp] = useState('');
+  const [sensitivity, setSensitivity] = useState<number[]>();
+  const [activeCommands, setActiveCommands] = useState<string[]>();
+
+  const handleChange = async (event: React.ChangeEvent<{}>,value:number | number[]) =>{
+  
+    if(typeof value === 'number'){
+    let driver:CortexDriver = CortexDriver.getInstance();
+    let sensitivity = [value,value,value, value];
+    let values = [7,7,7,7];
+    console.log('Value: ' + sensitivity);
+      driver.setSensitivity(authToken, profile, sessionId, sensitivity);
+    }
+  
+  }
+
+  const getSensitivity = async () => {      
+    let driver: CortexDriver = CortexDriver.getInstance();
+    let sensitivity = await driver.getSensitivity(authToken, profile);
+    let commands = await driver.getMentalCommandActiveActionRequest(authToken, profile);
+    setSensitivity(sensitivity);
+    setActiveCommands(commands);
+    console.log(sensitivity);
+    
+  }
 
   useEffect(() => {
     let ip: string = props.location.state.ipAdress;
     setIp(ip);
-    let mobileDriver: MobileDriver = MobileDriver.getInstance();
-    let driver: CortexDriver = CortexDriver.getInstance();
+
+    const startStream = async () => {
+      try{
+      let driver: CortexDriver = CortexDriver.getInstance();
+      let authToken: string = await driver.authorize();
+      let headsetId: string = await driver.queryHeadsetId();
+      let sessionId = await driver.createSession(authToken, headsetId);
+      let profile = await driver.getCurrentProfile(authToken, headsetId);
+      //let sensitivity = await driver.getSensitivity(authToken, profile);
+      driver.startStream(authToken, sessionId);
+      setAuthToken(authToken);
+      setHeadsetId(headsetId);
+      setsessionId(sessionId);
+      // setSensitivity(sensitivity);
+      setProfile(profile);
+      console.log("profile: " + profile);
+      }
+      catch(error){
+        if (error instanceof CortexError) {
+          alert(error.errMessage);
+      }
+    }
+  }
+
     const offLoad = () => {
+      let mobileDriver: MobileDriver = MobileDriver.getInstance();
+      let driver: CortexDriver = CortexDriver.getInstance();
       driver.stopStream();
       mobileDriver.closeSocket();
     };
+
+    startStream();
 
     return() => offLoad();
   }, []);
@@ -52,6 +108,12 @@ export default function StreamPage(props: any) {
         <SimplePaper>
           <h3>Stream:</h3>
           <p>{'Connected to: ' + ip} </p>
+          <p>{'Sensitivity: ' + sensitivity} </p>
+          <p>{'Commands: ' + activeCommands} </p>
+          <SettingSlider handleChange={handleChange}/>
+          <button onClick={getSensitivity}>
+            få sensitivity
+          </button>
 
           <div className={classes.buttons}>
             <Link to="/ip">
