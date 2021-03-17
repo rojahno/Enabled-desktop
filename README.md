@@ -3,9 +3,9 @@
 ![Github License](https://img.shields.io/badge/license-MIT-green)
 ![Code Size](https://img.shields.io/github/languages/code-size/rojahno/enabled-desktop)
 
-<img alt="Enabled App"
-        height="400"
-        src="https://i.imgur.com/h7UT5dT.jpeg" />
+<img alt="Enabled Desktop App"
+        height="350"
+        src="https://i.imgur.com/0fa0y9i.png" />
 
 ### Description
 This Project was created as a Bachelor Thesis at Norwegian University of Science and Technology in Ålesund. The aim of the project is to give patients with ALS a way to perform simple tasks and communicate with the people around them using the [Emotiv Epoc X Headset](https://www.emotiv.com/epoc-x/) 
