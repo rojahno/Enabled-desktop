@@ -10,13 +10,15 @@ import Typography from '@material-ui/core/Typography';
 import { FacadeTest } from '../FacadeTest';
 import {Error,CheckBox, Adjust} from '@material-ui/icons'
 import { StepIconProps } from '@material-ui/core';
-import clsx from 'clsx';
+
 
 const StyledStepLabel = styled(StepLabel)({
   '& .MuiStepLabel-label': {
     color: '#fff'
-  }
+  },
+
 });
+
 
 const facade = new FacadeTest
 
@@ -41,7 +43,10 @@ createStyles({
     color: '#fff',
     backgroundColor: '#ffffff27'
   },
-  stepIcon: {
+  successIcon: {
+    color: 'green'
+  },
+  errorIcon: {
     color: 'red'
   }
 }),
@@ -55,7 +60,9 @@ function getSteps() {
 
 
 export default function VerticalLinearStepper() {
-
+  
+  
+  
   
   // function trueFalseStepIcon(bool: string){
     //   let iconArray = icons.slice()
@@ -119,13 +126,17 @@ export default function VerticalLinearStepper() {
         
         function trueFalseStepIcon(props: StepIconProps){
 
-        let firstIcon = <Adjust/>
-        let secondIcon = <Adjust/>
-        let thirdIcon = <Adjust/>
+        let errorIcon = <Error className = {classes.errorIcon}/>
+        let successIcon = <CheckBox className = {classes.successIcon}/>
+        let notHandledIcon = <Adjust/>
+
+        let firstIcon = notHandledIcon
+        let secondIcon = notHandledIcon
+        let thirdIcon = notHandledIcon
         if(props.active || props.completed){
-          firstIcon = hasAccessError ? <Error/> : <CheckBox/>
-          secondIcon = headsetIdError ? <Error/> : <CheckBox/>
-          thirdIcon = deviceError ? <Error/> : <CheckBox/>
+          firstIcon = hasAccessError ? errorIcon : successIcon
+          secondIcon = headsetIdError ? errorIcon : successIcon
+          thirdIcon = deviceError ? errorIcon : successIcon
         }
         const icons:{[index: string]: React.ReactElement} = {
           1:firstIcon,
@@ -135,10 +146,6 @@ export default function VerticalLinearStepper() {
         return(
           
           <div>
-             {/* className={clsx(classes.root, {
-        [classes.active]: active,
-        [classes.completed]: completed,
-      })} */}
           {icons[String(props.icon)]}
           </div>
         )
@@ -165,7 +172,7 @@ export default function VerticalLinearStepper() {
       <Stepper className={classes.text} activeStep={activeStep} orientation="vertical">
         {steps.map((label, index) => (
           <Step key={label}>
-            <StyledStepLabel StepIconProps ={{classes: {root:classes.stepIcon}}} StepIconComponent = {trueFalseStepIcon}>{label}</StyledStepLabel>
+            <StyledStepLabel StepIconComponent = {trueFalseStepIcon}>{label}</StyledStepLabel>
             <StepContent>
               <Typography>{getStepContent(index)}</Typography>
               <div className={classes.actionsContainer}>
