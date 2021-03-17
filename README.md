@@ -38,11 +38,13 @@ Download the Enabled Desktop App from the lateste release [here]().
 ## Built With
 
 - [Electron](https://www.electronjs.org/)
-- 
+- [React Js](https://reactjs.org/)
+- [Typescript](https://www.typescriptlang.org/)
 
 ### External Libraries
 
-- 
+- [Material UI](https://material-ui.com/)
+- [Material Icons](https://material.io/resources/icons/)
 
 ## Contributing
 <table style="color:blue;">
