@@ -33,19 +33,7 @@ This app is meant to be used with the Enabled Desktop App which can be found her
 
 ### Install
 
-Enabled App will be available on Google Play and App Store at a later date. 
-<p align="left">
-<a href="">
-    <img alt="Get it on Google Play"
-        height="80"
-        src="https://images.squarespace-cdn.com/content/v1/55e50bdfe4b0a8e8abf3e82c/1532445518096-ZIE5N2FBQP5J7H31RMKF/ke17ZwdGBToddI8pDm48kLVvASrjTasyVRL7pDcruINZw-zPPgdn4jUwVcJE1ZvWEtT5uBSRWt4vQZAgTJucoTqqXjS3CfNDSuuf31e0tVE6NuP7hFDNQxTVsA3HqqbN8iOga9h4TKX7aaUAcobSqWQ6l2WM7tn7mqHTODzkmeM/global-playstore.png" />
-</a>  
-<a href="">
-    <img alt="Get it on App Store"
-        height="80"
-        src="https://i1.wp.com/incipia.co/wp-content/uploads/2017/10/app-store.png?fit=519%2C160&ssl=1" />
-        </a>
-        </p>
+Download the Enabled Desktop App from the lateste release [here]().
 
 ## Built With
 
@@ -82,5 +70,4 @@ This project is licensed under the [MIT License](https://github.com/this/project
 ## Acknowledgements
 
 - [README.md template](https://gist.github.com/SimonHoiberg/15db461e2c1c2e933d94ffeb363e2185) used in this project
-
-See this template in use on the Open-Source project [Hue Debugger UI](https://github.com/Silind-Software/Hue-Debugger-UI)
+- [Electron React Boilerplate](https://github.com/electron-react-boilerplate/electron-react-boilerplate) used in this project
