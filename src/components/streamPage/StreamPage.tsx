@@ -49,7 +49,6 @@ export default function StreamPage(props: any) {
   const [ip, setIp] = useState('');
   const [sensitivity, setSensitivity] = useState<number>();
   const [activeCommands, setActiveCommands] = useState<string[]>();
-  
 
   const handleChange = async (
     event: React.ChangeEvent<{}>,

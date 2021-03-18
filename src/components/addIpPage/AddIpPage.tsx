@@ -3,7 +3,6 @@ import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import CustomInput from './customInput';
 import CustomDialog from './CustomDialog';
 import SimplePaper from '../SimplePaper';
-import { CortexDriver } from '../../modules/CortexDriver';
 import { useHistory } from 'react-router-dom';
 import { MobileDriver } from '../../modules/MobileDriver';
 import NavigationButtons from '../selectProfile/NavigationButtons';

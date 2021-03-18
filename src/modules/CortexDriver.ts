@@ -83,7 +83,7 @@ class CortexDriver {
   public awaitSocketOpening = async () => {
     this._socket = new WebSocket('wss://localhost:6868');
 
-    return new Promise<boolean>((resolve, reject) => {
+    return new Promise<boolean>((resolve) => {
       let wait = setTimeout(() => {
         clearTimeout(wait);
         resolve(false);
@@ -184,9 +184,8 @@ class CortexDriver {
       this._socket.send(JSON.stringify(queryHeadsetRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
-          
           if (data.indexOf('error') !== -1) {
-            let parsed:Warning = JSON.parse(data);
+            let parsed: Warning = JSON.parse(data);
             console.log(parsed.warning.message);
             reject(new CortexError(2, data));
           } else {
@@ -265,7 +264,7 @@ class CortexDriver {
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
           if (data.indexOf('error') !== -1) {
-            let parsed:Warning = JSON.parse(data);
+            let parsed: Warning = JSON.parse(data);
             console.log(parsed.warning.message);
             reject(new CortexError(1, data));
           }
@@ -368,21 +367,21 @@ class CortexDriver {
       },
       id: SUB_REQUEST_ID,
     };
-    return new Promise<boolean>((resolve, reject) => {
-    this._socket.send(JSON.stringify(subRequest));
-    this._socket.onmessage = ({ data }: MessageEvent) => {
-      try {
-        if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
-          let parsed: DataSample = JSON.parse(data);
-          this.notify(parsed.com[0]);
-          resolve(true);
+    return new Promise<boolean>((resolve) => {
+      this._socket.send(JSON.stringify(subRequest));
+      this._socket.onmessage = ({ data }: MessageEvent) => {
+        try {
+          if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
+            let parsed: DataSample = JSON.parse(data);
+            this.notify(parsed.com[0]);
+            resolve(true);
+          }
+        } catch (error) {
+          console.error('Sub request error');
+          resolve(false);
         }
-      } catch (error) {
-        console.error('Sub request error');
-        resolve(false);
-      }
-    }
-  });
+      };
+    });
   };
 
   public stopStream = async () => {
@@ -412,7 +411,7 @@ class CortexDriver {
    */
   public getMentalCommandActiveActionRequest = (
     authToken: string,
-    profile: string,
+    profile: string
   ) => {
     const MENTAL_COMMAND_ACTIVE_ACTION_ID = 10;
     let mentalCommandActiveActionRequest = {
@@ -442,12 +441,12 @@ class CortexDriver {
     });
   };
   /**
-   * 
-   * @param authToken 
-   * @param sessionId 
-   * @param profile 
-   * @param action 
-   * @returns 
+   *
+   * @param authToken
+   * @param sessionId
+   * @param profile
+   * @param action
+   * @returns
    */
   public setMentalCommandActiveActionRequest = (
     authToken: string,
@@ -548,7 +547,6 @@ class CortexDriver {
       this._socket.send(JSON.stringify(setupProfileRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
-          
           if (data.indexOf('error') !== -1) {
             reject(new CortexError(5, data));
           } else {
@@ -582,7 +580,6 @@ class CortexDriver {
     authToken: string,
     headsetId: string
   ): Promise<boolean> => {
-    const SETUP_PROFILE_ID = 7;
     let hasCurrentProfileRequest = {
       id: 1,
       jsonrpc: '2.0',
@@ -667,7 +664,7 @@ class CortexDriver {
     authToken: string,
     profile: string,
     session: string,
-    values: number[],
+    values: number[]
   ) => {
     let currentProfileRequest = {
       id: 16,
@@ -679,35 +676,33 @@ class CortexDriver {
         session: session,
         status: 'set',
         values: values,
-      }
+      },
     };
-    return new Promise<string> ((resolve, reject)  => {
-    this._socket.send(JSON.stringify(currentProfileRequest));
-    this._socket.onmessage = async ({ data }: MessageEvent) => {
-      try {
-        console.log("set sensitivity:  " + values +  ' \n' + 'data: ' +data);
-        resolve(data);
-      } catch (error) {
-        console.log(error);
-      }
-    }
+    return new Promise<string>((resolve) => {
+      this._socket.send(JSON.stringify(currentProfileRequest));
+      this._socket.onmessage = async ({ data }: MessageEvent) => {
+        try {
+          console.log('set sensitivity:  ' + values + ' \n' + 'data: ' + data);
+          resolve(data);
+        } catch (error) {
+          console.log(error);
+        }
+      };
     });
   };
 
   public setStreamOnmessageEvent = () => {
     this._socket.onmessage = ({ data }: MessageEvent) => {
-    try {
-      if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
-        let parsed: DataSample = JSON.parse(data);
-        this.notify(parsed.com[0]);
+      try {
+        if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
+          let parsed: DataSample = JSON.parse(data);
+          this.notify(parsed.com[0]);
+        }
+      } catch (error) {
+        console.error('Sub request error');
       }
-    } catch (error) {
-      console.error('Sub request error');
-    }
-  }
-  }
-
-  
+    };
+  };
 
   /**
    *
@@ -715,65 +710,70 @@ class CortexDriver {
    * @param profile
    * @returns
    */
-  public getSensitivity = async (authToken: string, profile: string): Promise<number[]> => {
+  public getSensitivity = async (
+    authToken: string,
+    profile: string
+  ): Promise<number[]> => {
     let getSensitivityRequest = {
       id: 17,
       jsonrpc: '2.0',
-      method: "mentalCommandActionSensitivity",
+      method: 'mentalCommandActionSensitivity',
       params: {
         cortexToken: authToken,
         profile: profile,
         status: 'get',
       },
     };
-    return new Promise<number[]> ((resolve, reject)  => {
+    return new Promise<number[]>((resolve, reject) => {
       this._socket.send(JSON.stringify(getSensitivityRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
+          if (data.indexOf('error') === -1) {
+            console.log('get sensitivity: ' + data);
+            let parsed: getSensitivityResponse = JSON.parse(data);
 
-          if (data.indexOf('error') === -1) { 
-            console.log("get sensitivity: " + data);
-            let parsed:getSensitivityResponse = JSON.parse(data);
-
-            if(parsed.id == 17){
-            resolve(parsed.result);
+            if (parsed.id == 17) {
+              resolve(parsed.result);
             }
           }
         } catch (error) {
           reject(new CortexError(2, error));
         }
-    
       };
     });
   };
-   
-     public saveProfile = async (authToken:string, headsetId: string, profile: string): Promise<number[]> => {
-      let saveProfileRequest = {
-        id: 18,
-        jsonrpc: '2.0',
-        method: "setupProfile",
-        params: {
-          cortexToken: authToken,
-          headset:headsetId,
-          profile: profile,
-          status: 'save',
-        },
-      };
-      console.log('save profile called');
-      return new Promise<number[]>((resolve, reject) => {
-        this._socket.send(JSON.stringify(saveProfileRequest));
-        this._socket.onmessage = ({ data }: MessageEvent) => {
-          try {
-            console.log("Save profile: " + data);
-            if (data.indexOf('error') === -1) {
-              resolve(data);
-            }
-          } catch (error) {
-            reject(new CortexError(2, error));
-          }
-        };
-      });
+
+  public saveProfile = async (
+    authToken: string,
+    headsetId: string,
+    profile: string
+  ): Promise<number[]> => {
+    let saveProfileRequest = {
+      id: 18,
+      jsonrpc: '2.0',
+      method: 'setupProfile',
+      params: {
+        cortexToken: authToken,
+        headset: headsetId,
+        profile: profile,
+        status: 'save',
+      },
     };
+    console.log('save profile called');
+    return new Promise<number[]>((resolve, reject) => {
+      this._socket.send(JSON.stringify(saveProfileRequest));
+      this._socket.onmessage = ({ data }: MessageEvent) => {
+        try {
+          console.log('Save profile: ' + data);
+          if (data.indexOf('error') === -1) {
+            resolve(data);
+          }
+        } catch (error) {
+          reject(new CortexError(2, error));
+        }
+      };
+    });
+  };
 
   /**
    * Queries all the profiles saved on this user.
