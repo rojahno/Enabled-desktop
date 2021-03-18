@@ -1,16 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/core/Slider';
+import { handleInputChange } from '../addIpPage/customInput';
+
 
 const useStyles = makeStyles({
   root: {
     width: 300,
+
   },
 });
 
 function valuetext(value: number) {
-  return `${value}°C`;
+  return `${value}`;
 }
 
 const marks = [
@@ -56,8 +59,14 @@ const marks = [
       },
   ];
 
-export default function DiscreteSlider() {
+  interface sliderProps{
+
+    handleChange:(event: React.ChangeEvent<{}>, value:number | number[]) => void
+
+}
+export default function SettingSlider(props:sliderProps) {
   const classes = useStyles();
+
 
   return (
     <div className={classes.root}>
@@ -65,6 +74,7 @@ export default function DiscreteSlider() {
         Headseth sensitivity
       </Typography>
       <Slider
+      onChangeCommitted={ (event,value) => props.handleChange(event, value)}
         defaultValue={1}
         getAriaValueText={valuetext}
         aria-labelledby="discrete-slider-small-steps"

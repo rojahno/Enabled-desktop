@@ -13,28 +13,24 @@ import MuiDialogContent from '@material-ui/core/DialogContent';
 import MuiDialogActions from '@material-ui/core/DialogActions';
 import IconButton from '@material-ui/core/IconButton';
 import Link from '@material-ui/core/Link';
-
+import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
-import SettingSlider from './SettingSlider';
-
+import { DialogContentText, Divider } from '@material-ui/core';
+import iphoneSettings from './../../images/iphone-settings.png';
+import iphoneWifi from './../../images/iphone-settings-wifi.png';
+import iphoneAbout from './../../images/iphone-settings-about.png';
 
 const styles = (theme: Theme) =>
   createStyles({
     root: {
       margin: 0,
       padding: theme.spacing(2),
-      backgroundColor: '#fff',
     },
     closeButton: {
       position: 'absolute',
       right: theme.spacing(1),
       top: theme.spacing(1),
       color: theme.palette.grey[500],
-    },
-    openButton: {
-      color: '#ffffff',
-      textDecoration: 'underline',
-      fontSize: '4',
     },
   });
 
@@ -45,6 +41,26 @@ const useStyles = makeStyles(function (theme: Theme) {
       color: '#ffffff',
       textDecoration: 'underline',
       fontSize: '4',
+    },
+    dialogContent: {
+      minWidth: '50vw',
+      overflowX: 'hidden',
+    },
+    contentText: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+    },
+    imageContainer: {
+      width: '60%',
+    },
+
+    image: {
+      width: '100%',
+      paddingRight: '15px',
+    },
+    divider: {
+      margin: '15px',
     },
   });
 });
@@ -65,7 +81,9 @@ const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
           aria-label="close"
           className={classes.closeButton}
           onClick={onClose}
-        ></IconButton>
+        >
+          <CloseIcon />{' '}
+        </IconButton>
       ) : null}
     </MuiDialogTitle>
   );
@@ -86,7 +104,7 @@ const DialogActions = withStyles((theme: Theme) => ({
   },
 }))(MuiDialogActions);
 
-export default function SettingsDialogue(_props: any) {
+export default function CustomDialog(_props: any) {
   const [open, setOpen] = React.useState(false);
   const [scroll, setScroll] = React.useState<DialogProps['scroll']>('paper');
 
@@ -107,7 +125,7 @@ export default function SettingsDialogue(_props: any) {
         variant="body2"
         onClick={handleClickOpen('paper')}
       >
-        Settings
+        Find ip address
       </Link>
       <Dialog
         onClose={handleClose}
@@ -115,16 +133,47 @@ export default function SettingsDialogue(_props: any) {
         open={open}
       >
         <DialogTitle id="customized-dialog-title" onClose={handleClose}>
-          Settings
+          How to find ip
         </DialogTitle>
-        <DialogContent dividers>
-          <SettingSlider/>
-          <br/>
-          <br/>
-          <br/>
-          <br/>
-          <br/>
+        <DialogContent dividers className={classes.dialogContent}>
+          <h3>On enabled app:</h3>
+          <div>
+            <ol>
+              <li>Open the enabled app</li>
+              <li>Press the ip button</li>
+            </ol>
+          </div>
+          <Divider className={classes.divider} />
+          <h3>On iphone:</h3>
+          <div >
+            <ol>
+              <li>Open settings</li>
+              <li>Press the 'Wi-Fi' tab</li>
+              <div className={classes.imageContainer}>
+                <img className={classes.image} src={iphoneSettings} />
+              </div>
+              <li>Select the information icon</li>
+              <div className={classes.imageContainer}>
+                <img className={classes.image} src={iphoneWifi} />
+              </div>
+              <li>That's it. You can now read your IP Adress</li>
+              <div className={classes.imageContainer}>
+                <img className={classes.image} src={iphoneAbout} />
+              </div>
+            </ol>
+          </div>
+          <Divider className={classes.divider} />
+          <h3>On android :</h3>
+          <div>
+            <ol>
+              <li>Open settings</li>
+              <li>Navigate to "about phone" and select it</li>
+              <li>Navigate to "status" and select it</li>
+              <li>That's it. You can now read your IP Adress</li>
+            </ol>
+          </div>
         </DialogContent>
+
         <DialogActions>
           <Button autoFocus onClick={handleClose} color="primary">
             ok
