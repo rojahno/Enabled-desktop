@@ -10,6 +10,7 @@ import Typography from '@material-ui/core/Typography';
 import { FacadeTest } from '../FacadeTest';
 import {Error,CheckBox, Adjust} from '@material-ui/icons'
 import { StepIconProps } from '@material-ui/core';
+import { CortexDriver } from '../modules/CortexDriver';
 
 
 const StyledStepLabel = styled(StepLabel)({
@@ -21,7 +22,7 @@ const StyledStepLabel = styled(StepLabel)({
 
 
 const facade = new FacadeTest
-
+const driver = CortexDriver.getInstance();
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -61,6 +62,12 @@ function getSteps() {
 
 export default function VerticalLinearStepper() {
   
+  const [text,setText] = useState('')
+  const [headsetID,setHeadsetID] = useState('')
+  const [device,setDevice] = useState('')
+  const [hasAccessError, setHasAccessError] = useState(false)
+  const [headsetIdError, setHeadSetIdError] = useState(false)
+  const [deviceError, setDeviceError] = useState(false)
   
   
   
@@ -72,7 +79,9 @@ export default function VerticalLinearStepper() {
     // }
     
     async function hasAccess(){
-      let b = await facade.getHasAccess()
+      console.log('==============')
+      let b = await driver.hasAccess();
+      console.log(b)
       if(b){
         setText('You are connected to the app') 
         setHasAccessError(false)
@@ -97,9 +106,10 @@ export default function VerticalLinearStepper() {
     
     function getStepContent(step: number) {
       switch (step) {
-        case 0:  
-      hasAccess()
-      return text
+        case 0:  {
+          hasAccess();
+        }
+          return text
       case 1:
         getHeadsetID()
         return headsetID
@@ -111,12 +121,6 @@ export default function VerticalLinearStepper() {
             
           }
         }
-        const [text,setText] = useState('')
-        const [headsetID,setHeadsetID] = useState('')
-        const [device,setDevice] = useState('')
-        const [hasAccessError, setHasAccessError] = useState(false)
-        const [headsetIdError, setHeadSetIdError] = useState(false)
-        const [deviceError, setDeviceError] = useState(false)
         
         const handleChange = (text: string) => (event: React.ChangeEvent<{}>) => {
           setText(text)
