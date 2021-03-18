@@ -39,7 +39,7 @@ export default function StreamPage(props: any) {
   const [sessionId, setsessionId] = useState('');
   const [profile, setProfile] = useState('');
   const [ip, setIp] = useState('');
-  const [sensitivity, setSensitivity] = useState<number[]>();
+  const [sensitivity, setSensitivity] = useState<number>();
   const [activeCommands, setActiveCommands] = useState<string[]>();
 
   const handleChange = async (
@@ -49,28 +49,15 @@ export default function StreamPage(props: any) {
     if (typeof value === 'number') {
       let driver: CortexDriver = CortexDriver.getInstance();
       let sensitivity = [value, value, value, value];
-      let values = [7, 7, 7, 7];
-      console.log('Value: ' + sensitivity);
-      console.log('Profile: ' + profile);
-      let authToken: string = await driver.authorize();
-      setAuthToken(authToken);
-      await driver.setSensitivity(authToken, profile, sessionId, sensitivity, headsetId);
+      await driver.setSensitivity(authToken, profile, sessionId, sensitivity);
+      await driver.saveProfile(authToken, headsetId, profile);
+      let newSensitivity = await driver.getSensitivity(authToken, profile);
+      driver.setStreamOnmessageEvent();
+    setSensitivity(newSensitivity[0]);
     }
   };
 
-  const getSensitivity = async () => {
-    let driver: CortexDriver = CortexDriver.getInstance();
-    let sensitivity = await driver.getSensitivity(authToken, profile);
-    let commands = await driver.getMentalCommandActiveActionRequest(
-      authToken,
-      profile
-    );
-    setSensitivity(sensitivity);
-    setActiveCommands(commands);
-    console.log(sensitivity);
-  };
-
-  const startStream = async () => {
+  const startStream = () => {
     let driver: CortexDriver = CortexDriver.getInstance();
     driver.startStream(authToken, sessionId);
   };
@@ -87,13 +74,18 @@ export default function StreamPage(props: any) {
         let sessionId = await driver.createSession(authToken, headsetId);
         let profile = await driver.getCurrentProfile(authToken, headsetId);
         let sensitivity = await driver.getSensitivity(authToken, profile);
+        let commands = await driver.getMentalCommandActiveActionRequest(
+          authToken,
+          profile
+        );
 
+        startStream();
         setAuthToken(authToken);
         setHeadsetId(headsetId);
         setsessionId(sessionId);
-        setSensitivity(sensitivity);
+        setSensitivity(sensitivity[0]);
         setProfile(profile);
-        console.log('profile: ' + profile);
+        setActiveCommands(commands);
       } catch (error) {
         if (error instanceof CortexError) {
           alert(error.errMessage);
@@ -121,9 +113,6 @@ export default function StreamPage(props: any) {
           <p>{'Sensitivity: ' + sensitivity} </p>
           <p>{'Commands: ' + activeCommands} </p>
           <SettingSlider handleChange={handleChange} />
-          <button onClick={getSensitivity}>få sensitivity</button>
-          <button onClick={startStream}>start stream</button>
-
           <div className={classes.buttons}>
             <Link to="/ip">
               <button>Back</button>
