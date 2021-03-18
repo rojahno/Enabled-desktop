@@ -7,6 +7,8 @@ import { CortexDriver } from '../../modules/CortexDriver';
 import { useHistory } from 'react-router-dom';
 import { MobileDriver } from '../../modules/MobileDriver';
 import NavigationButtons from '../selectProfile/NavigationButtons';
+import { CortexFacade } from '../../modules/CortexFacade';
+import CortexError from '../../modules/CortexError';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -55,26 +57,27 @@ export default function AddIpPage(_props: any) {
 
   const handleNextClick = async () => {
     try {
-      let driver: CortexDriver = CortexDriver.getInstance();
-      let authoken: string = await driver.authorize();
-      let headsetId: string = await driver.queryHeadsetId();
-      let hasLoadedProfile = await driver.hasCurrentProfile(
-        authoken,
-        headsetId
-      );
+      let cortexFacade = new CortexFacade();
+      let hasErrors = await cortexFacade.hasConnectivityErrors();
 
-      if (hasLoadedProfile) {
+      if (hasErrors instanceof CortexError) {
+        alert(hasErrors.errMessage);
+      } else {
         let validIpAdress = hasValidIPaddress(ipAdress);
         console.log('valid ip: ' + validIpAdress);
         setValidIpAdress(validIpAdress);
         if (validIpAdress) {
           let mobileDriver = MobileDriver.getInstance();
           let connected = await mobileDriver.awaitSocketOpening(ipAdress);
-          if(connected){
-          history.push({ pathname: '/stream', state: { ipAdress: ipAdress } });
-          }
-          else{
-            alert('Can\'t connect to the phone. Check the ip adress and that the application is running');
+          if (connected) {
+            history.push({
+              pathname: '/stream',
+              state: { ipAdress: ipAdress },
+            });
+          } else {
+            alert(
+              "Can't connect to the phone. Check the ip adress and that the application is running"
+            );
           }
         }
       }
@@ -90,9 +93,11 @@ export default function AddIpPage(_props: any) {
           <h3>Add the IP of your phone</h3>
           <CustomInput handleChange={handleChange} />
           <CustomDialog />
-          <NavigationButtons canNavigateForward={validIpAdress}
-          handleNextClick={handleNextClick}
-          backNavigation ={'/select'} />
+          <NavigationButtons
+            canNavigateForward={validIpAdress}
+            handleNextClick={handleNextClick}
+            backNavigation={'/select'}
+          />
         </SimplePaper>
       </div>
     </div>

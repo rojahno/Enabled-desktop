@@ -10,7 +10,9 @@ import {
   SetupProfileObject,
   GetCurrentProfileResponse,
   DataSample,
-  Warning
+  Warning,
+  getSensitivityResponse,
+  getCommandResponse,
 } from './interfaces';
 
 /**
@@ -369,16 +371,7 @@ class CortexDriver {
     console.log('start stream');
 
     this._socket.send(JSON.stringify(subRequest));
-    this._socket.onmessage = ({ data }: MessageEvent) => {
-      try {
-        if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
-          let parsed: DataSample = JSON.parse(data);
-          this.notify(parsed.com[0]);
-        }
-      } catch (error) {
-        console.error('Sub request error');
-      }
-    };
+  this.setStreamOnmessageEvent();
   };
 
   public stopStream = async () => {
@@ -406,13 +399,55 @@ class CortexDriver {
    *If the status is "get" then the result is and array of strings.
    *If the status is "set", then the result is an object with "action" and "message" as fields.
    */
-  public mentalCommandActiveActionRequest = (
+  public getMentalCommandActiveActionRequest = (
+    authToken: string,
+    profile: string,
+  ) => {
+    const MENTAL_COMMAND_ACTIVE_ACTION_ID = 10;
+    let mentalCommandActiveActionRequest = {
+      jsonrpc: '2.0',
+      method: 'mentalCommandActiveAction',
+      params: {
+        cortexToken: authToken,
+        profile: profile,
+        status: 'get',
+      },
+      id: MENTAL_COMMAND_ACTIVE_ACTION_ID,
+    };
+    return new Promise<string[]>((resolve, reject) => {
+      this._socket.send(JSON.stringify(mentalCommandActiveActionRequest));
+      this._socket.onmessage = ({ data }: MessageEvent) => {
+        try {
+          if (JSON.parse(data)['id'] == MENTAL_COMMAND_ACTIVE_ACTION_ID) {
+            if (data.indexOf('error') === -1) {
+              let parsed: getCommandResponse = JSON.parse(data);
+              resolve(parsed.result);
+            }
+          }
+        } catch (error) {
+          reject('mental command active action error');
+        }
+        finally{
+          this.setStreamOnmessageEvent();
+        }
+      };
+    });
+  };
+  /**
+   * 
+   * @param authToken 
+   * @param sessionId 
+   * @param profile 
+   * @param action 
+   * @returns 
+   */
+  public setMentalCommandActiveActionRequest = (
     authToken: string,
     sessionId: string,
     profile: string,
-    action: string
+    action: string[]
   ) => {
-    const MENTAL_COMMAND_ACTIVE_ACTION_ID = 10;
+    const MENTAL_COMMAND_ACTIVE_ACTION_ID = 12;
     let mentalCommandActiveActionRequest = {
       jsonrpc: '2.0',
       method: 'mentalCommandActiveAction',
@@ -430,16 +465,20 @@ class CortexDriver {
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
           if (JSON.parse(data)['id'] == MENTAL_COMMAND_ACTIVE_ACTION_ID) {
+            console.log(data);
             resolve(data);
           }
         } catch (error) {
           reject('mental command active action error');
         }
+        finally{
+          this.setStreamOnmessageEvent();
+        }
       };
     });
   };
   /**
-   * Checks if ths application ahs access to the Emotiv App.
+   * Checks if ths application has access to the Emotiv App.
    *
    * @returns true if it has access and rejects an error message if not.
    */
@@ -539,7 +578,7 @@ class CortexDriver {
     headsetId: string
   ): Promise<boolean> => {
     const SETUP_PROFILE_ID = 7;
-    let getCurrentProfileRequest = {
+    let hasCurrentProfileRequest = {
       id: 1,
       jsonrpc: '2.0',
       method: 'getCurrentProfile',
@@ -550,7 +589,7 @@ class CortexDriver {
     };
 
     return new Promise<boolean>((resolve, reject) => {
-      this._socket.send(JSON.stringify(getCurrentProfileRequest));
+      this._socket.send(JSON.stringify(hasCurrentProfileRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
           let currentProfileResponse: GetCurrentProfileResponse = JSON.parse(
@@ -558,7 +597,9 @@ class CortexDriver {
           );
 
           if (currentProfileResponse.result.name == null) {
-            console.log('No previously loaded profile' + currentProfileResponse);
+            console.log(
+              'No previously loaded profile' + currentProfileResponse
+            );
             resolve(false);
           } else {
             console.log(
@@ -600,9 +641,9 @@ class CortexDriver {
       this._socket.send(JSON.stringify(currentProfileRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
-          let dataString = JSON.stringify(data);
-          if (dataString.indexOf('error') === -1) {
-            resolve(data);
+          if (data.indexOf('error') === -1) {
+            let parsed: GetCurrentProfileResponse = JSON.parse(data);
+            resolve(parsed.result.name);
           }
         } catch (error) {
           reject(new CortexError(2, error));
@@ -610,15 +651,21 @@ class CortexDriver {
       };
     });
   };
-
+  /**
+   *
+   * @param authToken
+   * @param profile
+   * @param session
+   * @param values
+   */
   public setSensitivity = async (
     authToken: string,
     profile: string,
     session: string,
-    values: number[]
-  ): Promise<string> => {
+    values: number[],
+  ) => {
     let currentProfileRequest = {
-      id: 1,
+      id: 16,
       jsonrpc: '2.0',
       method: 'mentalCommandActionSensitivity',
       params: {
@@ -627,20 +674,110 @@ class CortexDriver {
         session: session,
         status: 'set',
         values: values,
+      }
+    };
+    return new Promise<string> ((resolve, reject)  => {
+    this._socket.send(JSON.stringify(currentProfileRequest));
+    this._socket.onmessage = async ({ data }: MessageEvent) => {
+      try {
+        console.log("set sensitivity:  " + values +  ' \n' + 'data: ' +data);
+        resolve(data);
+      } catch (error) {
+        console.log(error);
+      }
+      finally{
+        //this.setStreamOnmessageEvent();
+      }
+    }
+    });
+  };
+
+  public setStreamOnmessageEvent = () => {
+    this._socket.onmessage = ({ data }: MessageEvent) => {
+    try {
+      if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
+        let parsed: DataSample = JSON.parse(data);
+        this.notify(parsed.com[0]);
+      }
+    } catch (error) {
+      console.error('Sub request error');
+    }
+  }
+  }
+
+  
+
+  /**
+   *
+   * @param authToken
+   * @param profile
+   * @returns
+   */
+  public getSensitivity = async (authToken: string, profile: string): Promise<number[]> => {
+    let getSensitivityRequest = {
+      id: 17,
+      jsonrpc: '2.0',
+      method: "mentalCommandActionSensitivity",
+      params: {
+        cortexToken: authToken,
+        profile: profile,
+        status: 'get',
       },
     };
-    return new Promise<string>((resolve, reject) => {
-      this._socket.send(JSON.stringify(currentProfileRequest));
+    return new Promise<number[]> ((resolve, reject)  => {
+      this._socket.send(JSON.stringify(getSensitivityRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
-          console.log(data);
-          resolve(data);
+
+          if (data.indexOf('error') === -1) { 
+            console.log("get sensitivity: " + data);
+            let parsed:getSensitivityResponse = JSON.parse(data);
+
+            if(parsed.id == 17){
+            resolve(parsed.result);
+            }
+          }
         } catch (error) {
-          reject('set sensitivity profile error');
+          reject(new CortexError(2, error));
+        }
+        finally{
+          //this.setStreamOnmessageEvent();
         }
       };
     });
   };
+   
+     public saveProfile = async (authToken:string, headsetId: string, profile: string): Promise<number[]> => {
+      let saveProfileRequest = {
+        id: 18,
+        jsonrpc: '2.0',
+        method: "setupProfile",
+        params: {
+          cortexToken: authToken,
+          headset:headsetId,
+          profile: profile,
+          status: 'save',
+        },
+      };
+      console.log('save profile called');
+      return new Promise<number[]>((resolve, reject) => {
+        this._socket.send(JSON.stringify(saveProfileRequest));
+        this._socket.onmessage = ({ data }: MessageEvent) => {
+          try {
+            console.log("Save profile: " + data);
+            if (data.indexOf('error') === -1) {
+              let parsed:getSensitivityResponse = JSON.parse(data);
+              resolve(parsed.result);
+            }
+          } catch (error) {
+            reject(new CortexError(2, error));
+          }
+          finally{
+            //this.setStreamOnmessageEvent();
+          }
+        };
+      });
+    };
 
   /**
    * Queries all the profiles saved on this user.
