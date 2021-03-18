@@ -54,7 +54,24 @@ class CortexFacade {
       return this.errorHandling(error); 
     }
   };
-  
+
+  hasConnectivityErrors= async () => {
+try{
+    let driver: CortexDriver = CortexDriver.getInstance();
+    let authToken: string = await driver.authorize();
+    let headsetId: string = await driver.queryHeadsetId();
+    let hasLoadedProfile = await driver.hasCurrentProfile(
+      authToken,
+      headsetId
+    );
+
+    return false;
+  }catch(error){
+    console.log(error);
+      return this.errorHandling(error); 
+  }
+
+}
 //Refactort errorHandling to handle rejects
   errorHandling(error: any) {
     if (error instanceof CortexError) {

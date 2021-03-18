@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/core/Slider';
+import { handleInputChange } from '../addIpPage/customInput';
 
 
 const useStyles = makeStyles({
@@ -58,13 +59,14 @@ const marks = [
       },
   ];
 
-export default function SettingSlider() {
+  interface sliderProps{
+
+    handleChange:(event: React.ChangeEvent<{}>, value:number | number[]) => void
+
+}
+export default function SettingSlider(props:sliderProps) {
   const classes = useStyles();
 
-  const handleChange = async (value:number) =>{
-
-
-  }
 
   return (
     <div className={classes.root}>
@@ -72,7 +74,7 @@ export default function SettingSlider() {
         Headseth sensitivity
       </Typography>
       <Slider
-      onChangeCommitted={(event,value) => console.log(value)}
+      onChangeCommitted={ (event,value) => props.handleChange(event, value)}
         defaultValue={1}
         getAriaValueText={valuetext}
         aria-labelledby="discrete-slider-small-steps"
