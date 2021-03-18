@@ -13,13 +13,14 @@ const useStyles = makeStyles((theme: Theme) =>
       minHeight: '100vh',
       display: 'flex',
       justifyContent: 'center',
-      flexDirection: 'row',
+      flexDirection: 'column',
       alignItems: 'center',
     },
     container: {
       margin: theme.spacing(2),
       display: 'flex',
       justifyContent: 'center',
+      alignContent: 'center',
     },
     buttons: {
       display: 'flex',
@@ -28,6 +29,13 @@ const useStyles = makeStyles((theme: Theme) =>
       width: '100%',
       height: '100%',
       padding: '3px',
+    },
+    textContainer: {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignContent: 'center',
+      padding: '30px',
     },
   })
 );
@@ -41,6 +49,7 @@ export default function StreamPage(props: any) {
   const [ip, setIp] = useState('');
   const [sensitivity, setSensitivity] = useState<number>();
   const [activeCommands, setActiveCommands] = useState<string[]>();
+  
 
   const handleChange = async (
     event: React.ChangeEvent<{}>,
@@ -53,13 +62,13 @@ export default function StreamPage(props: any) {
       await driver.saveProfile(authToken, headsetId, profile);
       let newSensitivity = await driver.getSensitivity(authToken, profile);
       driver.setStreamOnmessageEvent();
-    setSensitivity(newSensitivity[0]);
+      setSensitivity(newSensitivity[0]);
     }
   };
 
-  const startStream = () => {
+  const startStream = async () => {
     let driver: CortexDriver = CortexDriver.getInstance();
-    driver.startStream(authToken, sessionId);
+    await driver.startStream(authToken, sessionId);
   };
 
   useEffect(() => {
@@ -71,15 +80,29 @@ export default function StreamPage(props: any) {
         let driver: CortexDriver = CortexDriver.getInstance();
         let authToken: string = await driver.authorize();
         let headsetId: string = await driver.queryHeadsetId();
-        let sessionId = await driver.createSession(authToken, headsetId);
-        let profile = await driver.getCurrentProfile(authToken, headsetId);
-        let sensitivity = await driver.getSensitivity(authToken, profile);
-        let commands = await driver.getMentalCommandActiveActionRequest(
+        let sessionId: string = await driver.createSession(
+          authToken,
+          headsetId
+        );
+        let profile: string = await driver.getCurrentProfile(
+          authToken,
+          headsetId
+        );
+        let sensitivity: number[] = await driver.getSensitivity(
           authToken,
           profile
         );
 
-        startStream();
+        let commands = await driver.getMentalCommandActiveActionRequest(
+          authToken,
+          profile
+        );
+        let startStream: boolean = await driver.startStream(
+          authToken,
+          sessionId
+        );
+        console.log('started stream: ' + startStream);
+
         setAuthToken(authToken);
         setHeadsetId(headsetId);
         setsessionId(sessionId);
@@ -89,9 +112,12 @@ export default function StreamPage(props: any) {
       } catch (error) {
         if (error instanceof CortexError) {
           alert(error.errMessage);
+        } else {
+          console.error(error);
         }
       }
     };
+    start();
 
     const offLoad = () => {
       let mobileDriver: MobileDriver = MobileDriver.getInstance();
@@ -100,8 +126,6 @@ export default function StreamPage(props: any) {
       mobileDriver.closeSocket();
     };
 
-    start();
-
     return () => offLoad();
   }, []);
   return (
@@ -109,10 +133,19 @@ export default function StreamPage(props: any) {
       <div className={classes.container}>
         <SimplePaper>
           <h3>Stream:</h3>
-          <p>{'Connected to: ' + ip} </p>
-          <p>{'Sensitivity: ' + sensitivity} </p>
-          <p>{'Commands: ' + activeCommands} </p>
-          <SettingSlider handleChange={handleChange} />
+          <SettingSlider
+            sliderTitle={'Headset sensitivity'}
+            handleChange={handleChange}
+            minSteps={1}
+            maxSteps={10}
+          />
+          <div className={classes.textContainer}>
+            <p>
+              Moving the slider to the right (10) will make it easier to
+              trigger. Moving the slider to the left (1) will make the commands
+              harder to trigger.
+            </p>
+          </div>
           <div className={classes.buttons}>
             <Link to="/ip">
               <button>Back</button>

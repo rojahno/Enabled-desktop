@@ -368,10 +368,21 @@ class CortexDriver {
       },
       id: SUB_REQUEST_ID,
     };
-    console.log('start stream');
-
+    return new Promise<boolean>((resolve, reject) => {
     this._socket.send(JSON.stringify(subRequest));
-  this.setStreamOnmessageEvent();
+    this._socket.onmessage = ({ data }: MessageEvent) => {
+      try {
+        if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
+          let parsed: DataSample = JSON.parse(data);
+          this.notify(parsed.com[0]);
+          resolve(true);
+        }
+      } catch (error) {
+        console.error('Sub request error');
+        resolve(false);
+      }
+    }
+  });
   };
 
   public stopStream = async () => {
@@ -427,9 +438,6 @@ class CortexDriver {
         } catch (error) {
           reject('mental command active action error');
         }
-        finally{
-          this.setStreamOnmessageEvent();
-        }
       };
     });
   };
@@ -470,9 +478,6 @@ class CortexDriver {
           }
         } catch (error) {
           reject('mental command active action error');
-        }
-        finally{
-          this.setStreamOnmessageEvent();
         }
       };
     });
@@ -685,9 +690,6 @@ class CortexDriver {
       } catch (error) {
         console.log(error);
       }
-      finally{
-        //this.setStreamOnmessageEvent();
-      }
     }
     });
   };
@@ -740,9 +742,7 @@ class CortexDriver {
         } catch (error) {
           reject(new CortexError(2, error));
         }
-        finally{
-          //this.setStreamOnmessageEvent();
-        }
+    
       };
     });
   };
@@ -766,14 +766,10 @@ class CortexDriver {
           try {
             console.log("Save profile: " + data);
             if (data.indexOf('error') === -1) {
-              let parsed:getSensitivityResponse = JSON.parse(data);
-              resolve(parsed.result);
+              resolve(data);
             }
           } catch (error) {
             reject(new CortexError(2, error));
-          }
-          finally{
-            //this.setStreamOnmessageEvent();
           }
         };
       });

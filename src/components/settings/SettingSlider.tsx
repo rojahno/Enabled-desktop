@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/core/Slider';
-import { handleInputChange } from '../addIpPage/customInput';
+import { useEffect } from 'react';
 
 
 const useStyles = makeStyles({
   root: {
     width: 300,
-
+    textAlign: 'center',
   },
 });
 
@@ -60,8 +60,10 @@ const marks = [
   ];
 
   interface sliderProps{
-
-    handleChange:(event: React.ChangeEvent<{}>, value:number | number[]) => void
+    sliderTitle:string,
+    handleChange:(event: React.ChangeEvent<{}>, value:number | number[]) => void,
+    maxSteps:number,
+    minSteps:number,
 
 }
 export default function SettingSlider(props:sliderProps) {
@@ -71,7 +73,7 @@ export default function SettingSlider(props:sliderProps) {
   return (
     <div className={classes.root}>
       <Typography id="discrete-slider-small-steps" gutterBottom>
-        Headseth sensitivity
+        {props.sliderTitle}
       </Typography>
       <Slider
       onChangeCommitted={ (event,value) => props.handleChange(event, value)}
@@ -80,8 +82,8 @@ export default function SettingSlider(props:sliderProps) {
         aria-labelledby="discrete-slider-small-steps"
         step={1}
         marks={marks}
-        min={1}
-        max={10}
+        min={props.minSteps}
+        max={props.maxSteps}
         valueLabelDisplay="auto"
       />
     </div>
