@@ -55,6 +55,14 @@ export default function AddIpPage(_props: any) {
     }
   };
 
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      if (validIpAdress) {
+        handleNextClick();
+      }
+    }
+  };
+
   const handleNextClick = async () => {
     try {
       let cortexFacade = new CortexFacade();
@@ -91,7 +99,10 @@ export default function AddIpPage(_props: any) {
       <div className={classes.container}>
         <SimplePaper>
           <h3>Add the IP of your phone</h3>
-          <CustomInput handleChange={handleChange} />
+          <CustomInput
+            handleChange={handleChange}
+            handleKeyPress={handleKeyPress}
+          />
           <CustomDialog />
           <NavigationButtons
             canNavigateForward={validIpAdress}

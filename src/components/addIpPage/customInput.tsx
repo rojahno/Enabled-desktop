@@ -5,7 +5,7 @@ import {
   withStyles,
 } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import React, { useState } from 'react';
+import React, { KeyboardEventHandler, useState } from 'react';
 
 const CssTextField = withStyles({
   root: {
@@ -41,12 +41,18 @@ const useStyles = makeStyles(function (theme: Theme) {
   });
 });
 
-export interface handleInputChange{
+export interface inputProps{
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleKeyPress: (event: React.KeyboardEvent) => void;
+}
+interface listProps{
+  profiles:string[]
+  handleListItemClick:(event: React.MouseEvent<HTMLDivElement>, index:number, profile:string) => void
+  selectedIndex:number
 }
 
 
- const CustomInput = ({handleChange}:handleInputChange) => {
+ const CustomInput = (props:inputProps) => {
   const classes = useStyles();
 
 
@@ -58,7 +64,8 @@ export interface handleInputChange{
       inputProps={{ min: 0, style: { textAlign: 'center' }}}
       placeholder="127.0.0.1"
       label=" "
-      onChange={handleChange}
+      onChange={props.handleChange}
+      onKeyPress={props.handleKeyPress}
     />
   );
 }
