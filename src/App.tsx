@@ -10,9 +10,15 @@ import StreamPage from './components/streamPage/StreamPage';
 import StartPage from './components/StartPage/StartPage';
 
 export default function App() {
-  useEffect(() => {
-    CortexDriver.getInstance();
+  useEffect( () => {
+
+    const start = async () => {
+      let driver:CortexDriver= CortexDriver.getInstance();
+      await driver.awaitSocketOpening();
+    }
+    start();
   });
+
 
   return (
     <Router>
