@@ -22,7 +22,7 @@ class CortexError {
     switch (errorId) {
       case 1:
         {
-          return 'case 1';
+          return 'Can\'t access the Emotive servers.';
         }
         break;
 
