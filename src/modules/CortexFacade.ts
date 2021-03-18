@@ -58,12 +58,13 @@ class CortexFacade {
   hasConnectivityErrors= async () => {
 try{
     let driver: CortexDriver = CortexDriver.getInstance();
-    let authoken: string = await driver.authorize();
+    let authToken: string = await driver.authorize();
     let headsetId: string = await driver.queryHeadsetId();
     let hasLoadedProfile = await driver.hasCurrentProfile(
-      authoken,
+      authToken,
       headsetId
     );
+
     return false;
   }catch(error){
     console.log(error);

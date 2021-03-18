@@ -436,7 +436,7 @@ class CortexDriver {
     authToken: string,
     sessionId: string,
     profile: string,
-    action: string
+    action: string[]
   ) => {
     const MENTAL_COMMAND_ACTIVE_ACTION_ID = 12;
     let mentalCommandActiveActionRequest = {
@@ -456,16 +456,20 @@ class CortexDriver {
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
           if (JSON.parse(data)['id'] == MENTAL_COMMAND_ACTIVE_ACTION_ID) {
+            console.log(data);
             resolve(data);
           }
         } catch (error) {
           reject('mental command active action error');
         }
+        finally{
+          this.setStreamOnmessageEvent();
+        }
       };
     });
   };
   /**
-   * Checks if ths application ahs access to the Emotiv App.
+   * Checks if ths application has access to the Emotiv App.
    *
    * @returns true if it has access and rejects an error message if not.
    */
@@ -648,10 +652,11 @@ class CortexDriver {
     authToken: string,
     profile: string,
     session: string,
-    values: number[]
+    values: number[],
+    headsetId:string
   ) => {
     let currentProfileRequest = {
-      id: 1,
+      id: 16,
       jsonrpc: '2.0',
       method: 'mentalCommandActionSensitivity',
       params: {
@@ -660,16 +665,17 @@ class CortexDriver {
         session: session,
         status: 'set',
         values: values,
-      },
+      }
     };
     this._socket.send(JSON.stringify(currentProfileRequest));
     this._socket.onmessage = ({ data }: MessageEvent) => {
       try {
-        console.log("set senistivity: " + data);
+        console.log("set sensitivity:  " + values +  ' \n' + 'data: ' +data);
       } catch (error) {
         console.log(error);
       }
       finally{
+        this.saveProfile(authToken, headsetId, profile)
         this.setStreamOnmessageEvent();
       }
     };
@@ -696,24 +702,22 @@ class CortexDriver {
    */
   public getSensitivity = async (authToken: string, profile: string): Promise<number[]> => {
     let getSensitivityRequest = {
-      id: 1,
+      id: 17,
       jsonrpc: '2.0',
-      method: 'mentalCommandActionSensitivity',
+      method: "mentalCommandActionSensitivity",
       params: {
         cortexToken: authToken,
         profile: profile,
         status: 'get',
       },
     };
-    console.log("get senistivity called");
-    return new Promise<number[]>((resolve, reject) => {
+    return new Promise<number[]> ( (resolve, reject)  => {
       this._socket.send(JSON.stringify(getSensitivityRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
           if (data.indexOf('error') === -1) {
-            console.log("get senistivity: " + data);
+            console.log("get sensitivity: " + data);
             let parsed:getSensitivityResponse = JSON.parse(data);
-
             resolve(parsed.result);
           }
         } catch (error) {
@@ -725,6 +729,39 @@ class CortexDriver {
       };
     });
   };
+
+   
+     private saveProfile = async (authToken:string, headsetId: string, profile: string): Promise<number[]> => {
+      let saveProfileRequest = {
+        id: 18,
+        jsonrpc: '2.0',
+        method: "setupProfile",
+        params: {
+          cortexToken: authToken,
+          headset:headsetId,
+          profile: profile,
+          status: 'save',
+        },
+      };
+      console.log('save profile called');
+      return new Promise<number[]>((resolve, reject) => {
+        this._socket.send(JSON.stringify(saveProfileRequest));
+        this._socket.onmessage = ({ data }: MessageEvent) => {
+          try {
+            console.log("Save profile: " + data);
+            if (data.indexOf('error') === -1) {
+              let parsed:getSensitivityResponse = JSON.parse(data);
+              resolve(parsed.result);
+            }
+          } catch (error) {
+            reject(new CortexError(2, error));
+          }
+          finally{
+            this.setStreamOnmessageEvent();
+          }
+        };
+      });
+    };
 
   /**
    * Queries all the profiles saved on this user.
