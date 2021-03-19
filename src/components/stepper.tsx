@@ -18,12 +18,7 @@ import { StepIconProps } from '@material-ui/core';
 import { CortexDriver } from '../modules/CortexDriver';
 import SuccessIcon from './StartPage/icon';
 import CortexError from '../modules/CortexError';
-
-const StyledStepLabel = styled(StepLabel)({
-  '& .MuiStepLabel-label': {
-    color: '#fff',
-  },
-});
+import StepperStatus from './StartPage/StepperStatus';
 
 const facade = new FacadeTest();
 const driver = CortexDriver.getInstance();
@@ -127,48 +122,12 @@ export default function VerticalLinearStepper() {
     setDeviceError(true);
   }
 
-  function getStepContent(step: number) {
-    switch (step) {
-      case 0:
-        {
-          hasAccess();
-        }
-        return text;
-      case 1:
-        getHeadsetID();
-        return headsetID;
-      case 2:
-        getDevice();
-        return device;
-      default:
-        return 'Unknown step';
-    }
-  }
 
   const handleChange = (text: string) => (event: React.ChangeEvent<{}>) => {
     setText(text);
   };
 
-  function trueFalseStepIcon(props: StepIconProps) {
-    let errorIcon = <Error className={classes.errorIcon} />;
-    let successIcon = <CheckBox className={classes.successIcon} />;
-    let notHandledIcon = <Adjust />;
 
-    let firstIcon = notHandledIcon;
-    let secondIcon = notHandledIcon;
-    let thirdIcon = notHandledIcon;
-    if (props.active || props.completed) {
-      firstIcon = hasAccessError ? errorIcon : successIcon;
-      secondIcon = headsetIdError ? errorIcon : successIcon;
-      thirdIcon = deviceError ? errorIcon : successIcon;
-    }
-    const icons: { [index: string]: React.ReactElement } = {
-      1: firstIcon,
-      2: secondIcon,
-      3: thirdIcon,
-    };
-    return <div>{icons[String(props.icon)]}</div>;
-  }
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
@@ -194,11 +153,14 @@ export default function VerticalLinearStepper() {
       >
         {steps.map((label, index) => (
           <Step key={label}>
-            <StyledStepLabel StepIconComponent={trueFalseStepIcon}>
+            <SuccessIcon hasError = {true} label = {label} ></SuccessIcon>
+            {/* <StyledStepLabel StepIconComponent={Error}>
               {label}
-            </StyledStepLabel>
+            </StyledStepLabel> */}
             <StepContent>
-              <SuccessIcon hasError={hasAccessError} />
+              {/* <StepperStatus hasError={hasAccessError} text = {'123'} />
+              <StepperStatus hasError={headsetIdError}/>
+              <StepperStatus hasError={deviceError} /> */}
               <div className={classes.actionsContainer}>
                 <div>
                   <Button
