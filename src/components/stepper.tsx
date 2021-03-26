@@ -18,6 +18,7 @@ import { StepIconProps } from '@material-ui/core';
 import { CortexDriver } from '../modules/CortexDriver';
 import SuccessIcon from './StartPage/icon';
 import CortexError from '../modules/CortexError';
+import { truncate } from 'fs';
 
 const StyledStepLabel = styled(StepLabel)({
   '& .MuiStepLabel-label': {
@@ -70,7 +71,7 @@ export default function VerticalLinearStepper() {
   const [device, setDevice] = useState('');
   const [hasAccessError, setHasAccessError] = useState(false);
   const [headsetIdError, setHeadSetIdError] = useState(false);
-  const [deviceError, setDeviceError] = useState(false);
+  const [deviceError, setDeviceError] = useState(true);
 
   // function trueFalseStepIcon(bool: string){
   //   let iconArray = icons.slice()
@@ -78,31 +79,9 @@ export default function VerticalLinearStepper() {
 
   // }
 
-  useEffect(() => {
-    const start = async () => {
-      try {
-
-        if(!driver.isConnected()){
-          let connected =  await driver.awaitSocketOpening();
-          if(!connected){
-            alert(new CortexError(6,"").errMessage);
-          }
-        }
-        await hasAccess();
-        await getHeadsetID();
-        await getDevice();
-      } catch (error) {
-        if (error instanceof CortexError) {
-          alert(error.errMessage);
-        }
-      }
-      start();
-    };
-  }, []);
-
   async function hasAccess() {
     console.log('==============');
-    let b:boolean = await driver.hasAccess();
+    let b: boolean = await driver.hasAccess();
     console.log(b);
     if (b) {
       setText('You are connected to the app');
@@ -126,6 +105,25 @@ export default function VerticalLinearStepper() {
     setDevice(s);
     setDeviceError(true);
   }
+
+  // function handleStepMovement(){
+  //   if(!hasAccessError){
+  //     handleNext()
+  //   }else{
+  //     return
+  //   }
+  //   if(!headsetIdError){
+  //     handleNext()
+  //   }else{
+  //     return
+  //   }
+  //   if(!deviceError){
+  //     handleNext()
+  //   }else{
+  //     return
+  //   }
+
+  // }
 
   function getStepContent(step: number) {
     switch (step) {
@@ -185,8 +183,44 @@ export default function VerticalLinearStepper() {
     setActiveStep(0);
   };
 
+  async function handleStart() {
+    try {
+      await facade.handleSetupApp();
+      let errors: any = facade.getSetupErrors();
+      console.log('5435345354');
+      setHasAccessError(errors[0]);
+      setHeadSetIdError(errors[1]);
+      setDeviceError(errors[2]);
+      //handleStepMovement()
+    } catch (error) {
+      if (error instanceof CortexError) {
+        alert(error.errMessage);
+      }
+    }
+  }
+
+  useEffect(() => {
+    const start = async () => {
+      try {
+        await facade.handleSetupApp();
+        let errors: any = facade.getSetupErrors();
+        console.log('5435345354');
+        setHasAccessError(errors[0]);
+        setHeadSetIdError(errors[1]);
+        setDeviceError(errors[2]);
+        //handleStepMovement()
+      } catch (error) {
+        if (error instanceof CortexError) {
+          alert(error.errMessage);
+        }
+      }
+    };
+    start();
+  }, []);
+
   return (
     <div className={classes.root}>
+      <Button onClick={handleStart}>Connect</Button>
       <Stepper
         className={classes.text}
         activeStep={activeStep}
@@ -198,7 +232,6 @@ export default function VerticalLinearStepper() {
               {label}
             </StyledStepLabel>
             <StepContent>
-              <SuccessIcon hasError={hasAccessError} />
               <div className={classes.actionsContainer}>
                 <div>
                   <Button

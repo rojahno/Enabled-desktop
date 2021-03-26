@@ -1,12 +1,47 @@
 
 import { CortexDriver } from "./modules/CortexDriver";
+import CortexError from "./modules/CortexError";
 
 class FacadeTest {
     private authToken : string = ''
     headsetID: string = ''
     private driver = CortexDriver.getInstance();
+    accessError:boolean = true;
+    headsetError:boolean = true;
+    deviceError:boolean = true;
     
     
+    handleSetupApp = async () => {
+        try{
+            if(!this.driver.isConnected()){
+                let connected = await this.driver.awaitSocketOpening()
+                if(!connected){
+                    //new CortexError(3,'Access denied by user')
+                }
+            }
+            let hasAccess = await this.driver.hasAccess()
+            if(!hasAccess){
+                let requestAccess = await this.driver.requestAccess()
+                if(!requestAccess){
+
+                    //new CortexError(6,'')
+                }
+            }
+            this.accessError = false;
+            let headsetID = await this.driver.queryHeadsetId()
+            console.log("3242424532")
+            this.headsetError = false
+            await this.driver.controlDevice(headsetID)
+            this.deviceError = false;
+            //return [accessError,headsetError,deviceError]
+        }
+        catch(error){}
+    }
+
+    getSetupErrors = () => {
+        return [this.accessError,this.headsetError,this.deviceError]
+    }
+
     async getHasAccess() {
         try{
             return await this.driver.hasAccess()

@@ -36,12 +36,11 @@ export default function StartPage(_props: any) {
          <div className="frontpage-container">
          <VerticalLinearStepper/>
       <SimplePaper>
-        <Link to = '/select'>
-        <Button variant="contained">Default</Button>
-        </Link>
          <h3>Give access through the emotiv application</h3>
          <h3>Connect your headset to the emotiv application</h3>
+        <Link to = '/select'>
         <Button variant="contained">Next</Button>
+        </Link>
       </SimplePaper>
          </div>
     </div>
