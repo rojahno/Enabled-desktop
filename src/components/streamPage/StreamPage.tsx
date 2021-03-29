@@ -65,14 +65,9 @@ export default function StreamPage(props: any) {
     }
   };
 
-  const startStream = async () => {
-    let driver: CortexDriver = CortexDriver.getInstance();
-    await driver.startStream(authToken, sessionId);
-  };
-
   useEffect(() => {
-    let ip: string = props.location.state.ipAdress;
-    setIp(ip);
+    //let ip: string = props.location.state.ipAdress;
+    //setIp(ip);
 
     const start = async () => {
       try {
@@ -107,7 +102,7 @@ export default function StreamPage(props: any) {
         setsessionId(sessionId);
         setSensitivity(sensitivity[0]);
         setProfile(profile);
-        setActiveCommands(commands);
+        console.log(commands);
       } catch (error) {
         if (error instanceof CortexError) {
           alert(error.errMessage);

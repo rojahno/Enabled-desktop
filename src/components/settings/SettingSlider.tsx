@@ -69,7 +69,6 @@ const marks = [
 export default function SettingSlider(props:sliderProps) {
   const classes = useStyles();
 
-
   return (
     <div className={classes.root}>
       <Typography id="discrete-slider-small-steps" gutterBottom>
@@ -77,7 +76,7 @@ export default function SettingSlider(props:sliderProps) {
       </Typography>
       <Slider
       onChangeCommitted={ (event,value) => props.handleChange(event, value)}
-        defaultValue={1}
+        defaultValue={5}
         getAriaValueText={valuetext}
         aria-labelledby="discrete-slider-small-steps"
         step={1}
