@@ -5,7 +5,7 @@ import {
   withStyles,
 } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import React, { useState } from 'react';
+import React from 'react';
 
 const CssTextField = withStyles({
   root: {
@@ -41,25 +41,25 @@ const useStyles = makeStyles(function (theme: Theme) {
   });
 });
 
-export interface handleInputChange{
+export interface inputProps {
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleKeyPress: (event: React.KeyboardEvent) => void;
 }
 
-
- const CustomInput = ({handleChange}:handleInputChange) => {
+const CustomInput = (props: inputProps) => {
   const classes = useStyles();
-
 
   return (
     <CssTextField
       className={classes.root}
       error={false}
       hiddenLabel={true}
-      inputProps={{ min: 0, style: { textAlign: 'center' }}}
+      inputProps={{ min: 0, style: { textAlign: 'center' } }}
       placeholder="127.0.0.1"
       label=" "
-      onChange={handleChange}
+      onChange={props.handleChange}
+      onKeyPress={props.handleKeyPress}
     />
   );
-}
+};
 export default CustomInput;
