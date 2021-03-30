@@ -13,7 +13,7 @@ import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import { FacadeTest } from '../FacadeTest';
-import { Error, CheckBox, Adjust } from '@material-ui/icons';
+import { Error, CheckBox, Adjust, PinDropSharp } from '@material-ui/icons';
 import { StepIconProps } from '@material-ui/core';
 import { CortexDriver } from '../modules/CortexDriver';
 import SuccessIcon from './StartPage/icon';
@@ -32,7 +32,9 @@ const driver = CortexDriver.getInstance();
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      width: '15vw',
+      minWidth: '20vw',
+      Height: '100%',
+      
     },
     button: {
       marginTop: theme.spacing(1),
@@ -46,7 +48,9 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     text: {
       color: '#fff',
-      backgroundColor: '#ffffff27',
+      backgroundColor: '#ffffff50',
+      borderRadius:'4px',
+      boxShadow: '0px 6px 6px -3px rgba(0,0,0,0.2), 0px 10px 14px 1px rgba(0,0,0,0.14), 0px 4px 18px 3px rgba(0,0,0,0.12)'
     },
     successIcon: {
       color: 'green',
@@ -54,118 +58,75 @@ const useStyles = makeStyles((theme: Theme) =>
     errorIcon: {
       color: 'red',
     },
+    notHandledIcon:{
+      color: 'white',
+    }
   })
 );
 
 function getSteps() {
   return [
-    'Request permission from the emotiv app',
-    'Create an ad group',
-    'Create an ad',
+    'Requesting permission from the emotiv app',
+    'Getting headset ID',
+    'Connecting to headset',
   ];
 }
 
-export default function VerticalLinearStepper() {
+
+
+interface stepProps{
+  setData:(das:string) => void
+  hasAccessError:boolean
+  headsetIdError:boolean
+  deviceError:boolean
+  currentStep: number
+  isClicked:boolean
+}
+
+export default function VerticalLinearStepper(props:stepProps) {
   const [text, setText] = useState('');
   const [headsetID, setHeadsetID] = useState('');
   const [device, setDevice] = useState('');
-  const [hasAccessError, setHasAccessError] = useState(false);
-  const [headsetIdError, setHeadSetIdError] = useState(false);
-  const [deviceError, setDeviceError] = useState(true);
 
-  // function trueFalseStepIcon(bool: string){
-  //   let iconArray = icons.slice()
-  //   if(bool === 'true'){iconArray.push(CheckBox)}
-
+  // function getStepContent(step: number) {
+  //   switch (step) {
+  //     case 0:
+  //       {
+  //         hasAccess();
+  //       }
+  //       return text;
+  //     case 1:
+  //       getHeadsetID();
+  //       return headsetID;
+  //     case 2:
+  //       getDevice();
+  //       return device;
+  //     default:
+  //       return 'Unknown step';
+  //   }
   // }
 
-  async function hasAccess() {
-    console.log('==============');
-    let b: boolean = await driver.hasAccess();
-    console.log(b);
-    if (b) {
-      setText('You are connected to the app');
-      setHasAccessError(false);
-    } else {
-      setText(
-        'Could not connect to emotiv app, make sure to give access in emotiv app'
-      );
-      setHasAccessError(true);
-    }
-  }
 
-  async function getHeadsetID() {
-    let s = await facade.getheadsetID();
-    setHeadsetID(s);
-    setHeadSetIdError(true);
-  }
-
-  async function getDevice() {
-    let s = await facade.getDevice();
-    setDevice(s);
-    setDeviceError(true);
-  }
-
-  // function handleStepMovement(){
-  //   if(!hasAccessError){
-  //     handleNext()
-  //   }else{
-  //     return
-  //   }
-  //   if(!headsetIdError){
-  //     handleNext()
-  //   }else{
-  //     return
-  //   }
-  //   if(!deviceError){
-  //     handleNext()
-  //   }else{
-  //     return
-  //   }
-
-  // }
-
-  function getStepContent(step: number) {
-    switch (step) {
-      case 0:
-        {
-          hasAccess();
-        }
-        return text;
-      case 1:
-        getHeadsetID();
-        return headsetID;
-      case 2:
-        getDevice();
-        return device;
-      default:
-        return 'Unknown step';
-    }
-  }
-
-  const handleChange = (text: string) => (event: React.ChangeEvent<{}>) => {
-    setText(text);
-  };
-
-  function trueFalseStepIcon(props: StepIconProps) {
-    let errorIcon = <Error className={classes.errorIcon} />;
-    let successIcon = <CheckBox className={classes.successIcon} />;
-    let notHandledIcon = <Adjust />;
-
+  function trueFalseStepIcon(iconProps: StepIconProps) {
+      let errorIcon = <Error className={classes.errorIcon} />;
+      let successIcon = <CheckBox className={classes.successIcon} />;
+      let notHandledIcon = <Adjust className={classes.notHandledIcon}/>;
+    
     let firstIcon = notHandledIcon;
     let secondIcon = notHandledIcon;
     let thirdIcon = notHandledIcon;
-    if (props.active || props.completed) {
-      firstIcon = hasAccessError ? errorIcon : successIcon;
-      secondIcon = headsetIdError ? errorIcon : successIcon;
-      thirdIcon = deviceError ? errorIcon : successIcon;
+    if (iconProps.active || iconProps.completed) {
+      firstIcon = props.hasAccessError ? errorIcon : successIcon;
+      secondIcon = props.headsetIdError ? errorIcon : successIcon;
+      thirdIcon = props.deviceError? errorIcon : successIcon;
     }
     const icons: { [index: string]: React.ReactElement } = {
       1: firstIcon,
       2: secondIcon,
       3: thirdIcon,
     };
-    return <div>{icons[String(props.icon)]}</div>;
+    return <div>{icons[String(iconProps.icon)]}</div>;
+  
   }
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
@@ -183,47 +144,40 @@ export default function VerticalLinearStepper() {
     setActiveStep(0);
   };
 
-  async function handleStart() {
-    try {
-      await facade.handleSetupApp();
-      let errors: any = facade.getSetupErrors();
-      console.log('5435345354');
-      setHasAccessError(errors[0]);
-      setHeadSetIdError(errors[1]);
-      setDeviceError(errors[2]);
-      //handleStepMovement()
-    } catch (error) {
-      if (error instanceof CortexError) {
-        alert(error.errMessage);
-      }
-    }
+ 
+  const sendData = () =>{
+    props.setData('123')
   }
 
-  useEffect(() => {
-    const start = async () => {
-      try {
-        await facade.handleSetupApp();
-        let errors: any = facade.getSetupErrors();
-        console.log('5435345354');
-        setHasAccessError(errors[0]);
-        setHeadSetIdError(errors[1]);
-        setDeviceError(errors[2]);
-        //handleStepMovement()
-      } catch (error) {
-        if (error instanceof CortexError) {
-          alert(error.errMessage);
-        }
-      }
-    };
-    start();
-  }, []);
+  function handleChange(){
 
+    if(!props.isClicked){
+      return -1
+    }
+
+    if(props.hasAccessError){
+      console.log(props.hasAccessError)
+      //setActiveStep(0)
+      return 0
+    }
+    if(props.headsetIdError){
+      console.log(props.headsetIdError)
+      //setActiveStep(1)
+      return 1
+    }
+    if(props.deviceError){
+      console.log(props.deviceError)
+      //setActiveStep(2)
+      return 2
+    }
+    return 2
+  }
+  
   return (
     <div className={classes.root}>
-      <Button onClick={handleStart}>Connect</Button>
       <Stepper
         className={classes.text}
-        activeStep={activeStep}
+        activeStep={handleChange()}
         orientation="vertical"
       >
         {steps.map((label, index) => (
@@ -232,41 +186,11 @@ export default function VerticalLinearStepper() {
               {label}
             </StyledStepLabel>
             <StepContent>
-              <div className={classes.actionsContainer}>
-                <div>
-                  <Button
-                    disabled={activeStep === 0}
-                    onClick={() => {
-                      handleBack();
-                    }}
-                    className={classes.button}
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => {
-                      handleNext();
-                    }}
-                    className={classes.button}
-                  >
-                    {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-                  </Button>
-                </div>
-              </div>
+            
             </StepContent>
           </Step>
         ))}
       </Stepper>
-      {activeStep === steps.length && (
-        <Paper square elevation={0} className={classes.resetContainer}>
-          <Typography>All steps completed - you&apos;re finished</Typography>
-          <Button onClick={handleReset} className={classes.button}>
-            Reset
-          </Button>
-        </Paper>
-      )}
     </div>
   );
 }
