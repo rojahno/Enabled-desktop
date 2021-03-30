@@ -3,7 +3,6 @@ import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import CustomInput from './customInput';
 import CustomDialog from './CustomDialog';
 import SimplePaper from '../SimplePaper';
-import { CortexDriver } from '../../modules/CortexDriver';
 import { useHistory } from 'react-router-dom';
 import { MobileDriver } from '../../modules/MobileDriver';
 import NavigationButtons from '../selectProfile/NavigationButtons';
@@ -55,6 +54,14 @@ export default function AddIpPage(_props: any) {
     }
   };
 
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      if (validIpAdress) {
+        handleNextClick();
+      }
+    }
+  };
+
   const handleNextClick = async () => {
     try {
       let cortexFacade = new CortexFacade();
@@ -91,7 +98,10 @@ export default function AddIpPage(_props: any) {
       <div className={classes.container}>
         <SimplePaper>
           <h3>Add the IP of your phone</h3>
-          <CustomInput handleChange={handleChange} />
+          <CustomInput
+            handleChange={handleChange}
+            handleKeyPress={handleKeyPress}
+          />
           <CustomDialog />
           <NavigationButtons
             canNavigateForward={validIpAdress}

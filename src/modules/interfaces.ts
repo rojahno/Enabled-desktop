@@ -104,8 +104,13 @@ interface GetCurrentProfileResponse {
   };
 }
 
-interface DataSample{
+interface ComDataSample{
   com:[command:string],
+  sid:string,
+  time:number
+}
+interface FacDataSample{
+  fac:any[],
   sid:string,
   time:number
 }
@@ -115,6 +120,51 @@ interface Warning{
     code:number,
     message:any
   }
+}
+
+interface unsubscribeResponse{
+    id: number,
+    jsonrpc: string,
+    result: {
+        failure:[],
+        success:[]
+    }
+}
+
+interface UpdateSessionResponse{
+  
+    id: number,
+    jsonrpc: string,
+    result: {
+        appId: string,
+        headset: {
+            connectedBy: string,
+            customName: string,
+            dongle: string,
+            firmware: string,
+            id: string,
+            motionSensors: string[],
+            sensors: string[],
+            settings: {
+                eegRate: number,
+                eegRes: number,
+                memsRate: number,
+                memsRes: number,
+                mode: number
+            },
+            status: string
+        },
+        id: string,
+        license: string,
+        owner: string,
+        recordIds: string[],
+        recording: boolean,
+        started: string,
+        status: string,
+        stopped:string,
+        streams: []
+    }
+
 }
 
 export {
@@ -130,8 +180,13 @@ export {
   AuthorizeResponse,
   CreateSessionResponse,
   GetCurrentProfileResponse,
-  DataSample,
+  ComDataSample,
+  FacDataSample,
   Warning,
   getSensitivityResponse,
   getCommandResponse,
+  unsubscribeResponse,
+  UpdateSessionResponse
+  
+  
 };
