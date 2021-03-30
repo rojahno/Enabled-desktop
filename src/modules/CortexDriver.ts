@@ -1,3 +1,4 @@
+import CortexCommand from './CortexCommand';
 import CortexError from './CortexError';
 
 import {
@@ -14,7 +15,6 @@ import {
   Warning,
   getSensitivityResponse,
   getCommandResponse,
-  unsubscribeResponse,
   UpdateSessionResponse,
 } from './interfaces';
 
@@ -358,11 +358,8 @@ class CortexDriver {
    * @param sessionId
    * Starts the stream and notifies the observers.
    */
-  public startComStream = async (
-    authToken: string,
-    sessionId: string,
-  ) => {
-    const SUB_REQUEST_ID =26;
+  public startComStream = async (authToken: string, sessionId: string) => {
+    const SUB_REQUEST_ID = 26;
     let subRequest = {
       jsonrpc: '2.0',
       method: 'subscribe',
@@ -379,12 +376,12 @@ class CortexDriver {
         try {
           if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
             let parsed: ComDataSample = JSON.parse(data);
-            console.log(data);
-            this.notify(parsed.com[0]);
+            let command = new CortexCommand('com', parsed.com[0], parsed);
+            this.notify(command);
             resolve(true);
           }
         } catch (error) {
-          console.error('Com request error: ' +error);
+          console.error('Com request error: ' + error);
           resolve(false);
         }
       };
@@ -397,11 +394,8 @@ class CortexDriver {
    * @param sessionId
    * Starts the stream and notifies the observers.
    */
-   public startFacStream = async (
-    authToken: string,
-    sessionId: string,
-  ) => {
-    const SUB_REQUEST_ID =26;
+  public startFacStream = async (authToken: string, sessionId: string) => {
+    const SUB_REQUEST_ID = 26;
     let subRequest = {
       jsonrpc: '2.0',
       method: 'subscribe',
@@ -419,11 +413,12 @@ class CortexDriver {
           if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
             let parsed: FacDataSample = JSON.parse(data);
             console.log(data);
-            this.notify(parsed.fac[0]);
+            let command = new CortexCommand('fac', parsed.fac[0], parsed);
+            this.notify(command);
             resolve(true);
           }
         } catch (error) {
-          console.error('Fac request error: ' +error);
+          console.error('Fac request error: ' + error);
           resolve(false);
         }
       };
@@ -443,19 +438,18 @@ class CortexDriver {
       id: CLOSE_REQUEST_ID,
     };
     return new Promise<boolean>((resolve) => {
-    if (this.cortexToken) this._socket.send(JSON.stringify(subRequest));
-    this._socket.onmessage = ({ data }: MessageEvent) => {
-      try {
-        let parsed: UpdateSessionResponse = JSON.parse(data);
-        if(parsed.id === CLOSE_REQUEST_ID){
-        resolve(data);
+      if (this.cortexToken) this._socket.send(JSON.stringify(subRequest));
+      this._socket.onmessage = ({ data }: MessageEvent) => {
+        try {
+          let parsed: UpdateSessionResponse = JSON.parse(data);
+          if (parsed.id === CLOSE_REQUEST_ID) {
+            resolve(data);
+          }
+        } catch (error) {
+          console.error('Close request error');
         }
-      } 
-    catch (error) {
-        console.error('Close request error');
-      }
-    };
-  });
+      };
+    });
   };
 
   /** This method is to get or set the active action for the mental command detection.
@@ -749,7 +743,8 @@ class CortexDriver {
       try {
         if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
           let parsed: ComDataSample = JSON.parse(data);
-          this.notify(parsed.com[0]);
+          let command = new CortexCommand('com', parsed.com[0], parsed);
+          this.notify(command);
         }
       } catch (error) {
         console.error('Sub request error');
@@ -761,7 +756,8 @@ class CortexDriver {
       try {
         if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
           let parsed: FacDataSample = JSON.parse(data);
-          this.notify(parsed.fac[0]);
+          let command = new CortexCommand('fac', parsed.fac[0], parsed);
+          this.notify(command);
         }
       } catch (error) {
         console.error('Fac request error: ' + error);
@@ -879,14 +875,6 @@ class CortexDriver {
     });
   };
 
-  private hasErrorInString(data: string) {
-    if (data.indexOf('error') !== -1) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   public async subscribe(observer: IObserver) {
     this.observers.push(observer);
   }
@@ -905,13 +893,13 @@ class CortexDriver {
     console.table(this.observers);
   }
 
-  private notify(streamCommand: string) {
+  private notify(streamCommand: CortexCommand) {
     this.observers.forEach((observer) => observer.sendCommand(streamCommand));
   }
 }
 
 interface IObserver {
-  sendCommand(command: string): void;
+  sendCommand(command: CortexCommand): void;
 }
 
 export { CortexDriver, StreamObserver, IObserver };

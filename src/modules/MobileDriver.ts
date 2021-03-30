@@ -1,4 +1,6 @@
+import CortexCommand from './CortexCommand';
 import { CortexDriver, IObserver, StreamObserver } from './CortexDriver';
+import { ComDataSample, FacDataSample } from './interfaces';
 
 const CONNECTION_RETRY_INTERVAL = 5000; // in ms
 const CONNECTION_RETRY_MAX_COUNT = 60; // 60 times to retry x 5s = 5min of total retries
@@ -15,11 +17,15 @@ class MobileDriver implements IObserver {
 
   private constructor() {}
 
-  sendCommand(command: string): void {
-    console.log('The command: ' + command);
+  sendCommand(cortexCommand: CortexCommand): void {
+    console.log('The command: ' + cortexCommand.getCommand() + '\n Type: ' + cortexCommand.getStreamType());
     this.currentTime = Date.now();
     if (this.currentTime - this.previousTriggerTime >= this.commandInterval) {
-      this.sendSomething(command);
+  
+      if(cortexCommand.getStreamType() === 'com'){
+      this.sendSomething(cortexCommand.getCommand());
+      }
+    
     }
   }
 
