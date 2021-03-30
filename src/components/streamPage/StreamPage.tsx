@@ -47,6 +47,7 @@ export default function StreamPage(props: any) {
   const [sessionId, setsessionId] = useState('');
   const [profile, setProfile] = useState('');
   const [ip, setIp] = useState('');
+  const [isComStream, setIsComStream] = useState(true);
   const [sensitivity, setSensitivity] = useState<number>();
   const [activeCommands, setActiveCommands] = useState<string[]>();
 
@@ -60,9 +61,32 @@ export default function StreamPage(props: any) {
       await driver.setSensitivity(authToken, profile, sessionId, sensitivity);
       await driver.saveProfile(authToken, headsetId, profile);
       let newSensitivity = await driver.getSensitivity(authToken, profile);
-      driver.setStreamOnmessageEvent();
+      if(isComStream){
+      driver.setComStreamOnmessageEvent();
+      }
+      else{
+        driver.setFacStreamOnmessageEvent();
+      }
       setSensitivity(newSensitivity[0]);
     }
+  };
+
+  const handleFacPress = async () => {
+    let driver: CortexDriver = CortexDriver.getInstance();
+    await driver.closeSession();
+    let sessionId: string = await driver.createSession(authToken, headsetId);
+    await driver.startFacStream(authToken, sessionId);
+    setsessionId(sessionId);
+    setIsComStream(false);
+  };
+
+  const handleComPress = async () => {
+    let driver: CortexDriver = CortexDriver.getInstance();
+    await driver.closeSession();
+    let sessionId: string = await driver.createSession(authToken, headsetId);
+    await driver.startComStream(authToken, sessionId);
+    setsessionId(sessionId);
+    setIsComStream(true);
   };
 
   useEffect(() => {
@@ -91,7 +115,7 @@ export default function StreamPage(props: any) {
           authToken,
           profile
         );
-        let startStream: boolean = await driver.startStream(
+        let startStream: boolean = await driver.startComStream(
           authToken,
           sessionId
         );
@@ -116,7 +140,7 @@ export default function StreamPage(props: any) {
     const offLoad = () => {
       let mobileDriver: MobileDriver = MobileDriver.getInstance();
       let driver: CortexDriver = CortexDriver.getInstance();
-      driver.stopStream();
+      driver.closeSession();
       mobileDriver.closeSocket();
     };
 
@@ -132,6 +156,7 @@ export default function StreamPage(props: any) {
             handleChange={handleChange}
             minSteps={1}
             maxSteps={10}
+            disabled={!isComStream}
           />
           <div className={classes.textContainer}>
             <p>
@@ -140,6 +165,13 @@ export default function StreamPage(props: any) {
               harder to trigger.
             </p>
           </div>
+          <button disabled={isComStream} onClick={handleComPress}>
+            Mental command stream
+          </button>
+
+          <button disabled={!isComStream} onClick={handleFacPress}>
+            Facial expression stream
+          </button>
           <div className={classes.buttons}>
             <Link to="/ip">
               <button>Back</button>

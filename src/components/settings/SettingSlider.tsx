@@ -64,6 +64,7 @@ const marks = [
     handleChange:(event: React.ChangeEvent<{}>, value:number | number[]) => void,
     maxSteps:number,
     minSteps:number,
+    disabled:boolean
 
 }
 export default function SettingSlider(props:sliderProps) {
@@ -84,6 +85,7 @@ export default function SettingSlider(props:sliderProps) {
         min={props.minSteps}
         max={props.maxSteps}
         valueLabelDisplay="auto"
+        disabled={props.disabled}
       />
     </div>
   );
