@@ -64,11 +64,11 @@ const marks = [
     handleChange:(event: React.ChangeEvent<{}>, value:number | number[]) => void,
     maxSteps:number,
     minSteps:number,
+    disabled:boolean
 
 }
 export default function SettingSlider(props:sliderProps) {
   const classes = useStyles();
-
 
   return (
     <div className={classes.root}>
@@ -77,7 +77,7 @@ export default function SettingSlider(props:sliderProps) {
       </Typography>
       <Slider
       onChangeCommitted={ (event,value) => props.handleChange(event, value)}
-        defaultValue={1}
+        defaultValue={5}
         getAriaValueText={valuetext}
         aria-labelledby="discrete-slider-small-steps"
         step={1}
@@ -85,6 +85,7 @@ export default function SettingSlider(props:sliderProps) {
         min={props.minSteps}
         max={props.maxSteps}
         valueLabelDisplay="auto"
+        disabled={props.disabled}
       />
     </div>
   );

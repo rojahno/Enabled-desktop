@@ -72,8 +72,7 @@ export default function SelectProfilePage(_props: any) {
         let authToken = await driver.authorize();
         let allProfiles = await driver.queryProfileRequest(authToken);
         setProfiles(allProfiles);
-      } catch (error) {
-      }
+      } catch (error) {}
     };
 
     getProfiles();
