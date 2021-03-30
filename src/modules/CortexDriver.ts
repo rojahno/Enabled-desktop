@@ -9,10 +9,13 @@ import {
   RequestAccessResponse,
   SetupProfileObject,
   GetCurrentProfileResponse,
-  DataSample,
+  ComDataSample,
+  FacDataSample,
   Warning,
   getSensitivityResponse,
   getCommandResponse,
+  unsubscribeResponse,
+  UpdateSessionResponse,
 } from './interfaces';
 
 /**
@@ -355,8 +358,11 @@ class CortexDriver {
    * @param sessionId
    * Starts the stream and notifies the observers.
    */
-  public startStream = async (authToken: string, sessionId: string) => {
-    const SUB_REQUEST_ID = 6;
+  public startComStream = async (
+    authToken: string,
+    sessionId: string,
+  ) => {
+    const SUB_REQUEST_ID =26;
     let subRequest = {
       jsonrpc: '2.0',
       method: 'subscribe',
@@ -372,20 +378,60 @@ class CortexDriver {
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
           if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
-            let parsed: DataSample = JSON.parse(data);
+            let parsed: ComDataSample = JSON.parse(data);
+            console.log(data);
             this.notify(parsed.com[0]);
             resolve(true);
           }
         } catch (error) {
-          console.error('Sub request error');
+          console.error('Com request error: ' +error);
           resolve(false);
         }
       };
     });
   };
 
-  public stopStream = async () => {
-    const SUB_REQUEST_ID = 6;
+  /**
+   *
+   * @param authToken
+   * @param sessionId
+   * Starts the stream and notifies the observers.
+   */
+   public startFacStream = async (
+    authToken: string,
+    sessionId: string,
+  ) => {
+    const SUB_REQUEST_ID =26;
+    let subRequest = {
+      jsonrpc: '2.0',
+      method: 'subscribe',
+      params: {
+        cortexToken: authToken,
+        session: sessionId,
+        streams: ['fac'],
+      },
+      id: SUB_REQUEST_ID,
+    };
+    return new Promise<boolean>((resolve) => {
+      this._socket.send(JSON.stringify(subRequest));
+      this._socket.onmessage = ({ data }: MessageEvent) => {
+        try {
+          if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
+            let parsed: FacDataSample = JSON.parse(data);
+            console.log(data);
+            this.notify(parsed.fac[0]);
+            resolve(true);
+          }
+        } catch (error) {
+          console.error('Fac request error: ' +error);
+          resolve(false);
+        }
+      };
+    });
+  };
+
+  public closeSession = async () => {
+    const CLOSE_REQUEST_ID = 19;
     let subRequest = {
       jsonrpc: '2.0',
       method: 'updateSession',
@@ -394,15 +440,22 @@ class CortexDriver {
         session: this.sessionId,
         status: 'close',
       },
-      id: SUB_REQUEST_ID,
+      id: CLOSE_REQUEST_ID,
     };
+    return new Promise<boolean>((resolve) => {
     if (this.cortexToken) this._socket.send(JSON.stringify(subRequest));
     this._socket.onmessage = ({ data }: MessageEvent) => {
       try {
-      } catch (error) {
-        console.error('Sub request error');
+        let parsed: UpdateSessionResponse = JSON.parse(data);
+        if(parsed.id === CLOSE_REQUEST_ID){
+        resolve(data);
+        }
+      } 
+    catch (error) {
+        console.error('Close request error');
       }
     };
+  });
   };
 
   /** This method is to get or set the active action for the mental command detection.
@@ -691,15 +744,27 @@ class CortexDriver {
     });
   };
 
-  public setStreamOnmessageEvent = () => {
+  public setComStreamOnmessageEvent = () => {
     this._socket.onmessage = ({ data }: MessageEvent) => {
       try {
         if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
-          let parsed: DataSample = JSON.parse(data);
+          let parsed: ComDataSample = JSON.parse(data);
           this.notify(parsed.com[0]);
         }
       } catch (error) {
         console.error('Sub request error');
+      }
+    };
+  };
+  public setFacStreamOnmessageEvent = () => {
+    this._socket.onmessage = ({ data }: MessageEvent) => {
+      try {
+        if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
+          let parsed: FacDataSample = JSON.parse(data);
+          this.notify(parsed.fac[0]);
+        }
+      } catch (error) {
+        console.error('Fac request error: ' + error);
       }
     };
   };
