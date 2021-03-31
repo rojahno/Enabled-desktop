@@ -9,10 +9,9 @@ import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from '@material-ui/core/StepContent';
-import { FacadeTest } from '../FacadeTest';
-import { Error, CheckBox, Adjust } from '@material-ui/icons';
+import { Error, CheckBox, Adjust, PinDropSharp } from '@material-ui/icons';
 import { StepIconProps } from '@material-ui/core';
-import { CortexDriver } from '../modules/CortexDriver';
+
 
 const StyledStepLabel = styled(StepLabel)({
   '& .MuiStepLabel-label': {
@@ -20,8 +19,6 @@ const StyledStepLabel = styled(StepLabel)({
   },
 });
 
-const facade = new FacadeTest();
-const driver = CortexDriver.getInstance();
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -65,19 +62,16 @@ function getSteps() {
   ];
 }
 
-interface stepProps {
-  setData: (das: string) => void;
-  hasAccessError: boolean;
-  headsetIdError: boolean;
-  deviceError: boolean;
-  currentStep: number;
-  isClicked: boolean;
+
+
+interface stepProps{
+  hasAccessError:boolean
+  headsetIdError:boolean
+  deviceError:boolean
+  isClicked:boolean
 }
 
-export default function VerticalLinearStepper(props: stepProps) {
-  const [text, setText] = useState('');
-  const [headsetID, setHeadsetID] = useState('');
-  const [device, setDevice] = useState('');
+export default function VerticalLinearStepper(props:stepProps) {
 
   function trueFalseStepIcon(iconProps: StepIconProps) {
     let errorIcon = <Error className={classes.errorIcon} />;
@@ -100,44 +94,24 @@ export default function VerticalLinearStepper(props: stepProps) {
     return <div>{icons[String(iconProps.icon)]}</div>;
   }
   const classes = useStyles();
-  const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
 
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
+  function handleChange(){
 
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
-  const handleReset = () => {
-    setActiveStep(0);
-  };
-
-  const sendData = () => {
-    props.setData('123');
-  };
-
-  function handleChange() {
-    if (!props.isClicked) {
-      return -1;
+    if(!props.isClicked){
+      return -1
     }
-
-    if (props.hasAccessError) {
-      console.log(props.hasAccessError);
-      //setActiveStep(0)
-      return 0;
+    if(props.hasAccessError){
+      console.log(props.hasAccessError)
+      return 0
     }
-    if (props.headsetIdError) {
-      console.log(props.headsetIdError);
-      //setActiveStep(1)
-      return 1;
+    if(props.headsetIdError){
+      console.log(props.headsetIdError)
+      return 1
     }
-    if (props.deviceError) {
-      console.log(props.deviceError);
-      //setActiveStep(2)
-      return 2;
+    if(props.deviceError){
+      console.log(props.deviceError)
+      return 2
     }
     return 2;
   }
