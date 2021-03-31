@@ -1,4 +1,3 @@
-import { createStyles, makeStyles, Theme } from '@material-ui/core';
 
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
@@ -8,8 +7,7 @@ import { CortexFacade } from '../../modules/CortexFacade';
 import SelectProfilePage from './SelectProfilePage';
 
 const SelectProfileContainer = () => {
-  const driver = CortexDriver.getInstance();
-
+    
   //Select profile useStates
   const [profiles, setProfiles] = useState<string[]>([]);
   const [selectedProfile, setSelectedProfile] = useState('');
