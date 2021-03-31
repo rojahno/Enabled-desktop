@@ -14,6 +14,8 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(2),
       display: 'flex',
       justifyContent: 'center',
+      flexDirection: 'column',
+
     },
     paper: {
       margin: theme.spacing(3),
@@ -34,7 +36,8 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     text:{
       marginTop:'auto',
-      marginBot:'auto'
+      marginBot:'auto',
+      fontSize:'12px'
     }
     })
 );
@@ -76,7 +79,7 @@ export default function StartPage(this: any, _props: any) {
       await facade.handleSetupApp();
       let errors: any = facade.getSetupErrors();
       console.log('5435345354');
-      setHasAccessError(errors[0]);
+      setHasAccessError(true);
       setHeadSetIdError(errors[1]);
       setDeviceError(errors[2]);
       setIsClicked(true)
@@ -110,7 +113,8 @@ export default function StartPage(this: any, _props: any) {
 
 return (
     <div className={classes.root}>
-         <div className={'frontpage-container'}>
+        <div>
+        <SimplePaper>
          <VerticalLinearStepper setData = {setChildData} 
                                 hasAccessError = {hasAccessError}
                                 headsetIdError = {headsetIdError}
@@ -119,7 +123,6 @@ return (
                                 isClicked = {isClicked}
                                 />
                                 
-      <SimplePaper>
         <div className = {classes.text}>
          <h3 hidden = {!isClicked}>{hasAccessError ? 'Could not connect to the emotiv app, try to go to the app and permit access': 'Connected to the emotiv app'}</h3>
          <h3 hidden = {!isClicked}>{headsetIdError ? 'Could not retrieve the ID of your headset': 'Headset ID retrieved'}</h3>

@@ -48,9 +48,9 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     text: {
       color: '#fff',
-      backgroundColor: '#ffffff50',
+      backgroundColor: '#ffffff00',
       borderRadius:'4px',
-      boxShadow: '0px 6px 6px -3px rgba(0,0,0,0.2), 0px 10px 14px 1px rgba(0,0,0,0.14), 0px 4px 18px 3px rgba(0,0,0,0.12)'
+      //boxShadow: '0px 6px 6px -3px rgba(0,0,0,0.2), 0px 10px 14px 1px rgba(0,0,0,0.14), 0px 4px 18px 3px rgba(0,0,0,0.12)'
     },
     successIcon: {
       color: 'green',
@@ -87,24 +87,6 @@ export default function VerticalLinearStepper(props:stepProps) {
   const [text, setText] = useState('');
   const [headsetID, setHeadsetID] = useState('');
   const [device, setDevice] = useState('');
-
-  // function getStepContent(step: number) {
-  //   switch (step) {
-  //     case 0:
-  //       {
-  //         hasAccess();
-  //       }
-  //       return text;
-  //     case 1:
-  //       getHeadsetID();
-  //       return headsetID;
-  //     case 2:
-  //       getDevice();
-  //       return device;
-  //     default:
-  //       return 'Unknown step';
-  //   }
-  // }
 
 
   function trueFalseStepIcon(iconProps: StepIconProps) {
