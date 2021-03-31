@@ -14,11 +14,15 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(2),
       display: 'flex',
       justifyContent: 'center',
+      flexDirection: 'column',
+      minHeight:'100vh'
+
     },
     paper: {
       margin: theme.spacing(3),
       width: theme.spacing(50),
       height: theme.spacing(50),
+      minWidth:'100%',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
@@ -34,7 +38,8 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     text:{
       marginTop:'auto',
-      marginBot:'auto'
+      marginBot:'auto',
+      fontSize:'12px'
     }
     })
 );
@@ -43,33 +48,13 @@ const facade = new FacadeTest();
 const driver = CortexDriver.getInstance();
 
 
-export default function StartPage(this: any, _props: any) {
+export default function StartPage(_props: any) {
   
-  const [data,setData] = useState('')
   const [hasAccessError, setHasAccessError] = useState(true);
   const [headsetIdError, setHeadSetIdError] = useState(false);
   const [deviceError, setDeviceError] = useState(false);
-  const [stepNumber, setStepNumber] = useState(0)
   const [isClicked,setIsClicked] = useState(false)
 
-  // useEffect(() => {
-  //   const startup = async () => {
-  //     try {
-  //       await facade.handleSetupApp();
-  //       let errors: any = facade.getSetupErrors();
-  //       console.log('5435345354');
-  //       setHasAccessError(errors[0]);
-  //       setHeadSetIdError(errors[1]);
-  //       setDeviceError(errors[2]);
-  //     } catch (error) {
-  //       if (error instanceof CortexError) {
-  //         alert(error.errMessage);
-  //       }
-  //     }
-  //   };
-
-  //   startup();
-  // }, []);
 
   async function handleStart() {
     try {
@@ -87,9 +72,6 @@ export default function StartPage(this: any, _props: any) {
     }
   }
 
-  const setError = () =>{
-    setHasAccessError(!hasAccessError)
-  }
 
   const enableNext = () =>{
     if(!hasAccessError && !headsetIdError && !deviceError){
@@ -98,28 +80,18 @@ export default function StartPage(this: any, _props: any) {
     else return true
   }
   
-   const setChildData = (childData:string) => {
-     console.log('12312')
-      setData(childData)
-   }
-  
-    const testUpdate = () =>{
-    console.log(data)
-   }
   const classes = useStyles();
 
 return (
     <div className={classes.root}>
-         <div className={'frontpage-container'}>
-         <VerticalLinearStepper setData = {setChildData} 
-                                hasAccessError = {hasAccessError}
+        <div>
+        <SimplePaper>
+         <VerticalLinearStepper hasAccessError = {hasAccessError}
                                 headsetIdError = {headsetIdError}
                                 deviceError = {deviceError}
-                                currentStep = {stepNumber}
                                 isClicked = {isClicked}
                                 />
                                 
-      <SimplePaper>
         <div className = {classes.text}>
          <h3 hidden = {!isClicked}>{hasAccessError ? 'Could not connect to the emotiv app, try to go to the app and permit access': 'Connected to the emotiv app'}</h3>
          <h3 hidden = {!isClicked}>{headsetIdError ? 'Could not retrieve the ID of your headset': 'Headset ID retrieved'}</h3>
