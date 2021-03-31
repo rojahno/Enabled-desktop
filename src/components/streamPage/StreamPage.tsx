@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import SimplePaper from '../SimplePaper';
 import { Link } from 'react-router-dom';
@@ -23,22 +23,17 @@ const useStyles = makeStyles((theme: Theme) =>
       flexDirection: 'column',
       justifyContent: 'center',
       alignContent: 'center',
-      fontSize:'15px',
+      fontSize: '15px',
       padding: '15px',
     },
-    dialog:{
-      paddingTop:'10px'
+    dialog: {
+      paddingTop: '10px',
     },
   })
 );
 
 interface StreamProps {
   handleChange: (
-  const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-    setValue(newValue);
-    console.log('value is: ' + value)
-  }
-  const [value, setValue] = useState(0)
     event: React.ChangeEvent<{}>,
     value: number | number[]
   ) => void;
@@ -50,59 +45,43 @@ interface StreamProps {
 export default function StreamPage(props: StreamProps) {
   const classes = useStyles();
 
+  const [value, setValue] = useState(0);
+
+  const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+    setValue(newValue);
+    console.log('value is: ' + value);
+  };
+
   return (
-    <div className={classes.root}>
-      <div className={classes.container}>
-        <SimplePaper>
-          <h3>Stream:</h3>
-          <SettingSlider
-            sliderTitle={'Headset sensitivity'}
-            handleChange={handleChange}
-            minSteps={1}
-            maxSteps={10}
-            disabled={!isComStream}
-          />
-          <div className={classes.textContainer}>
-            <p>
-              Moving the slider to the right (10) will make it easier to
-              trigger. Moving the slider to the left (1) will make the commands
-              harder to trigger.
-            </p>
-          </div>
-          <Tabs
-    value={value}
-    indicatorColor="primary"
-    textColor="primary"
-    onChange={handleTabChange}
-    aria-label="disabled tabs example"
-  >
-    <Tab label="Command Stream" onClick={handleComPress} />
-    <Tab label="Expression Stream" onClick={handleFacPress} />
-  </Tabs>
-  <div className={classes.dialog}>
-  <CustomStreamDialog/>
-  </div>
-          {/* <button disabled={isComStream} onClick={handleComPress}>
-            Mental command stream
-          </button>
-
-          <button disabled={!isComStream} onClick={handleFacPress}>
-            Facial expression stream
-          </button> */}
-          <div className={classes.buttons}>
-            <Link to="/ip">
-              <button>Back</button>
-            </Link>
-          </div>
-        </SimplePaper>
+    <SimplePaper>
+      <h3>Stream:</h3>
+      <SettingSlider
+        sliderTitle={'Headset sensitivity'}
+        handleChange={props.handleChange}
+        minSteps={1}
+        maxSteps={10}
+        disabled={!props.isComStream}
+      />
+      <div className={classes.textContainer}>
+        <p>
+          Moving the slider to the right (10) will make it easier to trigger.
+          Moving the slider to the left (1) will make the commands harder to
+          trigger.
+        </p>
       </div>
-      <button disabled={props.isComStream} onClick={props.handleComPress}>
-        Mental command stream
-      </button>
-
-      <button disabled={!props.isComStream} onClick={props.handleFacPress}>
-        Facial expression stream
-      </button>
+      <Tabs
+        value={value}
+        indicatorColor="primary"
+        textColor="primary"
+        onChange={handleTabChange}
+        aria-label="disabled tabs example"
+      >
+        <Tab label="Command Stream" onClick={props.handleComPress} />
+        <Tab label="Expression Stream" onClick={props.handleFacPress} />
+      </Tabs>
+      <div className={classes.dialog}>
+        <CustomStreamDialog />
+      </div>
       <div className={classes.buttons}>
         <Link to="/ip">
           <button>Back</button>
