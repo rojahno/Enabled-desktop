@@ -13,6 +13,8 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(2),
       display: 'flex',
       justifyContent: 'center',
+      flexDirection: 'column',
+
     },
     button: {
       display: 'flex',
@@ -21,11 +23,12 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: '3px',
       marginTop: 'auto',
     },
-    text: {
-      marginTop: 'auto',
-      marginBot: 'auto',
-    },
-  })
+    text:{
+      marginTop:'auto',
+      marginBot:'auto',
+      fontSize:'12px'
+    }
+    })
 );
 
 const facade = new FacadeTest();
@@ -62,8 +65,8 @@ export default function StartPage(this: any, _props: any) {
     try {
       await facade.handleSetupApp();
       let errors: any = facade.getSetupErrors();
-      console.log('StartPage: handle start called');
-      setHasAccessError(errors[0]);
+      console.log('5435345354');
+      setHasAccessError(true);
       setHeadSetIdError(errors[1]);
       setDeviceError(errors[2]);
       setIsClicked(true);
@@ -96,44 +99,29 @@ export default function StartPage(this: any, _props: any) {
 
   return (
     <div className={classes.root}>
-      <div className={'frontpage-container'}>
-        <VerticalLinearStepper
-          setData={setChildData}
-          hasAccessError={hasAccessError}
-          headsetIdError={headsetIdError}
-          deviceError={deviceError}
-          currentStep={stepNumber}
-          isClicked={isClicked}
-        />
-
+        <div>
         <SimplePaper>
-          <div className={classes.text}>
-            <h3 hidden={!isClicked}>
-              {hasAccessError
-                ? 'Could not connect to the emotiv app, try to go to the app and permit access'
-                : 'Connected to the emotiv app'}
-            </h3>
-            <h3 hidden={!isClicked}>
-              {headsetIdError
-                ? 'Could not retrieve the ID of your headset'
-                : 'Headset ID retrieved'}
-            </h3>
-            <h3 hidden={!isClicked}>
-              {deviceError
-                ? 'Could not connect to your emotiv device'
-                : 'Connected to emotiv device'}
-            </h3>
-          </div>
-          <div className={classes.button}>
-            <button onClick={handleStart}>
-              {isClicked ? 'Reconnect' : 'Connect'}
-            </button>
-            <Link to="/select">
-              <button disabled={enableNext()}>Next</button>
-            </Link>
-          </div>
-        </SimplePaper>
-      </div>
+         <VerticalLinearStepper setData = {setChildData} 
+                                hasAccessError = {hasAccessError}
+                                headsetIdError = {headsetIdError}
+                                deviceError = {deviceError}
+                                currentStep = {stepNumber}
+                                isClicked = {isClicked}
+                                />
+                                
+        <div className = {classes.text}>
+         <h3 hidden = {!isClicked}>{hasAccessError ? 'Could not connect to the emotiv app, try to go to the app and permit access': 'Connected to the emotiv app'}</h3>
+         <h3 hidden = {!isClicked}>{headsetIdError ? 'Could not retrieve the ID of your headset': 'Headset ID retrieved'}</h3>
+         <h3 hidden = {!isClicked}>{deviceError ? 'Could not connect to your emotiv device':'Connected to emotiv device'}</h3>
+        </div>
+         <div className = {classes.button}>
+        <button onClick = {handleStart}>{isClicked ? 'Reconnect':'Connect'}</button>
+        <Link to = '/select'>
+        <button disabled={enableNext()}>Next</button>
+        </Link>
+         </div>
+      </SimplePaper>
+         </div>
     </div>
   );
 }
