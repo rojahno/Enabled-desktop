@@ -6,6 +6,8 @@ import { Link } from 'react-router-dom';
 import { MobileDriver } from '../../modules/MobileDriver';
 import SettingSlider from '../settings/SettingSlider';
 import CortexError from '../../modules/CortexError';
+import { Tab, Tabs } from '@material-ui/core';
+import CustomStreamDialog from './CustomStreamDialog';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -29,6 +31,17 @@ const useStyles = makeStyles((theme: Theme) =>
       height: '100%',
       padding: '3px',
     },
+    textContainer: {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignContent: 'center',
+      fontSize:'15px',
+      padding: '15px',
+    },
+    dialog:{
+      paddingTop:'10px'
+    },
   })
 );
 
@@ -41,6 +54,15 @@ export default function StreamPage(props: any) {
   const [ip, setIp] = useState('');
   const [sensitivity, setSensitivity] = useState<number>();
   const [activeCommands, setActiveCommands] = useState<string[]>();
+
+  const [value, setValue] = useState(0)
+
+  const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+    setValue(newValue);
+    console.log('value is: ' + value)
+  }
+
+
 
   const handleChange = async (
     event: React.ChangeEvent<{}>,
@@ -109,10 +131,40 @@ export default function StreamPage(props: any) {
       <div className={classes.container}>
         <SimplePaper>
           <h3>Stream:</h3>
-          <p>{'Connected to: ' + ip} </p>
-          <p>{'Sensitivity: ' + sensitivity} </p>
-          <p>{'Commands: ' + activeCommands} </p>
-          <SettingSlider handleChange={handleChange} />
+          <SettingSlider
+            sliderTitle={'Headset sensitivity'}
+            handleChange={handleChange}
+            minSteps={1}
+            maxSteps={10}
+            disabled={!isComStream}
+          />
+          <div className={classes.textContainer}>
+            <p>
+              Moving the slider to the right (10) will make it easier to
+              trigger. Moving the slider to the left (1) will make the commands
+              harder to trigger.
+            </p>
+          </div>
+          <Tabs
+    value={value}
+    indicatorColor="primary"
+    textColor="primary"
+    onChange={handleTabChange}
+    aria-label="disabled tabs example"
+  >
+    <Tab label="Command Stream" onClick={handleComPress} />
+    <Tab label="Expression Stream" onClick={handleFacPress} />
+  </Tabs>
+  <div className={classes.dialog}>
+  <CustomStreamDialog/>
+  </div>
+          {/* <button disabled={isComStream} onClick={handleComPress}>
+            Mental command stream
+          </button>
+
+          <button disabled={!isComStream} onClick={handleFacPress}>
+            Facial expression stream
+          </button> */}
           <div className={classes.buttons}>
             <Link to="/ip">
               <button>Back</button>
