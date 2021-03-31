@@ -13,11 +13,15 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(3),
       width: theme.spacing(50),
       height: theme.spacing(50),
+      backgroundColor: '#ffffffaa',
+    },
+    container: {
+      height: '100%',
+      width: '100%',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor:"#ffffffaa"
     },
   })
 );
@@ -28,7 +32,7 @@ export default function SimplePaper(_props: any) {
   return (
     <div className={classes.root}>
       <Paper className={classes.paper} elevation={10}>
-        {_props.children}
+        <div className={classes.container}>{_props.children}</div>
       </Paper>
     </div>
   );
