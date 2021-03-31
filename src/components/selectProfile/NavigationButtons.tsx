@@ -7,8 +7,8 @@ const useStyles = makeStyles((theme: Theme) =>
     root: {
       display: 'flex',
       justifyContent: 'space-between',
+      alignSelf:'flex-end',
       width: '100%',
-      padding: '3px',
     },
   })
 );
