@@ -19,6 +19,10 @@ import { DialogContentText, Divider } from '@material-ui/core';
 import iphoneSettings from './../../images/iphone-settings.png';
 import iphoneWifi from './../../images/iphone-settings-wifi.png';
 import iphoneAbout from './../../images/iphone-settings-about.png';
+import androidSettingsFirst from '../../images/Android-Settings-Main-1.jpg'
+import androidSettingsSecond from '../../images/Android-Settings-Main-2.jpg'
+import androidAbout from '../../images/Android-Settings-About.jpg'
+import androidStatus from '../../images/Android-Settings-Status.jpg'
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -167,9 +171,21 @@ export default function CustomDialog(_props: any) {
           <div>
             <ol>
               <li>Open settings</li>
+              <div className={classes.imageContainer}>
+                <img className={classes.image} src={androidSettingsFirst} />
+              </div>
               <li>Navigate to "about phone" and select it</li>
+              <div className={classes.imageContainer}>
+                <img className={classes.image} src={androidSettingsSecond} />
+              </div>
               <li>Navigate to "status" and select it</li>
+              <div className={classes.imageContainer}>
+                <img className={classes.image} src={androidAbout} />
+              </div>
               <li>That's it. You can now read your IP Adress</li>
+              <div className={classes.imageContainer}>
+                <img className={classes.image} src={androidStatus} />
+              </div>
             </ol>
           </div>
         </DialogContent>
