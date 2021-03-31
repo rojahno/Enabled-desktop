@@ -1,15 +1,11 @@
 import { createStyles, makeStyles, Theme } from '@material-ui/core';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { HashRouter as Router, Route, Switch } from 'react-router-dom';
-import { CortexDriver } from './modules/CortexDriver';
 import AddIpPage from './components/addIpPage/AddIpPage';
-import SelectProfilePage from './components/selectProfile/SelectProfilePage';
 import StreamPage from './components/streamPage/StreamPage';
-import StartPage from './components/StartPage/StartPage';
-import { FacadeTest } from './FacadeTest';
-import CortexError from './modules/CortexError';
 import StartPageContainer from './components/StartPage/StartPageContainer';
+import SelectProfileContainer from './components/selectProfile/SelectProfileContainer';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -36,7 +32,7 @@ const AppContainer = () => {
         <Router>
           <Switch>
             <Route path="/" exact component={StartPageContainer} />
-            <Route path="/select" exact component={SelectProfilePage} />
+            <Route path="/select" exact component={SelectProfileContainer} />
             <Route path="/ip" exact component={AddIpPage} />
             <Route path="/stream" exact component={StreamPage} />
           </Switch>
