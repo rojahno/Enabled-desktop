@@ -14,6 +14,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       justifyContent: 'center',
       flexDirection: 'column',
+      minHeight:'100vh'
 
     },
     button: {
