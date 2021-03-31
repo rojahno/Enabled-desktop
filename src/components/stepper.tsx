@@ -127,10 +127,9 @@ export default function VerticalLinearStepper(props:stepProps) {
       >
         {steps.map((label, index) => (
           <Step key={label}>
-            <SuccessIcon hasError = {true} label = {label} ></SuccessIcon>
-            {/* <StyledStepLabel StepIconComponent={Error}>
+            <StyledStepLabel StepIconComponent={trueFalseStepIcon}>
               {label}
-            </StyledStepLabel> */}
+            </StyledStepLabel>
             <StepContent>
             
             </StepContent>
