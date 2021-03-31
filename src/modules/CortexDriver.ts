@@ -751,6 +751,8 @@ class CortexDriver {
       }
     };
   };
+
+  
   public setFacStreamOnmessageEvent = () => {
     this._socket.onmessage = ({ data }: MessageEvent) => {
       try {
