@@ -2,10 +2,10 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core';
 
 import React from 'react';
 import { HashRouter as Router, Route, Switch } from 'react-router-dom';
-import StreamPage from './components/streamPage/StreamPage';
 import StartPageContainer from './components/StartPage/StartPageContainer';
 import SelectProfileContainer from './components/selectProfile/SelectProfileContainer';
 import AddIpContainer from './components/addIpPage/AddIpContainer';
+import StreamContainer from './components/streamPage/StreamContainer';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -34,7 +34,7 @@ const AppContainer = () => {
             <Route path="/" exact component={StartPageContainer} />
             <Route path="/select" exact component={SelectProfileContainer} />
             <Route path="/ip" exact component={AddIpContainer} />
-            <Route path="/stream" exact component={StreamPage} />
+            <Route path="/stream" exact component={StreamContainer} />
           </Switch>
         </Router>
       </div>

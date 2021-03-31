@@ -63,7 +63,7 @@ const AddIpContainer = () => {
           if (connected) {
             history.push({
               pathname: '/stream',
-              state: { ipAdress: ipAdress },
+              //state: { ipAdress: ipAdress },
             });
           } else {
             alert(
