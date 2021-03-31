@@ -1,26 +1,8 @@
 import React from 'react';
-import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import SimplePaper from '../SimplePaper';
 import NavigationButtons from './NavigationButtons';
 import CustomList from './CustomList';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      minHeight: '100vh',
-      display: 'flex',
-      justifyContent: 'center',
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-
-    container: {
-      margin: theme.spacing(2),
-      display: 'flex',
-      justifyContent: 'center',
-    },
-  })
-);
 
 interface SelectPageProps {
   profiles: string[];
@@ -43,11 +25,8 @@ interface SelectPageProps {
  * @returns
  */
 export default function SelectProfilePage(props: SelectPageProps) {
-  const classes = useStyles();
 
   return (
-    <div className={classes.root}>
-      <div className={classes.container}>
         <SimplePaper>
           <h3>Select profile {props.selectedProfile}</h3>
           <CustomList
@@ -61,7 +40,5 @@ export default function SelectProfilePage(props: SelectPageProps) {
             backNavigation={'/'}
           />
         </SimplePaper>
-      </div>
-    </div>
   );
 }

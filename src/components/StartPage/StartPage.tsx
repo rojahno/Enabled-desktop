@@ -42,7 +42,6 @@ export default function StartPage(props: StartPageProps) {
   };
 
   const setChildData = (childData: string) => {
-    console.log('Startpage: set child data called');
     setData(childData);
   };
 

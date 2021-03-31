@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import CortexError from '../../modules/CortexError';
@@ -6,9 +5,7 @@ import { CortexFacade } from '../../modules/CortexFacade';
 import { MobileDriver } from '../../modules/MobileDriver';
 import AddIpPage from './AddIpPage';
 
-
 const AddIpContainer = () => {
-    
   //Add ip useStates
   const [ipAdress, setIpAdress] = useState('No input');
   const [validIpAdress, setValidIpAdress] = useState(false);
@@ -77,22 +74,17 @@ const AddIpContainer = () => {
     }
   };
 
-  useEffect(() => {
+  useEffect(() => {}, []);
 
-  }, []);
-
-  return(
-      <AddIpPage
+  return (
+    <AddIpPage
       handleChange={handleChange}
       handleKeyPress={handleKeyPress}
       handleNextClick={handleNextClick}
       ipAdress={ipAdress}
       validIpAdress={validIpAdress}
-      />
+    />
   );
-
- 
-
-  }
+};
 
 export default AddIpContainer;

@@ -6,19 +6,7 @@ import SettingSlider from '../settings/SettingSlider';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {
-      minHeight: '100vh',
-      display: 'flex',
-      justifyContent: 'center',
-      flexDirection: 'column',
-      alignItems: 'center',
-    },
-    container: {
-      margin: theme.spacing(2),
-      display: 'flex',
-      justifyContent: 'center',
-      alignContent: 'center',
-    },
+    root: {},
     buttons: {
       display: 'flex',
       justifyContent: 'flex-start',
@@ -38,49 +26,47 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 interface StreamProps {
-handleChange:(event: React.ChangeEvent<{}>, value:number | number[]) => void,
-handleComPress: () => void;
-handleFacPress: () => void;
-isComStream:boolean;
+  handleChange: (
+    event: React.ChangeEvent<{}>,
+    value: number | number[]
+  ) => void;
+  handleComPress: () => void;
+  handleFacPress: () => void;
+  isComStream: boolean;
 }
 
 export default function StreamPage(props: StreamProps) {
   const classes = useStyles();
 
-  
   return (
-    <div className={classes.root}>
-      <div className={classes.container}>
-        <SimplePaper>
-          <h3>Stream:</h3>
-          <SettingSlider
-            sliderTitle={'Headset sensitivity'}
-            handleChange={props.handleChange}
-            minSteps={1}
-            maxSteps={10}
-            disabled={!props.isComStream}
-          />
-          <div className={classes.textContainer}>
-            <p>
-              Moving the slider to the right (10) will make it easier to
-              trigger. Moving the slider to the left (1) will make the commands
-              harder to trigger.
-            </p>
-          </div>
-          <button disabled={props.isComStream} onClick={props.handleComPress}>
-            Mental command stream
-          </button>
-
-          <button disabled={!props.isComStream} onClick={props.handleFacPress}>
-            Facial expression stream
-          </button>
-          <div className={classes.buttons}>
-            <Link to="/ip">
-              <button>Back</button>
-            </Link>
-          </div>
-        </SimplePaper>
+    <SimplePaper>
+      <h3>Stream:</h3>
+      <SettingSlider
+        sliderTitle={'Headset sensitivity'}
+        handleChange={props.handleChange}
+        minSteps={1}
+        maxSteps={10}
+        disabled={!props.isComStream}
+      />
+      <div className={classes.textContainer}>
+        <p>
+          Moving the slider to the right (10) will make it easier to trigger.
+          Moving the slider to the left (1) will make the commands harder to
+          trigger.
+        </p>
       </div>
-    </div>
+      <button disabled={props.isComStream} onClick={props.handleComPress}>
+        Mental command stream
+      </button>
+
+      <button disabled={!props.isComStream} onClick={props.handleFacPress}>
+        Facial expression stream
+      </button>
+      <div className={classes.buttons}>
+        <Link to="/ip">
+          <button>Back</button>
+        </Link>
+      </div>
+    </SimplePaper>
   );
 }

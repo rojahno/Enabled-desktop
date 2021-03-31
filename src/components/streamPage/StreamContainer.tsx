@@ -11,7 +11,7 @@ const StreamContainer = () => {
   const [sessionId, setsessionId] = useState('');
   const [profile, setProfile] = useState('');
   const [isComStream, setIsComStream] = useState(true);
-  
+
   const [sensitivity, setSensitivity] = useState<number>();
   const [activeCommands, setActiveCommands] = useState<string[]>();
 
@@ -27,10 +27,9 @@ const StreamContainer = () => {
       await driver.setSensitivity(authToken, profile, sessionId, sensitivity);
       await driver.saveProfile(authToken, headsetId, profile);
       let newSensitivity = await driver.getSensitivity(authToken, profile);
-      if(isComStream){
-      driver.setComStreamOnmessageEvent();
-      }
-      else{
+      if (isComStream) {
+        driver.setComStreamOnmessageEvent();
+      } else {
         driver.setFacStreamOnmessageEvent();
       }
       setSensitivity(newSensitivity[0]);
@@ -56,7 +55,6 @@ const StreamContainer = () => {
   };
 
   useEffect(() => {
-
     const start = async () => {
       try {
         let driver: CortexDriver = CortexDriver.getInstance();
@@ -111,11 +109,14 @@ const StreamContainer = () => {
     return () => offLoad();
   }, []);
 
-  return <StreamPage
-  handleChange={handleChange}
-  handleComPress={handleComPress}
-  handleFacPress={handleFacPress}
-  isComStream={isComStream}/>;
+  return (
+    <StreamPage
+      handleChange={handleChange}
+      handleComPress={handleComPress}
+      handleFacPress={handleFacPress}
+      isComStream={isComStream}
+    />
+  );
 };
 
 export default StreamContainer;
