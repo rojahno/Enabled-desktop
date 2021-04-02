@@ -376,7 +376,7 @@ class CortexDriver {
         try {
           if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
             let parsed: ComDataSample = JSON.parse(data);
-            console.log(data);
+            //console.log(data);
             this.notify(parsed);
             resolve(true);
           }
@@ -412,7 +412,7 @@ class CortexDriver {
         try {
           if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
             let parsed: FacDataSample = JSON.parse(data);
-            console.log(data);
+            //console.log(data);
             this.notify(parsed);
             resolve(true);
           }

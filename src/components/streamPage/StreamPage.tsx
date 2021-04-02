@@ -49,7 +49,6 @@ export default function StreamPage(props: StreamProps) {
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setValue(newValue);
-    console.log('value is: ' + value);
   };
 
   return (
