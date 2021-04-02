@@ -1,0 +1,92 @@
+import React, { useState } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import Slider from '@material-ui/core/Slider';
+import { useEffect } from 'react';
+
+
+const useStyles = makeStyles({
+  root: {
+    width: 300,
+    textAlign: 'center',
+  },
+});
+
+function valuetext(value: number) {
+  return `${value}`;
+}
+
+const marks = [
+    {
+      value: 1,
+      label: '1',
+    },
+    {
+      value: 2,
+      label: '2',
+    },
+    {
+      value: 3,
+      label: '3',
+    },
+    {
+      value: 4,
+      label: '4',
+    },
+    {
+        value: 5,
+        label: '5',
+      },
+      {
+        value: 6,
+        label: '6',
+      },
+      {
+        value: 7,
+        label: '7',
+      },
+      {
+        value: 8,
+        label: '8',
+      },
+      {
+        value: 9,
+        label: '9',
+      },
+      {
+        value: 10,
+        label: '10',
+      },
+  ];
+
+  interface sliderProps{
+    sliderTitle:string,
+    handleChange:(event: React.ChangeEvent<{}>, value:number | number[]) => void,
+    maxSteps:number,
+    minSteps:number,
+    disabled:boolean
+
+}
+export default function SettingSlider(props:sliderProps) {
+  const classes = useStyles();
+
+  return (
+    <div className={classes.root}>
+      <Typography id="discrete-slider-small-steps" gutterBottom>
+        {props.sliderTitle}
+      </Typography>
+      <Slider
+      onChangeCommitted={ (event,value) => props.handleChange(event, value)}
+        defaultValue={5}
+        getAriaValueText={valuetext}
+        aria-labelledby="discrete-slider-small-steps"
+        step={1}
+        marks={marks}
+        min={props.minSteps}
+        max={props.maxSteps}
+        valueLabelDisplay="auto"
+        disabled={props.disabled}
+      />
+    </div>
+  );
+}
