@@ -1,4 +1,5 @@
 import { CortexDriver, IObserver, StreamObserver } from './CortexDriver';
+import { ComDataSample, FacDataSample } from './interfaces';
 
 const CONNECTION_RETRY_INTERVAL = 5000; // in ms
 const CONNECTION_RETRY_MAX_COUNT = 60; // 60 times to retry x 5s = 5min of total retries
@@ -15,11 +16,15 @@ class MobileDriver implements IObserver {
 
   private constructor() {}
 
-  sendCommand(command: string): void {
-    console.log('The command: ' + command);
+  sendCommand(command: FacDataSample | ComDataSample): void {
     this.currentTime = Date.now();
     if (this.currentTime - this.previousTriggerTime >= this.commandInterval) {
-      this.sendSomething(command);
+      if ('com' in command) {
+        console.log('Mental stream command sent: ' + command.com[0]);
+        this.sendSomething(command.com[0]);
+      } else if ('fac' in command) {
+        console.log('Faciall stream command sent: ' + command.fac[0]);
+      }
     }
   }
 
@@ -121,7 +126,6 @@ class MobileDriver implements IObserver {
   subscribeToCortexStream = () => {
     let driver: CortexDriver = CortexDriver.getInstance();
     driver.subscribe(this);
- 
   };
 
   getRandomInt(max: number) {

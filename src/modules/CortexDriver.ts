@@ -380,7 +380,7 @@ class CortexDriver {
           if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
             let parsed: ComDataSample = JSON.parse(data);
             console.log(data);
-            this.notify(parsed.com[0]);
+            this.notify(parsed);
             resolve(true);
           }
         } catch (error) {
@@ -419,7 +419,7 @@ class CortexDriver {
           if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
             let parsed: FacDataSample = JSON.parse(data);
             console.log(data);
-            this.notify(parsed.fac[0]);
+            this.notify(parsed);
             resolve(true);
           }
         } catch (error) {
@@ -749,7 +749,7 @@ class CortexDriver {
       try {
         if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
           let parsed: ComDataSample = JSON.parse(data);
-          this.notify(parsed.com[0]);
+          this.notify(parsed);
         }
       } catch (error) {
         console.error('Sub request error');
@@ -763,7 +763,7 @@ class CortexDriver {
       try {
         if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
           let parsed: FacDataSample = JSON.parse(data);
-          this.notify(parsed.fac[0]);
+          this.notify(parsed);
         }
       } catch (error) {
         console.error('Fac request error: ' + error);
@@ -907,13 +907,13 @@ class CortexDriver {
     console.table(this.observers);
   }
 
-  private notify(streamCommand: string) {
+  private notify(streamCommand: FacDataSample | ComDataSample) {
     this.observers.forEach((observer) => observer.sendCommand(streamCommand));
   }
 }
 
 interface IObserver {
-  sendCommand(command: string): void;
+  sendCommand(command: FacDataSample | ComDataSample): void;
 }
 
 export { CortexDriver, StreamObserver, IObserver };
