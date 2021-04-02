@@ -25,6 +25,7 @@ class MobileDriver implements IObserver {
         this.sendSomething(command.com[0]);
       } else if ('fac' in command) {
         console.log('Faciall stream command sent: ' + command.fac[0]);
+        this.previousTriggerTime = this.currentTime;
       }
     }
   }
