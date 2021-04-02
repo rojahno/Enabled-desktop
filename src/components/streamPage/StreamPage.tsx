@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import SimplePaper from '../SimplePaper';
 import { Link } from 'react-router-dom';
 import SettingSlider from '../settings/SettingSlider';
+import CortexError from '../../modules/CortexError';
+import { Tab, Tabs } from '@material-ui/core';
+import CustomStreamDialog from './CustomStreamDialog';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -20,7 +23,11 @@ const useStyles = makeStyles((theme: Theme) =>
       flexDirection: 'column',
       justifyContent: 'center',
       alignContent: 'center',
-      padding: '30px',
+      fontSize: '15px',
+      padding: '15px',
+    },
+    dialog: {
+      paddingTop: '10px',
     },
   })
 );
@@ -37,6 +44,13 @@ interface StreamProps {
 
 export default function StreamPage(props: StreamProps) {
   const classes = useStyles();
+
+  const [value, setValue] = useState(0);
+
+  const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+    setValue(newValue);
+    console.log('value is: ' + value);
+  };
 
   return (
     <SimplePaper>
@@ -55,13 +69,19 @@ export default function StreamPage(props: StreamProps) {
           trigger.
         </p>
       </div>
-      <button disabled={props.isComStream} onClick={props.handleComPress}>
-        Mental command stream
-      </button>
-
-      <button disabled={!props.isComStream} onClick={props.handleFacPress}>
-        Facial expression stream
-      </button>
+      <Tabs
+        value={value}
+        indicatorColor="primary"
+        textColor="primary"
+        onChange={handleTabChange}
+        aria-label="disabled tabs example"
+      >
+        <Tab label="Command Stream" onClick={props.handleComPress} />
+        <Tab label="Expression Stream" onClick={props.handleFacPress} />
+      </Tabs>
+      <div className={classes.dialog}>
+        <CustomStreamDialog />
+      </div>
       <div className={classes.buttons}>
         <Link to="/ip">
           <button>Back</button>

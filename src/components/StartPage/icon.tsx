@@ -1,52 +1,61 @@
 
 
-import React, { useState } from 'react';
-import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
+import React, { ReactElement, useState } from 'react';
+import { Theme, createStyles, makeStyles, styled } from '@material-ui/core/styles';
+import { Error, CheckBox, Adjust } from '@material-ui/icons';
+import { IconProps, StepIconProps, StepLabel } from '@material-ui/core';
 
+// const StyledStepLabel = styled(StepLabel)({
+//     '& .MuiStepLabel-label': {
+//       color: '#fff',
+//     },
+//   });
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: 0,
-        flexGrow: 1,
-        overflow: 'auto',
-        width: '100%',
-    },
-    listItems: {
-        padding: '10px 20px',
-        display: 'flex',
-        justifyContent: 'center',
-        transition: 'transform ease-in 0.1s',
-        fontSize: '18px',
-  
+      successIcon: {
+        color: 'green',
       },
-  })
-);
+      errorIcon: {
+        color: 'red',
+  }
+}
+));
 
 interface iconProps{
-    hasError:boolean
+    hasError:boolean 
+    label: string
 }
 
+
+
+//     return <div>{icons[String(props.icon)]}</div>
+// }
 function SuccessIcon(props:iconProps) {
     const classes = useStyles();
+
     
     if(props.hasError){
-        return(<div>
-            <button> feil</button>
-          
-        </div>)
+        return (
+        <div>
+        <StepLabel StepIconComponent={Error}>
+        {props.label}
+        </StepLabel>
+        </div>
+      )
+
     }
     else{
-    return(
-        <div className={classes.root}>
-       <button>
-           riktig
-       </button>
-      </div>
-    )
+        return (
+            <div>
+            <StepLabel StepIconComponent={CheckBox}>
+            {props.label}
+            </StepLabel>
+            </div>
+          )
+    
+        }
     }
-}
+
 
 export default SuccessIcon;

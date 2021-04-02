@@ -17,15 +17,15 @@ class MobileDriver implements IObserver {
 
   private constructor() {}
 
-  sendCommand(cortexCommand: CortexCommand): void {
-    console.log('The command: ' + cortexCommand.getCommand() + '\n Type: ' + cortexCommand.getStreamType());
+  sendCommand(command: FacDataSample | ComDataSample): void {
     this.currentTime = Date.now();
     if (this.currentTime - this.previousTriggerTime >= this.commandInterval) {
-  
-      if(cortexCommand.getStreamType() === 'com'){
-      this.sendSomething(cortexCommand.getCommand());
+      if ('com' in command) {
+        console.log('Mental stream command sent: ' + command.com[0]);
+        this.sendSomething(command.com[0]);
+      } else if ('fac' in command) {
+        console.log('Faciall stream command sent: ' + command.fac[0]);
       }
-    
     }
   }
 
@@ -127,7 +127,6 @@ class MobileDriver implements IObserver {
   subscribeToCortexStream = () => {
     let driver: CortexDriver = CortexDriver.getInstance();
     driver.subscribe(this);
- 
   };
 
   getRandomInt(max: number) {
