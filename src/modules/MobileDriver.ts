@@ -1,3 +1,4 @@
+import CortexCommand from './CortexCommand';
 import { CortexDriver, IObserver, StreamObserver } from './CortexDriver';
 import { ComDataSample, FacDataSample } from './interfaces';
 
