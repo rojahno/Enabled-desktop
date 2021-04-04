@@ -41,18 +41,12 @@ export default function StartPage(props: StartPageProps) {
     } else return true;
   };
 
-  const setChildData = (childData: string) => {
-    setData(childData);
-  };
-
   return (
     <SimplePaper>
       <VerticalLinearStepper
-        setData={setChildData}
         hasAccessError={props.hasAccessError}
         headsetIdError={props.headsetIdError}
         deviceError={props.deviceError}
-        currentStep={stepNumber}
         isClicked={props.isClicked}
       />
 
