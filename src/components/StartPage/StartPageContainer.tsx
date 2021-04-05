@@ -1,8 +1,6 @@
-import { createStyles, makeStyles, Theme } from '@material-ui/core';
 
 import React, { useState } from 'react';
 import { FacadeTest } from '../../FacadeTest';
-import { CortexDriver } from '../../modules/CortexDriver';
 import CortexError from '../../modules/CortexError';
 import StartPage from './StartPage';
 
@@ -33,7 +31,7 @@ const StartPageContainer = () => {
   return (
     <StartPage
       connectClicked={connectClicked}
-      hasAccessError={false}
+      hasAccessError={hasAccessError}
       headsetIdError={headsetIdError}
       deviceError={deviceError}
       isClicked={isClicked}
