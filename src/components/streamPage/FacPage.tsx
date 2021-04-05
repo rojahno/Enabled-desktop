@@ -1,11 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
-import SimplePaper from '../SimplePaper';
-import { Link } from 'react-router-dom';
-import SettingSlider from '../settings/SettingSlider';
-import CortexError from '../../modules/CortexError';
-import { Tab, Tabs } from '@material-ui/core';
-import CustomStreamDialog from './CustomStreamDialog';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -38,18 +32,18 @@ const useStyles = makeStyles((theme: Theme) =>
 //                 value: number | number[]) => void;
 // }
 
-export default function ComPage(props: any){
-    const classes = useStyles();
+export default function FacPage(props: any) {
+  const classes = useStyles();
 
-    return(
-        <div>
+  return (
+    <div>
       <div className={classes.textContainer}>
         <p>
-          Moving the slider to the right (10) will make it easier to trigger.
-          Moving the slider to the left (1) will make the commands harder to
-          trigger.
+          This stream will use the results of the facial expressions detection.
         </p>
+        <p>The supported commands are: Neutral, Smile, Wink left, Wink right and Blink</p>
+  
       </div>
-        </div>
-    )
+    </div>
+  );
 }
