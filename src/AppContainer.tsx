@@ -31,7 +31,7 @@ const AppContainer = () => {
       <div className={classes.container}>
         <Router>
           <Switch>
-            <Route path="/" exact component={StartPageContainer} />
+            <Route path="/" exact component={StreamContainer} />
             <Route path="/select" exact component={SelectProfileContainer} />
             <Route path="/ip" exact component={AddIpContainer} />
             <Route path="/stream" exact component={StreamContainer} />
