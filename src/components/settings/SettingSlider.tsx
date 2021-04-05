@@ -1,14 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/core/Slider';
-import { useEffect } from 'react';
+import HelpOutlineTwoToneIcon from '@material-ui/icons/HelpOutlineTwoTone';
+import Tooltip from '@material-ui/core/Tooltip';
 
 
 const useStyles = makeStyles({
   root: {
     width: 300,
     textAlign: 'center',
+  },
+  sliderContainer: {
+    display:'flex',
+    justifyContent: 'center',
   },
 });
 
@@ -64,7 +69,8 @@ const marks = [
     handleChange:(event: React.ChangeEvent<{}>, value:number | number[]) => void,
     maxSteps:number,
     minSteps:number,
-    disabled:boolean
+    disabled:boolean,
+    tooltip:string
 
 }
 export default function SettingSlider(props:sliderProps) {
@@ -72,9 +78,14 @@ export default function SettingSlider(props:sliderProps) {
 
   return (
     <div className={classes.root}>
+      <div className= {classes.sliderContainer}>
       <Typography id="discrete-slider-small-steps" gutterBottom>
         {props.sliderTitle}
       </Typography>
+      <Tooltip title={props.tooltip}>
+      <HelpOutlineTwoToneIcon/>
+      </Tooltip>
+      </div>
       <Slider
       onChangeCommitted={ (event,value) => props.handleChange(event, value)}
         defaultValue={5}
