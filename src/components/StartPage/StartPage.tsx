@@ -17,8 +17,17 @@ const useStyles = makeStyles((theme: Theme) =>
     text: {
       marginTop: 'auto',
       marginBot: 'auto',
+      padding: '12px',
       fontSize: '12px',
     },
+    content:{
+      display: 'flex',
+      flexDirection: 'column',
+      minHeight: 0,
+      flexGrow: 1,
+      overflow: 'auto',
+      width: '100%',
+    }
   })
 );
 
@@ -41,6 +50,7 @@ export default function StartPage(props: StartPageProps) {
 
   return (
     <SimplePaper>
+      <div className = {classes.content}>
       <VerticalLinearStepper
         hasAccessError={props.hasAccessError}
         headsetIdError={props.headsetIdError}
@@ -65,14 +75,16 @@ export default function StartPage(props: StartPageProps) {
             : 'Connected to emotiv device'}
         </h3>
       </div>
+      </div>
       <div className={classes.button}>
         <button onClick={props.connectClicked}>
           {props.isClicked ? 'Reconnect' : 'Connect'}
         </button>
-          <button disabled={enableNext()}>Next
-            <Link to="/select">
-            </Link>
-          </button>
+        <Link to="/select">
+        <button disabled={enableNext()}>
+          Next
+        </button>
+          </Link>
       </div>
     </SimplePaper>
   );

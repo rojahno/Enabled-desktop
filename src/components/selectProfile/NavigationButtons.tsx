@@ -7,26 +7,32 @@ const useStyles = makeStyles((theme: Theme) =>
     root: {
       display: 'flex',
       justifyContent: 'space-between',
-      alignSelf:'flex-end',
+      alignSelf: 'flex-end',
       width: '100%',
     },
   })
 );
 
-  interface navButtonProps {
-    canNavigateForward:boolean
-    handleNextClick:(event: React.MouseEvent<HTMLButtonElement>) => Promise<void>
-    backNavigation:string
-  }
+interface navButtonProps {
+  canNavigateForward: boolean;
+  handleNextClick: (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => Promise<void>;
+  backNavigation: string;
+}
 
-function NavigationButtons(props:navButtonProps) {
-    const classes = useStyles();
+function NavigationButtons(props: navButtonProps) {
+  const classes = useStyles();
   return (
     <div className={classes.root}>
-      <Link to={props.backNavigation}>
-        <button>Back</button>
-      </Link>
-      <button disabled={!props.canNavigateForward} onClick={props.handleNextClick}>
+      <button>
+        <Link to={props.backNavigation}>Back</Link>
+      </button>
+
+      <button
+        disabled={!props.canNavigateForward}
+        onClick={props.handleNextClick}
+      >
         Next
       </button>
     </div>
