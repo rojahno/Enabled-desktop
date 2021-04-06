@@ -13,7 +13,9 @@ const SelectProfileContainer = () => {
   const [selectedProfile, setSelectedProfile] = useState('');
   const [hasSelected, setHasSelected] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const history = useHistory();
+
 
   //Select profile page functions
 
@@ -23,8 +25,11 @@ const SelectProfileContainer = () => {
         let driver = CortexDriver.getInstance();
         let authToken = await driver.authorize();
         let allProfiles = await driver.queryProfileRequest(authToken);
+        setIsLoading(false);
         setProfiles(allProfiles);
-      } catch (error) {}
+      } catch (error) {
+        setIsLoading(false);
+      }
     };
     getProfiles();
   }, []);
@@ -64,6 +69,7 @@ const SelectProfileContainer = () => {
       hasSelected={hasSelected}
       handleListItemClick={handleListItemClick}
       handleNextClick={handleNextClick}
+      isLoading={isLoading}
     />
   );
 };
