@@ -32,8 +32,6 @@ interface StartPageProps {
 
 export default function StartPage(props: StartPageProps) {
   const classes = useStyles();
-  const [data, setData] = useState('');
-  const [stepNumber, setStepNumber] = useState(0);
 
   const enableNext = () => {
     if (!props.hasAccessError && !props.headsetIdError && !props.deviceError) {
