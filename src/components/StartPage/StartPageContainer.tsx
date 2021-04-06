@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { FacadeTest } from '../../FacadeTest';
 import CortexError from '../../modules/CortexError';
@@ -19,7 +18,7 @@ const StartPageContainer = () => {
       let errors: any = facade.getSetupErrors();
 
       setIsClicked(true);
-      setHasAccessError(true);
+      setHasAccessError(errors[0]);
       setHeadSetIdError(errors[1]);
       setDeviceError(errors[2]);
     } catch (error) {

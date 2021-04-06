@@ -14,6 +14,9 @@ const useStyles = makeStyles({
     display: 'flex',
     justifyContent: 'center',
   },
+  tootlips:{
+    fontSize:'19px'
+  }
 });
 
 function valuetext(value: number) {
@@ -83,7 +86,7 @@ export default function SettingSlider(props: sliderProps) {
         <Typography id="discrete-slider-small-steps" gutterBottom>
           {props.sliderTitle}
         </Typography>
-        <Tooltip title={props.tooltip}>
+        <Tooltip title={props.tooltip} className = {classes.tootlips}>
           <HelpOutlineTwoToneIcon />
         </Tooltip>
       </div>
