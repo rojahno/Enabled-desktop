@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { FacadeTest } from '../../FacadeTest';
 import CortexError from '../../modules/CortexError';
+import { CortexFacade } from '../../modules/CortexFacade';
 import StartPage from './StartPage';
 
 const StartPageContainer = () => {
@@ -13,7 +13,7 @@ const StartPageContainer = () => {
   //StartPage functions
   async function connectClicked() {
     try {
-      const facade = new FacadeTest();
+      const facade = new CortexFacade();
       await facade.handleSetupApp();
       let errors: any = facade.getSetupErrors();
 

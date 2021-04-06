@@ -3,7 +3,9 @@ import CortexError from './CortexError';
 
 class CortexFacade {
   private driver = CortexDriver.getInstance();
-
+  private accessError: boolean = true;
+  private headsetError: boolean = true;
+  private deviceError: boolean = true;
   /**
    * @todo test the request access logic.
    */
@@ -69,6 +71,36 @@ class CortexFacade {
       return this.errorHandling(error);
     }
   };
+
+  handleSetupApp = async () => {
+    try {
+      if (!this.driver.isConnected()) {
+        let connected = await this.driver.awaitSocketOpening();
+        if (!connected) {
+          //new CortexError(3,'Access denied by user')
+        }
+      }
+      let hasAccess = await this.driver.hasAccess();
+      if (!hasAccess) {
+        let requestAccess = await this.driver.requestAccess();
+        if (!requestAccess) {
+          //new CortexError(6,'')
+        }
+      }
+      this.accessError = false;
+      let headsetID = await this.driver.queryHeadsetId();
+      console.log('Facade: handleSetupApp');
+      this.headsetError = false;
+      await this.driver.controlDevice(headsetID);
+      this.deviceError = false;
+      //return [accessError,headsetError,deviceError]
+    } catch (error) {}
+  };
+
+  getSetupErrors = () => {
+    return [this.accessError, this.headsetError, this.deviceError];
+  };
+
   //Refactort errorHandling to handle rejects
   errorHandling(error: any) {
     if (error instanceof CortexError) {
