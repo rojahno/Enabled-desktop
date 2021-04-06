@@ -1,6 +1,6 @@
 import React from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -23,11 +23,15 @@ interface navButtonProps {
 
 function NavigationButtons(props: navButtonProps) {
   const classes = useStyles();
+  const history = useHistory();
+
+  function navigateBack() {
+    history.push({ pathname: props.backNavigation });
+  }
+
   return (
     <div className={classes.root}>
-      <button>
-        <Link to={props.backNavigation}>Back</Link>
-      </button>
+      <button onClick={navigateBack}>Back</button>
 
       <button
         disabled={!props.canNavigateForward}
