@@ -4,6 +4,7 @@ import CustomDialog from './CustomDialog';
 import SimplePaper from '../SimplePaper';
 import NavigationButtons from '../selectProfile/NavigationButtons';
 import { makeStyles, Theme, createStyles } from '@material-ui/core';
+import LoadingCircleDialog from '../../LoadingCircleDialog';
 
 interface AddIpProps {
   ipAdress: string;
@@ -13,6 +14,7 @@ interface AddIpProps {
     event: React.MouseEvent<HTMLButtonElement>
   ) => Promise<void>;
   validIpAdress: boolean;
+  openLoadingCircle:boolean;
 }
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -43,6 +45,7 @@ export default function AddIpPage(props: AddIpProps) {
         handleNextClick={props.handleNextClick}
         backNavigation={'/select'}
       />
+      <LoadingCircleDialog open={props.openLoadingCircle}/>
     </SimplePaper>
   );
 }

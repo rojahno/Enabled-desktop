@@ -1,10 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Fade from '@material-ui/core/Fade';
-import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Typography from '@material-ui/core/Typography';
-
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -19,55 +16,35 @@ const useStyles = makeStyles((theme: Theme) =>
     placeholder: {
       height: 40,
     },
+    progressBarColor:{
+      color:'#3c3c3c',
+    }
   })
 );
 
-const LoadingCircle =(load: boolean)=> {
+interface LoadingCircleProps {
+  loading: boolean;
+  delay:string;
+}
+
+const LoadingCircle = (props: LoadingCircleProps) => {
   const classes = useStyles();
-  const [loading, setLoading] = useState(false);
-  const [query, setQuery] = useState('idle');
-  const timerRef = useRef<number>();
-
-  useEffect(
-    () => () => {
-      clearTimeout(timerRef.current);
-    },[]
-  );
-
-  const handleClickLoading = () => {
-    setLoading((prevLoading) => !prevLoading);
-  };
-
-  const handleClickQuery = () => {
-    clearTimeout(timerRef.current);
-
-    if (query !== 'idle') {
-      setQuery('idle');
-      return;
-    }
-
-    setQuery('progress');
-    timerRef.current = window.setTimeout(() => {
-      setQuery('success');
-    }, 2000);
-  };
 
   return (
     <div className={classes.root}>
-        {query === 'success' ? (
-          <Typography>Success!</Typography>) : (
-          <Fade
-            in={query === 'progress'}
-            style={{transitionDelay: query === 'progress' ? '800ms' : '0ms' }}
-            unmountOnExit>
-            <CircularProgress />
-          </Fade>
-        )}
-      <Button onClick={handleClickQuery} className={classes.button}>
-        {query !== 'idle' ? 'Reset' : 'Simulate a load'}
-      </Button>
+      <Fade
+        in={props.loading}
+        style={{
+          transitionDelay: props.loading ? props.delay : '0ms',
+        }}
+        unmountOnExit
+      >
+        <CircularProgress classes={{
+          colorPrimary: classes.progressBarColor
+        }} />
+      </Fade>
     </div>
   );
-}
+};
 
-export default {LoadingCircle};
+export { LoadingCircle };

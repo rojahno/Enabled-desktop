@@ -2,6 +2,7 @@ import React from 'react';
 import SimplePaper from '../SimplePaper';
 import NavigationButtons from './NavigationButtons';
 import CustomList from './CustomList';
+import {LoadingCircle} from '../LoadingCircle';
 
 
 interface SelectPageProps {
@@ -18,6 +19,7 @@ interface SelectPageProps {
   selectedProfile:string;
   selectedIndex:number;
   hasSelected:boolean;
+  isLoading:boolean;
 
 }
 /**
@@ -33,12 +35,14 @@ export default function SelectProfilePage(props: SelectPageProps) {
             profiles={props.profiles}
             handleListItemClick={props.handleListItemClick}
             selectedIndex={props.selectedIndex}
+            isLoading={props.isLoading}
           />
           <NavigationButtons
             canNavigateForward={props.hasSelected}
             handleNextClick={props.handleNextClick}
             backNavigation={'/'}
           />
+         
         </SimplePaper>
   );
 }
