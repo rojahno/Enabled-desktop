@@ -20,6 +20,8 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(2),
       display: 'flex',
       justifyContent: 'center',
+      lineHeight:'1',
+      marginBlockEnd:'0',
     },
   })
 );
@@ -31,10 +33,10 @@ const AppContainer = () => {
       <div className={classes.container}>
         <Router>
           <Switch>
-            <Route path="/" exact component={StartPageContainer} />
+            <Route path="/stream" exact component={StartPageContainer} />
             <Route path="/select" exact component={SelectProfileContainer} />
             <Route path="/ip" exact component={AddIpContainer} />
-            <Route path="/stream" exact component={StreamContainer} />
+            <Route path="/" exact component={StreamContainer} />
           </Switch>
         </Router>
       </div>
