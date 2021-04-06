@@ -9,6 +9,7 @@ const AddIpContainer = () => {
   //Add ip useStates
   const [ipAdress, setIpAdress] = useState('No input');
   const [validIpAdress, setValidIpAdress] = useState(false);
+  const [openLoadingCircle, setOpenLoadingCircle] = useState(false);
 
   const history = useHistory();
 
@@ -45,6 +46,7 @@ const AddIpContainer = () => {
 
   const handleNextClick = async () => {
     try {
+      setOpenLoadingCircle(true);
       let cortexFacade = new CortexFacade();
       let hasErrors = await cortexFacade.hasConnectivityErrors();
 
@@ -58,11 +60,13 @@ const AddIpContainer = () => {
           let mobileDriver = MobileDriver.getInstance();
           let connected = await mobileDriver.awaitSocketOpening(ipAdress);
           if (connected) {
+            setOpenLoadingCircle(false);
             history.push({
               pathname: '/stream',
               //state: { ipAdress: ipAdress },
             });
           } else {
+            setOpenLoadingCircle(false);
             alert(
               "Can't connect to the phone. Check the ip adress and that the application is running"
             );
@@ -71,6 +75,7 @@ const AddIpContainer = () => {
       }
     } catch (error) {
       console.log('Handle click error: ' + error);
+      setOpenLoadingCircle(false);
     }
   };
 
@@ -83,6 +88,7 @@ const AddIpContainer = () => {
       handleNextClick={handleNextClick}
       ipAdress={ipAdress}
       validIpAdress={validIpAdress}
+      openLoadingCircle={openLoadingCircle}
     />
   );
 };
