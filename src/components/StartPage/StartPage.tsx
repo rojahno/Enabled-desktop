@@ -69,9 +69,10 @@ export default function StartPage(props: StartPageProps) {
         <button onClick={props.connectClicked}>
           {props.isClicked ? 'Reconnect' : 'Connect'}
         </button>
-        <Link to="/select">
-          <button disabled={enableNext()}>Next</button>
-        </Link>
+          <button disabled={enableNext()}>Next
+            <Link to="/select">
+            </Link>
+          </button>
       </div>
     </SimplePaper>
   );
