@@ -16,6 +16,9 @@ const useStyles = makeStyles((theme: Theme) =>
     placeholder: {
       height: 40,
     },
+    progressBarColor:{
+      color:'#3c3c3c',
+    }
   })
 );
 
@@ -36,7 +39,9 @@ const LoadingCircle = (props: LoadingCircleProps) => {
         }}
         unmountOnExit
       >
-        <CircularProgress />
+        <CircularProgress classes={{
+          colorPrimary: classes.progressBarColor
+        }} />
       </Fade>
     </div>
   );
