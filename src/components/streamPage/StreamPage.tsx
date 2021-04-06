@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import SimplePaper from '../SimplePaper';
 import { Link } from 'react-router-dom';
-import SettingSlider from '../settings/SettingSlider';
-import CortexError from '../../modules/CortexError';
 import { Tab, Tabs } from '@material-ui/core';
-import CustomStreamDialog from './CustomStreamDialog';
+import ComPage from './ComPage';
+import FacPage from './FacPage';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -18,13 +17,12 @@ const useStyles = makeStyles((theme: Theme) =>
       height: '100%',
       padding: '3px',
     },
-    textContainer: {
+    contentContainer: {
       display: 'flex',
       flexDirection: 'column',
+      justifySelf: 'center',
       justifyContent: 'center',
       alignContent: 'center',
-      fontSize: '15px',
-      padding: '15px',
     },
     dialog: {
       paddingTop: '10px',
@@ -45,29 +43,19 @@ interface StreamProps {
 export default function StreamPage(props: StreamProps) {
   const classes = useStyles();
 
+  const [isComTab, setIsComTab] = useState(true);
   const [value, setValue] = useState(0);
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+    if (newValue === 0) {
+      setIsComTab(true);
+    } else setIsComTab(false);
     setValue(newValue);
   };
 
   return (
     <SimplePaper>
-      <h3>Stream:</h3>
-      <SettingSlider
-        sliderTitle={'Headset sensitivity'}
-        handleChange={props.handleChange}
-        minSteps={1}
-        maxSteps={10}
-        disabled={!props.isComStream}
-      />
-      <div className={classes.textContainer}>
-        <p>
-          Moving the slider to the right (10) will make it easier to trigger.
-          Moving the slider to the left (1) will make the commands harder to
-          trigger.
-        </p>
-      </div>
+      <h3>Stream</h3>
       <Tabs
         value={value}
         indicatorColor="primary"
@@ -75,12 +63,20 @@ export default function StreamPage(props: StreamProps) {
         onChange={handleTabChange}
         aria-label="disabled tabs example"
       >
-        <Tab label="Command Stream" onClick={props.handleComPress} />
+        <Tab label="Command Stream" onClick={props.handleComPress}></Tab>
         <Tab label="Expression Stream" onClick={props.handleFacPress} />
       </Tabs>
-      <div className={classes.dialog}>
-        <CustomStreamDialog />
+      <div className={classes.contentContainer}>
+        {isComTab ? (
+          <ComPage
+            isComStream={props.isComStream}
+            handleChange={props.handleChange}
+          />
+        ) : (
+          <FacPage />
+        )}
       </div>
+
       <div className={classes.buttons}>
         <Link to="/ip">
           <button>Back</button>

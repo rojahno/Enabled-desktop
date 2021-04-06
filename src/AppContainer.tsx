@@ -20,6 +20,8 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(2),
       display: 'flex',
       justifyContent: 'center',
+      lineHeight:'1',
+      marginBlockEnd:'0',
     },
   })
 );

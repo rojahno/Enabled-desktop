@@ -21,37 +21,49 @@ const StreamContainer = () => {
     event: React.ChangeEvent<{}>,
     value: number | number[]
   ) => {
-    if (typeof value === 'number') {
-      let driver: CortexDriver = CortexDriver.getInstance();
-      let sensitivity = [value, value, value, value];
-      await driver.setSensitivity(authToken, profile, sessionId, sensitivity);
-      await driver.saveProfile(authToken, headsetId, profile);
-      let newSensitivity = await driver.getSensitivity(authToken, profile);
-      if (isComStream) {
-        driver.setComStreamOnmessageEvent();
-      } else {
-        driver.setFacStreamOnmessageEvent();
+    try {
+      if (typeof value === 'number') {
+        let driver: CortexDriver = CortexDriver.getInstance();
+        let sensitivity = [value, value, value, value];
+        await driver.setSensitivity(authToken, profile, sessionId, sensitivity);
+        await driver.saveProfile(authToken, headsetId, profile);
+        let newSensitivity = await driver.getSensitivity(authToken, profile);
+        if (isComStream) {
+          driver.setComStreamOnmessageEvent();
+        } else {
+          driver.setFacStreamOnmessageEvent();
+        }
+        setSensitivity(newSensitivity[0]);
       }
-      setSensitivity(newSensitivity[0]);
+    } catch (error) {
+      console.log(error);
     }
   };
 
   const handleFacPress = async () => {
-    let driver: CortexDriver = CortexDriver.getInstance();
-    await driver.closeSession();
-    let sessionId: string = await driver.createSession(authToken, headsetId);
-    await driver.startFacStream(authToken, sessionId);
-    setsessionId(sessionId);
-    setIsComStream(false);
+    try {
+      let driver: CortexDriver = CortexDriver.getInstance();
+      await driver.closeSession();
+      let sessionId: string = await driver.createSession(authToken, headsetId);
+      await driver.startFacStream(authToken, sessionId);
+      setsessionId(sessionId);
+      setIsComStream(false);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleComPress = async () => {
-    let driver: CortexDriver = CortexDriver.getInstance();
-    await driver.closeSession();
-    let sessionId: string = await driver.createSession(authToken, headsetId);
-    await driver.startComStream(authToken, sessionId);
-    setsessionId(sessionId);
-    setIsComStream(true);
+    try {
+      let driver: CortexDriver = CortexDriver.getInstance();
+      await driver.closeSession();
+      let sessionId: string = await driver.createSession(authToken, headsetId);
+      await driver.startComStream(authToken, sessionId);
+      setsessionId(sessionId);
+      setIsComStream(true);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {

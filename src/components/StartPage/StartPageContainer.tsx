@@ -1,9 +1,6 @@
-import { createStyles, makeStyles, Theme } from '@material-ui/core';
-
 import React, { useState } from 'react';
-import { FacadeTest } from '../../FacadeTest';
-import { CortexDriver } from '../../modules/CortexDriver';
 import CortexError from '../../modules/CortexError';
+import { CortexFacade } from '../../modules/CortexFacade';
 import StartPage from './StartPage';
 
 const StartPageContainer = () => {
@@ -16,12 +13,12 @@ const StartPageContainer = () => {
   //StartPage functions
   async function connectClicked() {
     try {
-      const facade = new FacadeTest();
+      const facade = new CortexFacade();
       await facade.handleSetupApp();
       let errors: any = facade.getSetupErrors();
 
       setIsClicked(true);
-      setHasAccessError(true);
+      setHasAccessError(errors[0]);
       setHeadSetIdError(errors[1]);
       setDeviceError(errors[2]);
     } catch (error) {
@@ -33,7 +30,7 @@ const StartPageContainer = () => {
   return (
     <StartPage
       connectClicked={connectClicked}
-      hasAccessError={false}
+      hasAccessError={hasAccessError}
       headsetIdError={headsetIdError}
       deviceError={deviceError}
       isClicked={isClicked}

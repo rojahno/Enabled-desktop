@@ -32,8 +32,6 @@ interface StartPageProps {
 
 export default function StartPage(props: StartPageProps) {
   const classes = useStyles();
-  const [data, setData] = useState('');
-  const [stepNumber, setStepNumber] = useState(0);
 
   const enableNext = () => {
     if (!props.hasAccessError && !props.headsetIdError && !props.deviceError) {
@@ -41,35 +39,29 @@ export default function StartPage(props: StartPageProps) {
     } else return true;
   };
 
-  const setChildData = (childData: string) => {
-    setData(childData);
-  };
-
   return (
     <SimplePaper>
       <VerticalLinearStepper
-        setData={setChildData}
         hasAccessError={props.hasAccessError}
         headsetIdError={props.headsetIdError}
         deviceError={props.deviceError}
-        currentStep={stepNumber}
         isClicked={props.isClicked}
       />
 
       <div className={classes.text}>
         <h3 hidden={!props.isClicked}>
           {props.hasAccessError
-            ? 'Could not connect to the emotiv app, try to go to the app and permit access'
+            ? 'Could not connect to the emotiv app, try to go to the emotiv app to permit access'
             : 'Connected to the emotiv app'}
         </h3>
         <h3 hidden={!props.isClicked}>
           {props.headsetIdError
-            ? 'Could not retrieve the ID of your headset'
+            ? 'Could not retrieve the ID of your headset, please try to reconnect your emotiv headwear'
             : 'Headset ID retrieved'}
         </h3>
         <h3 hidden={!props.isClicked}>
           {props.deviceError
-            ? 'Could not connect to your emotiv device'
+            ? 'Could not connect to your emotiv device, check that your device is connected and not in need of a firmware update'
             : 'Connected to emotiv device'}
         </h3>
       </div>
