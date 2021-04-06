@@ -4,6 +4,7 @@ import CustomDialog from './CustomDialog';
 import SimplePaper from '../SimplePaper';
 import NavigationButtons from '../selectProfile/NavigationButtons';
 import { makeStyles, Theme, createStyles } from '@material-ui/core';
+import LoadingCircleDialog from '../../LoadingCircleDialog';
 
 interface AddIpProps {
   ipAdress: string;
@@ -43,6 +44,7 @@ export default function AddIpPage(props: AddIpProps) {
         handleNextClick={props.handleNextClick}
         backNavigation={'/select'}
       />
+      <LoadingCircleDialog open={true}/>
     </SimplePaper>
   );
 }
