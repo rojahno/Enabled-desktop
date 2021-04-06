@@ -742,7 +742,7 @@ class CortexDriver {
         if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
           let parsed: ComDataSample = JSON.parse(data);
           this.notify(parsed);
-          console.log(data);
+  
           
         }
       } catch (error) {
@@ -758,7 +758,6 @@ class CortexDriver {
         if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
           let parsed: FacDataSample = JSON.parse(data);
           this.notify(parsed);
-          console.log(data);
         }
       } catch (error) {
         console.error('Fac request error: ' + error);
