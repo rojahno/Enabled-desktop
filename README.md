@@ -29,11 +29,31 @@ This app is meant to be used with the Enabled Desktop App which can be found her
 
 1. Download our app from [here](https://github.com/andesob/Enabled-app).
 2. Download the desktop app from [here](#Install).
-3. Follow the desktop app setup guide
 
 ### Install
+Clone the repo via git and install dependencies:
 
-Download the Enabled Desktop App from the lateste release [here]().
+```bash
+gh repo clone rojahno/enabled-desktop
+```
+```bash
+yarn add @material-ui/core
+```
+```bash
+yarn add @material-ui/icons
+```
+## Run application
+```bash
+yarn start
+```
+
+## Packaging for Production
+
+To package apps for the local platform:
+
+```bash
+yarn package
+```
 
 ## Built With
 
