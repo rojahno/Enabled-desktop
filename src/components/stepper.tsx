@@ -9,7 +9,7 @@ import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from '@material-ui/core/StepContent';
-import { Error, CheckBox, Adjust, PinDropSharp } from '@material-ui/icons';
+import { Error, CheckBox, Adjust} from '@material-ui/icons';
 import { StepIconProps } from '@material-ui/core';
 
 
@@ -23,8 +23,7 @@ const StyledStepLabel = styled(StepLabel)({
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      minWidth: '20vw',
-      Height: '100%',
+
     },
     button: {
       marginTop: theme.spacing(1),
@@ -117,7 +116,7 @@ export default function VerticalLinearStepper(props:stepProps) {
   }
 
   return (
-    <div className={classes.root}>
+    <div>
       <Stepper
         className={classes.text}
         activeStep={handleChange()}
