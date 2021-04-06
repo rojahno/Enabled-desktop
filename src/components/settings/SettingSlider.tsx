@@ -13,9 +13,10 @@ const useStyles = makeStyles({
   sliderContainer: {
     display: 'flex',
     justifyContent: 'center',
+    alignItems:'center'
   },
   tootlips:{
-    fontSize:'19px'
+    fontSize:'20px'
   }
 });
 
@@ -83,7 +84,7 @@ export default function SettingSlider(props: sliderProps) {
   return (
     <div className={classes.root}>
       <div className={classes.sliderContainer}>
-        <Typography id="discrete-slider-small-steps" gutterBottom>
+        <Typography id="discrete-slider-small-steps">
           {props.sliderTitle}
         </Typography>
         <Tooltip title={props.tooltip} className = {classes.tootlips}>
