@@ -14,6 +14,7 @@ interface AddIpProps {
     event: React.MouseEvent<HTMLButtonElement>
   ) => Promise<void>;
   validIpAdress: boolean;
+  openLoadingCircle:boolean;
 }
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -44,7 +45,7 @@ export default function AddIpPage(props: AddIpProps) {
         handleNextClick={props.handleNextClick}
         backNavigation={'/select'}
       />
-      <LoadingCircleDialog open={true}/>
+      <LoadingCircleDialog open={props.openLoadingCircle}/>
     </SimplePaper>
   );
 }

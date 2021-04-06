@@ -10,7 +10,7 @@ const StreamContainer = () => {
   const [authToken, setAuthToken] = useState('');
   const [sessionId, setsessionId] = useState('');
   const [profile, setProfile] = useState('');
-  const [isComStream, setIsComStream] = useState(true);
+  const [isComStream, setIsComStream] = useState(false);
 
   const [sensitivity, setSensitivity] = useState<number>();
   const [activeCommands, setActiveCommands] = useState<string[]>();
