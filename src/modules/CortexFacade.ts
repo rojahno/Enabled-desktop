@@ -78,6 +78,7 @@ class CortexFacade {
         let connected = await this.driver.awaitSocketOpening();
         if (!connected) {
           //new CortexError(3,'Access denied by user')
+          return
         }
       }
       let hasAccess = await this.driver.hasAccess();
@@ -85,6 +86,7 @@ class CortexFacade {
         let requestAccess = await this.driver.requestAccess();
         if (!requestAccess) {
           //new CortexError(6,'')
+          return
         }
       }
       this.accessError = false;
