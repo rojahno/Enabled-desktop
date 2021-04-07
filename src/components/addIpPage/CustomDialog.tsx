@@ -42,7 +42,7 @@ const styles = (theme: Theme) =>
 const useStyles = makeStyles(function (theme: Theme) {
   return createStyles({
     root: {
-      color: '#ffffff',
+      color:'#3c3c3c',
       textDecoration: 'underline',
       fontSize: '4',
     },

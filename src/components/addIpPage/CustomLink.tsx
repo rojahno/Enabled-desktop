@@ -8,7 +8,7 @@ import { makeStyles, Theme, createStyles } from '@material-ui/core';
 const useStyles = makeStyles(function (theme: Theme) {
   return createStyles({
     root: {
-      color: '#ffffff80',
+      color: '#3c3c3c',
       textDecoration: 'underline',
       fontSize: '4',
     },
@@ -22,8 +22,6 @@ export default function ButtonLink({props}:any) {
       component="button"
       variant="body2"
       onClick={() => {
-          
-        console.info("I'm a button.");
       }}
     >
       Find ip address
