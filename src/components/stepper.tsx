@@ -15,7 +15,7 @@ import { StepIconProps } from '@material-ui/core';
 
 const StyledStepLabel = styled(StepLabel)({
   '& .MuiStepLabel-label': {
-    color: '#fff',
+    color: '#3c3c3c',
   },
 });
 
