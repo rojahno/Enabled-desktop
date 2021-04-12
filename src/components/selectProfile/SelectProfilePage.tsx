@@ -1,8 +1,7 @@
 import React from 'react';
-import SimplePaper from '../SimplePaper';
+import SimplePaper from '../utils/SimplePaper';
 import NavigationButtons from './NavigationButtons';
 import CustomList from './CustomList';
-import {LoadingCircle} from '../LoadingCircle';
 
 
 interface SelectPageProps {

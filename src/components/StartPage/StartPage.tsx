@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
-import SimplePaper from '../SimplePaper';
-import { Link, useHistory } from 'react-router-dom';
-import VerticalLinearStepper from '../stepper';
+import SimplePaper from '../utils/SimplePaper';
+import { useHistory } from 'react-router-dom';
+import VerticalLinearStepper from '../utils/Stepper';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -86,10 +86,9 @@ export default function StartPage(props: StartPageProps) {
           {props.isClicked ? 'Reconnect' : 'Connect'}
         </button>
 
-        <button 
-        onClick={navigateNext}
-        disabled={enableNext()}>
-          Next</button>
+        <button onClick={navigateNext} disabled={enableNext()}>
+          Next
+        </button>
       </div>
     </SimplePaper>
   );

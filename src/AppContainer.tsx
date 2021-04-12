@@ -2,7 +2,7 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core';
 
 import React from 'react';
 import { HashRouter as Router, Route, Switch } from 'react-router-dom';
-import StartPageContainer from './components/StartPage/StartPageContainer';
+import StartPageContainer from './components/startPage/StartPageContainer';
 import SelectProfileContainer from './components/selectProfile/SelectProfileContainer';
 import AddIpContainer from './components/addIpPage/AddIpContainer';
 import StreamContainer from './components/streamPage/StreamContainer';

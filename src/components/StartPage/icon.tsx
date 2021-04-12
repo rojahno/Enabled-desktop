@@ -8,16 +8,19 @@ interface iconProps {
 }
 
 function SuccessIcon(props: iconProps) {
-  const hasError = props.hasError;
-  return (
-    <div data-testid="SuccessIcon">
-      {hasError ? (
+  if (props.hasError) {
+    return (
+      <div data-testid="failure">
         <StepLabel StepIconComponent={Error}>{props.label}</StepLabel>
-      ) : (
+      </div>
+    );
+  } else {
+    return (
+      <div data-testid="success">
         <StepLabel StepIconComponent={CheckBox}>{props.label}</StepLabel>
-      )}
-    </div>
-  );
+      </div>
+    );
+  }
 }
 
 export default SuccessIcon;

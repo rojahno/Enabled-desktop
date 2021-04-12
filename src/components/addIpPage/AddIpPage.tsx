@@ -1,10 +1,10 @@
 import React from 'react';
 import CustomInput from './CustomInput';
 import CustomDialog from './CustomDialog';
-import SimplePaper from '../SimplePaper';
+import SimplePaper from '../utils/SimplePaper';
 import NavigationButtons from '../selectProfile/NavigationButtons';
 import { makeStyles, Theme, createStyles } from '@material-ui/core';
-import LoadingCircleDialog from '../../LoadingCircleDialog';
+import LoadingCircleDialog from '../utils/LoadingCircleDialog';
 
 interface AddIpProps {
   ipAdress: string;

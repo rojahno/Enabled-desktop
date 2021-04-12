@@ -6,7 +6,7 @@ import SuccessIcon from '../Icon';
 
 // Check error beeing cast by this test.
 afterEach(cleanup);
-describe('tests the successicon component', () => {
+describe('tests the successIcon component', () => {
   test('check the conditional rendering', () => {
     const hasError = false;
     const label = 'Hello';

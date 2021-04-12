@@ -1,6 +1,6 @@
 import React from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
-import SettingSlider from '../settings/SettingSlider';
+import SettingSlider from './SettingSlider';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -42,7 +42,6 @@ export default function ComPage(props: ComProps) {
     <div className={classes.root}>
       <p>This stream will use the results of the mental commands.</p>
       <p>The supported commands are: Neutral, Push, Pull, Left and Right</p>
-  
 
       <div className={classes.container}>
         <SettingSlider
