@@ -45,7 +45,9 @@ export default function AddIpPage(props: AddIpProps) {
         handleNextClick={props.handleNextClick}
         backNavigation={'/select'}
       />
-      <LoadingCircleDialog open={props.openLoadingCircle} />
+      <LoadingCircleDialog
+        open={props.openLoadingCircle}
+      />
     </SimplePaper>
   );
 }
