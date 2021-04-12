@@ -51,6 +51,7 @@ const CustomInput = (props: inputProps) => {
 
   return (
     <CssTextField
+    data-testid="input"
       className={classes.root}
       error={false}
       hiddenLabel={true}
@@ -59,6 +60,7 @@ const CustomInput = (props: inputProps) => {
       label=" "
       onChange={props.handleChange}
       onKeyPress={props.handleKeyPress}
+  
     />
   );
 };

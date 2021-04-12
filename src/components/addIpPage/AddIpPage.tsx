@@ -1,5 +1,5 @@
 import React from 'react';
-import CustomInput from './customInput';
+import CustomInput from './CustomInput';
 import CustomDialog from './CustomDialog';
 import SimplePaper from '../SimplePaper';
 import NavigationButtons from '../selectProfile/NavigationButtons';

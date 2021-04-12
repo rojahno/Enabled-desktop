@@ -37,3 +37,5 @@ test('modal shows the children and close button', async () => {
   //Checks if the modal dialog title window has been removed.
   await waitForElementToBeRemoved(() => screen.queryByText('How to find ip'));
 });
+
+
