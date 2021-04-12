@@ -49,14 +49,14 @@ function CustomList(props: listProps) {
     return (
       <div className={classes.loadingBarContent}>
         <div>
-        <LoadingCircle loading={props.isLoading} delay={'0ms'} />
+        <LoadingCircle  loading={props.isLoading} delay={'0ms'} />
         </div>
       </div>
     );
   } else {
     return (
       <div className={classes.root}>
-        <List>
+        <List data-testid='list'>
           {props.profiles.map((profile, index) => (
             <ListItem
               className={classes.listItems}
