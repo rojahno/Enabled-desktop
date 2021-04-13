@@ -3,7 +3,7 @@ import React from 'react';
 import { render, cleanup, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 
-import NavigationButtons from '../../utils/NavigationButtons';
+import NavigationButtons from '../NavigationButtons';
 
 afterEach(cleanup);
 describe('Navigation buttons component', () => {
