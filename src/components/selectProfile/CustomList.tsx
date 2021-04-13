@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import { List } from '@material-ui/core';
 import ListItem from '@material-ui/core/ListItem';
-import { LoadingCircle } from '../LoadingCircle';
+import { LoadingCircle } from '../utils/LoadingCircle';
 import { PowerInputSharp } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme: Theme) =>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Dialog from '@material-ui/core/Dialog';
-import { LoadingCircle } from './components/LoadingCircle';
+import { LoadingCircle } from './LoadingCircle';
 import { useState } from 'react';
 
 const useStyles = makeStyles({

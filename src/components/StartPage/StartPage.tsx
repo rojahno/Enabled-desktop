@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
-import SimplePaper from '../SimplePaper';
-import { Link, useHistory } from 'react-router-dom';
-import VerticalLinearStepper from '../stepper';
+import SimplePaper from '../utils/SimplePaper';
+import { useHistory } from 'react-router-dom';
+import VerticalLinearStepper from '../startPage/stepper';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
-import SettingSlider from '../settings/SettingSlider';
+import SettingSlider from './SettingSlider';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
