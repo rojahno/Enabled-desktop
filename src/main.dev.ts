@@ -74,7 +74,9 @@ const createWindow = async () => {
     autoHideMenuBar: true,
     icon: getAssetPath('icon.png'),
     title:'Enabled desktop',
+    
     webPreferences: {
+      contextIsolation:false,
       nodeIntegration: true,
     },
   });
