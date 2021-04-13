@@ -39,7 +39,9 @@ const LoadingCircle = (props: LoadingCircleProps) => {
         }}
         unmountOnExit
       >
-        <CircularProgress classes={{
+        <CircularProgress 
+        data-testid="loadingCircle"
+        classes={{
           colorPrimary: classes.progressBarColor
         }} />
       </Fade>

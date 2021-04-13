@@ -56,7 +56,7 @@ function CustomList(props: listProps) {
   } else {
     return (
       <div className={classes.root}>
-        <List>
+        <List data-testid="list">
           {props.profiles.map((profile, index) => (
             <ListItem
               className={classes.listItems}

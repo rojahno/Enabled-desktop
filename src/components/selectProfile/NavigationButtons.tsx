@@ -31,9 +31,12 @@ function NavigationButtons(props: navButtonProps) {
 
   return (
     <div className={classes.root}>
-      <button onClick={navigateBack}>Back</button>
+      <button data-testid="backButton" onClick={navigateBack}>
+        Back
+      </button>
 
       <button
+        data-testid="nextButton"
         disabled={!props.canNavigateForward}
         onClick={props.handleNextClick}
       >

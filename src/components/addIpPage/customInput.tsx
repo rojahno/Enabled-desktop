@@ -51,6 +51,7 @@ const CustomInput = (props: inputProps) => {
 
   return (
     <CssTextField
+    data-testid="input"
       className={classes.root}
       error={false}
       hiddenLabel={true}
