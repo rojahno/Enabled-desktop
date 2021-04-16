@@ -66,6 +66,9 @@ class CortexFacade {
     }
   };
 
+  /**
+   * Connects the app to the headset through the Cortex Driver 
+   */
   handleSetupApp = async () => {
     try {
       if (!this.driver.isConnected()) {
@@ -93,6 +96,10 @@ class CortexFacade {
     } catch (error) {}
   };
 
+  /**
+   * Gets the state of errors when connecting to the headset
+   * @returns array of errors
+   */
   getSetupErrors = () => {
     return [this.accessError, this.headsetError, this.deviceError];
   };
