@@ -64,6 +64,7 @@ const AddIpContainer = () => {
 
       if (hasErrors instanceof CortexError) {
         alert(hasErrors.errMessage);
+        setOpenLoadingCircle(false);
       } else {
         let validIpAdress = hasValidIPaddress(ipAdress);
         console.log('valid ip: ' + validIpAdress);
