@@ -17,11 +17,6 @@ import {
   UpdateSessionResponse,
 } from './interfaces';
 
-/**
- * @todo check out event emitter
- */
-//require('events').EventEmitter.defaultMaxListeners = 15;
-
 const CONNECTION_RETRY_INTERVAL = 5000; // in ms
 const CONNECTION_RETRY_MAX_COUNT = 60; // 60 times to retry x 5s = 5min of total retries
 
@@ -29,11 +24,6 @@ type StreamObserver = (streamCommand: string) => void;
 /**
  * This class works as a connection between an app and the Emotiv API.
  * This class uses async/await and Promise for request and needs to be run on sync.
- *
- * The class handles:
- *  - Create socket connection
- *  - Handles request for : headset, request access, control headset ...
- *  - Handle sub main flow.
  *
  */
 class CortexDriver {
