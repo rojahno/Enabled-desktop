@@ -742,8 +742,6 @@ class CortexDriver {
         if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
           let parsed: ComDataSample = JSON.parse(data);
           this.notify(parsed);
-  
-          
         }
       } catch (error) {
         console.error('Sub request error');
@@ -751,7 +749,6 @@ class CortexDriver {
     };
   };
 
-  
   public setFacStreamOnmessageEvent = () => {
     this._socket.onmessage = ({ data }: MessageEvent) => {
       try {
@@ -893,13 +890,13 @@ class CortexDriver {
     console.table(this.observers);
   }
 
-  private notify(streamCommand: FacDataSample | ComDataSample) {
+  private notify(streamCommand: FacDataSample | ComDataSample) {
     this.observers.forEach((observer) => observer.sendCommand(streamCommand));
   }
 }
 
 interface IObserver {
-  sendCommand(command: FacDataSample | ComDataSample): void;
+  sendCommand(command: FacDataSample | ComDataSample): void;
 }
 
 export { CortexDriver, StreamObserver, IObserver };
