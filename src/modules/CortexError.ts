@@ -55,6 +55,11 @@ class CortexError {
             return 'Unable to create a connection with the Emotiv servers';
           }
         break;
+        case 7:
+          {
+            return 'An error has occured';
+          }
+        break;
 
        
 

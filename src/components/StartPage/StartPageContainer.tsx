@@ -10,7 +10,9 @@ const StartPageContainer = () => {
   const [deviceError, setDeviceError] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
 
-  //StartPage functions
+  /**
+   * Handles the connect button beeing clicked.
+   */
   async function connectClicked() {
     try {
       const facade = new CortexFacade();

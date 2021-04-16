@@ -15,8 +15,11 @@ const StreamContainer = () => {
   const [sensitivity, setSensitivity] = useState<number>();
   const [activeCommands, setActiveCommands] = useState<string[]>();
 
-  //Stream page functions
-
+  /**
+   * Changes the sensitivity of the selected profile.
+   * @param event The slider event
+   * @param value The new value from the event
+   */
   const handleChange = async (
     event: React.ChangeEvent<{}>,
     value: number | number[]
@@ -39,7 +42,10 @@ const StreamContainer = () => {
       console.log(error);
     }
   };
-
+  /**
+   * Closes the previous session and creates a new session and stream.
+   * Starts the fac stream.
+   */
   const handleFacPress = async () => {
     try {
       let driver: CortexDriver = CortexDriver.getInstance();
@@ -53,6 +59,10 @@ const StreamContainer = () => {
     }
   };
 
+  /**
+   * Closes the previous session and creates a new session and stream.
+   * Starts the com stream
+   */
   const handleComPress = async () => {
     try {
       let driver: CortexDriver = CortexDriver.getInstance();

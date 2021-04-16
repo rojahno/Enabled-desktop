@@ -43,12 +43,18 @@ export default function StartPage(props: StartPageProps) {
   const classes = useStyles();
   const history = useHistory();
 
+  /**
+   * Enables or disables the next button.
+   * @returns true if no errors occurs and false one or more errors occured.
+   */
   const enableNext = () => {
     if (!props.hasAccessError && !props.headsetIdError && !props.deviceError) {
       return false;
     } else return true;
   };
-
+/**
+ * Navigates to the next page.
+ */
   const navigateNext = () => {
     history.push({ pathname: '/select' });
   };

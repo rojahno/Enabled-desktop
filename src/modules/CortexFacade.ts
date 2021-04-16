@@ -6,22 +6,12 @@ class CortexFacade {
   private accessError: boolean = true;
   private headsetError: boolean = true;
   private deviceError: boolean = true;
-  /**
-   * @todo test the request access logic.
-   */
-  checkForSetupErrors = async () => {
-    try {
-      let hasAccess = await this.driver.hasAccess();
-      if (!hasAccess) {
-        let gotAccess = await this.driver.requestAccess();
-        if (!gotAccess) {
-          return new CortexError(3, 'Access denied by user');
-        } else {
-        }
-      }
-    } catch (error) {}
-  };
 
+  /**
+   * Unloads the old profile and loads the new profile.
+   * @param selectedProfile The selected profile
+   * @returns
+   */
   handleSetProfile = async (selectedProfile: string) => {
     try {
       if (!this.driver.isConnected()) {
@@ -55,6 +45,10 @@ class CortexFacade {
     }
   };
 
+  /**
+   * Checks for errors from the Emotiv API.
+   * @returns false if no errors occured and an error object if an error occures
+   */
   hasConnectivityErrors = async () => {
     try {
       let driver: CortexDriver = CortexDriver.getInstance();
@@ -78,7 +72,7 @@ class CortexFacade {
         let connected = await this.driver.awaitSocketOpening();
         if (!connected) {
           //new CortexError(3,'Access denied by user')
-          return
+          return;
         }
       }
       let hasAccess = await this.driver.hasAccess();
@@ -86,7 +80,7 @@ class CortexFacade {
         let requestAccess = await this.driver.requestAccess();
         if (!requestAccess) {
           //new CortexError(6,'')
-          return
+          return;
         }
       }
       this.accessError = false;
@@ -102,13 +96,16 @@ class CortexFacade {
   getSetupErrors = () => {
     return [this.accessError, this.headsetError, this.deviceError];
   };
-
-  //Refactort errorHandling to handle rejects
+  /**
+   * Check if the error was an instance of Cortex error.
+   * @param error The error we would like to check.
+   * @returns The cortex error
+   */
   errorHandling(error: any) {
     if (error instanceof CortexError) {
       return error;
     } else {
-      return 'An error has occured';
+      return new CortexError(7, '');
     }
   }
 }

@@ -16,15 +16,15 @@ const useStyles = makeStyles((theme: Theme) =>
     placeholder: {
       height: 40,
     },
-    progressBarColor:{
-      color:'#3c3c3c',
-    }
+    progressBarColor: {
+      color: '#3c3c3c',
+    },
   })
 );
 
 interface LoadingCircleProps {
   loading: boolean;
-  delay:string;
+  delay: string;
 }
 
 const LoadingCircle = (props: LoadingCircleProps) => {
@@ -39,11 +39,12 @@ const LoadingCircle = (props: LoadingCircleProps) => {
         }}
         unmountOnExit
       >
-        <CircularProgress 
-        data-testid="loadingCircle"
-        classes={{
-          colorPrimary: classes.progressBarColor
-        }} />
+        <CircularProgress
+          data-testid="loadingCircle"
+          classes={{
+            colorPrimary: classes.progressBarColor,
+          }}
+        />
       </Fade>
     </div>
   );

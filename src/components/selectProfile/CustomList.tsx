@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import { List } from '@material-ui/core';
 import ListItem from '@material-ui/core/ListItem';
 import { LoadingCircle } from '../utils/LoadingCircle';
-import { PowerInputSharp } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -49,7 +48,7 @@ function CustomList(props: listProps) {
     return (
       <div className={classes.loadingBarContent}>
         <div>
-        <LoadingCircle loading={props.isLoading} delay={'0ms'} />
+          <LoadingCircle loading={props.isLoading} delay={'0ms'} />
         </div>
       </div>
     );

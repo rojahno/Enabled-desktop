@@ -26,13 +26,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-// interface ComProps{
-//     isComStream:boolean
-//     handleChange:(event: React.ChangeEvent<{}>,
-//                 value: number | number[]) => void;
-// }
-
-export default function FacPage(props: any) {
+export default function FacPage() {
   const classes = useStyles();
 
   return (
@@ -41,8 +35,10 @@ export default function FacPage(props: any) {
         <p>
           This stream will use the results of the facial expressions detection.
         </p>
-        <p>The supported commands are: Neutral, Smile, Wink left, Wink right and Blink</p>
-  
+        <p>
+          The supported commands are: Neutral, Smile, Wink left, Wink right and
+          Blink
+        </p>
       </div>
     </div>
   );
