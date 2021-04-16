@@ -17,11 +17,6 @@ import {
   UpdateSessionResponse,
 } from './interfaces';
 
-/**
- * @todo check out event emitter
- */
-//require('events').EventEmitter.defaultMaxListeners = 15;
-
 const CONNECTION_RETRY_INTERVAL = 5000; // in ms
 const CONNECTION_RETRY_MAX_COUNT = 60; // 60 times to retry x 5s = 5min of total retries
 
@@ -29,11 +24,6 @@ type StreamObserver = (streamCommand: string) => void;
 /**
  * This class works as a connection between an app and the Emotiv API.
  * This class uses async/await and Promise for request and needs to be run on sync.
- *
- * The class handles:
- *  - Create socket connection
- *  - Handles request for : headset, request access, control headset ...
- *  - Handle sub main flow.
  *
  */
 class CortexDriver {
@@ -169,8 +159,8 @@ class CortexDriver {
   }
 
   /**
-   * Find and connects a headset. If there are more than one
-   * headset it connects to the first headset found.
+   * Find and returns a headset id. If there are more than one
+   * headset it chooses the first one found.
    *
    * @returns the headseth id
    */
@@ -213,7 +203,6 @@ class CortexDriver {
    * Requests acces to the emotiv app. When the script calls this method for the first time
    * a display message is shown in the Emotiv app.
    * @returns true and a message string if the user accepts and false and a message string otherwise.
-   * @todo change return value
    */
 
   public requestAccess = async (): Promise<boolean> => {
@@ -283,10 +272,11 @@ class CortexDriver {
     });
   };
 
-  /** Connects to the headset.
+  /**
+   * Connects to a headset based on the headset id.
    *
+   * @param headsetId - the headset id returned from queryHeadset.
    * @returns an response object from the Emotiv API.
-   * @todo change return value
    * */
   public controlDevice = (headsetId: string): Promise<string> => {
     const CONTROL_DEVICE_ID = 3;
@@ -314,8 +304,7 @@ class CortexDriver {
     });
   };
 
-  /** This method is to subscribe to one or more data streams. After you successfully subscribe
-   * Cortex will keep sending data sample objects.
+  /** This method is to open a session with an EMOTIV headset.
    *
    * @returns The data sample obejcts from the session.
    */
@@ -352,10 +341,10 @@ class CortexDriver {
   };
 
   /**
+   * Starts the com stream and notifies the observers.
    *
-   * @param authToken
-   * @param sessionId
-   * Starts the stream and notifies the observers.
+   * @param authToken - The cortex token
+   * @param sessionId - the session id
    */
   public startComStream = async (authToken: string, sessionId: string) => {
     const SUB_REQUEST_ID = 26;
@@ -375,7 +364,6 @@ class CortexDriver {
         try {
           if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
             let parsed: ComDataSample = JSON.parse(data);
-            //console.log(data);
             this.notify(parsed);
             resolve(true);
           }
@@ -388,10 +376,10 @@ class CortexDriver {
   };
 
   /**
+   * Starts the fac stream and notifies the observers.
    *
    * @param authToken
    * @param sessionId
-   * Starts the stream and notifies the observers.
    */
   public startFacStream = async (authToken: string, sessionId: string) => {
     const SUB_REQUEST_ID = 26;
@@ -411,7 +399,6 @@ class CortexDriver {
         try {
           if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
             let parsed: FacDataSample = JSON.parse(data);
-            //console.log(data);
             this.notify(parsed);
             resolve(true);
           }
@@ -422,7 +409,10 @@ class CortexDriver {
       };
     });
   };
-
+  /**
+   * Closes the session.
+   * @returns The response object from the Emotiv API.
+   */
   public closeSession = async () => {
     const CLOSE_REQUEST_ID = 19;
     let subRequest = {
@@ -450,10 +440,10 @@ class CortexDriver {
     });
   };
 
-  /** This method is to get or set the active action for the mental command detection.
+  /**
+   * This method is to get the active action for the mental command detection.
    *If the status is "get" then the result is and array of strings.
-   *If the status is "set", then the result is an object with "action" and "message" as fields.
-   */
+   **/
   public getMentalCommandActiveActionRequest = (
     authToken: string,
     profile: string
@@ -486,12 +476,13 @@ class CortexDriver {
     });
   };
   /**
-   *
-   * @param authToken
-   * @param sessionId
-   * @param profile
-   * @param action
-   * @returns
+   * This method is to set the active action for the mental command detection.
+   * If the status is "set", then the result is an object with "action" and "message" as fields.
+   * @param authToken - The auth token
+   * @param sessionId - The session id
+   * @param profile - The profile you would like to set the sensitivity for.
+   * @param action - The 4 different commands to activate
+   * @returns - A success message  from the Emotiv API.
    */
   public setMentalCommandActiveActionRequest = (
     authToken: string,
@@ -567,7 +558,6 @@ class CortexDriver {
    * @param status The status
    *
    * @returns a response object from the Emotiv API.
-   * @todo change the return value.
    */
   public setupProfile = async (
     authToken: string,
@@ -619,7 +609,7 @@ class CortexDriver {
    * @param profileName The profile name you want to set
    * @param status The status
    *
-   * @returns a response object from the Emotiv API.
+   * @returns true if there was a loaded profile and false if not.
    */
   public hasCurrentProfile = async (
     authToken: string,
@@ -642,34 +632,26 @@ class CortexDriver {
           let currentProfileResponse: GetCurrentProfileResponse = JSON.parse(
             data
           );
-
           if (currentProfileResponse.result.name == null) {
-            console.log(
-              'No previously loaded profile' + currentProfileResponse
-            );
             resolve(false);
           } else {
-            console.log(
-              'Loaded profile: ' + currentProfileResponse.result.name
-            );
             resolve(true);
           }
         } catch (error) {
-          console.log('has current profile error: ' + error);
           reject(new CortexError(2, error));
         }
       };
     });
   };
+
   /**
-   *
    * Gets the currently loaded profile.
    *
    * @param authToken The cortex token.
    * @param headsetId The headset id.
    *
    * @returns an response object with the currently used profile.
-   * @todo change return value.
+   * @todo Returns the profile name
    */
   public getCurrentProfile = async (
     authToken: string,
@@ -700,15 +682,15 @@ class CortexDriver {
   };
   /**
    *
-   * @param authToken
-   * @param profile
-   * @param session
-   * @param values
+   * @param authToken The auth token
+   * @param profile The profile you would like to set the sensitivity for
+   * @param sessionId The session id
+   * @param values The sensitivity values.
    */
   public setSensitivity = async (
     authToken: string,
     profile: string,
-    session: string,
+    sessionId: string,
     values: number[]
   ) => {
     let currentProfileRequest = {
@@ -718,7 +700,7 @@ class CortexDriver {
       params: {
         cortexToken: authToken,
         profile: profile,
-        session: session,
+        session: sessionId,
         status: 'set',
         values: values,
       },
@@ -736,14 +718,15 @@ class CortexDriver {
     });
   };
 
+  /**
+   * Sets the onmessage events for com stream.
+   */
   public setComStreamOnmessageEvent = () => {
     this._socket.onmessage = ({ data }: MessageEvent) => {
       try {
         if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
           let parsed: ComDataSample = JSON.parse(data);
           this.notify(parsed);
-  
-          
         }
       } catch (error) {
         console.error('Sub request error');
@@ -751,7 +734,9 @@ class CortexDriver {
     };
   };
 
-  
+  /**
+   * Sets the onmessage events for fac stream.
+   */
   public setFacStreamOnmessageEvent = () => {
     this._socket.onmessage = ({ data }: MessageEvent) => {
       try {
@@ -767,9 +752,9 @@ class CortexDriver {
 
   /**
    *
-   * @param authToken
-   * @param profile
-   * @returns
+   * @param authToken The auth token
+   * @param profile The profile you would like to get the sensitivity for.
+   * @returns An array of 4 sensitivity values.
    */
   public getSensitivity = async (
     authToken: string,
@@ -803,7 +788,13 @@ class CortexDriver {
       };
     });
   };
-
+  /**
+   * Updates the selected profile and saves it.
+   * @param authToken The auth token
+   * @param headsetId The headset id
+   * @param profile The profile you would like to update
+   * @returns A success message
+   */
   public saveProfile = async (
     authToken: string,
     headsetId: string,
@@ -875,14 +866,17 @@ class CortexDriver {
     });
   };
 
+  /**
+   * Subscribes to the stream.
+   * @param observer The observer
+   */
   public async subscribe(observer: IObserver) {
     this.observers.push(observer);
   }
 
   /**
-   *
+   * Unsubscribes to the stream.
    * @param observer the observer to remove
-   * @todo check if filter logic i correct??
    */
 
   public unsubscribe(observer: IObserver) {
@@ -893,13 +887,17 @@ class CortexDriver {
     console.table(this.observers);
   }
 
-  private notify(streamCommand: FacDataSample | ComDataSample) {
+  /**
+   * Notifies all the listeners.
+   * @param streamCommand The command from the stream.
+   */
+  private notify(streamCommand: FacDataSample | ComDataSample) {
     this.observers.forEach((observer) => observer.sendCommand(streamCommand));
   }
 }
 
 interface IObserver {
-  sendCommand(command: FacDataSample | ComDataSample): void;
+  sendCommand(command: FacDataSample | ComDataSample): void;
 }
 
 export { CortexDriver, StreamObserver, IObserver };

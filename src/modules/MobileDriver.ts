@@ -1,22 +1,25 @@
-import CortexCommand from './CortexCommand';
 import { CortexDriver, IObserver, StreamObserver } from './CortexDriver';
 import { ComDataSample, FacDataSample } from './interfaces';
 
 const CONNECTION_RETRY_INTERVAL = 5000; // in ms
 const CONNECTION_RETRY_MAX_COUNT = 60; // 60 times to retry x 5s = 5min of total retries
-
+/**
+ * The class connects to a Websockets server and sends the commands it recieves to it.
+ */
 class MobileDriver implements IObserver {
-  private _socket!: WebSocket;
+  private socket!: WebSocket;
   private static instance: MobileDriver;
-  private _retryCount: number = 0;
+  private retryCount: number = 0;
   private ipAdress: string = '';
   private currentTime: number = 0;
   private commandInterval: number = 1500;
   private previousTriggerTime: number = 0;
   public observer!: StreamObserver;
 
-  private constructor() {}
-
+  /**
+   *
+   * @param command sends a command to the websocket server
+   */
   sendCommand(command: FacDataSample | ComDataSample): void {
     this.currentTime = Date.now();
     if (this.currentTime - this.previousTriggerTime >= this.commandInterval) {
@@ -37,26 +40,28 @@ class MobileDriver implements IObserver {
     MobileDriver.instance = new MobileDriver();
     return MobileDriver.instance;
   }
-
+  /**
+   * Starts the socket.
+   * @param ipAdress The Websocket server ip adress
+   */
   public startSocket(ipAdress: string) {
     this.setip(ipAdress);
     this.connect();
   }
 
-  public get socket() {
-    return this._socket;
-  }
-
+  /**
+   * Sets the ip adress we would like to connect to.
+   * @param ipAdress The websocket servers ip adress.
+   */
   public setip(ipAdress: string) {
     this.ipAdress = ipAdress;
   }
 
   /**
    * Creates a connection to the websocket and sets the events.
-   * @todo implements start stream logic when facade is ready.
    */
   private connect = () => {
-    this._socket = new WebSocket('ws://' + this.ipAdress + ':9000');
+    this.socket = new WebSocket('ws://' + this.ipAdress + ':9000');
 
     this.setupSocketEvents();
   };
@@ -66,7 +71,7 @@ class MobileDriver implements IObserver {
       console.log('WS OPENED ✅');
 
       // reset the total retries
-      this._retryCount = 0;
+      this.retryCount = 0;
       this.subscribeToCortexStream();
     };
 
@@ -77,25 +82,27 @@ class MobileDriver implements IObserver {
     };
 
     this.socket.onclose = (_error) => {
-      // if we aren't retrying...
       if (!this.canRetry()) {
         console.log('Closing');
       }
 
-      // Reconnects if canRetry is true
-      if (this._retryCount < CONNECTION_RETRY_MAX_COUNT) {
+      if (this.retryCount < CONNECTION_RETRY_MAX_COUNT) {
         setTimeout(this.reconnect, CONNECTION_RETRY_INTERVAL);
       } else {
         // we passed the threshold for retries, let's abort
         this.unsubscribeToCortexStream();
-        this._retryCount = 0;
+        this.retryCount = 0;
       }
     };
   };
-
+  /**
+   * Waits for the socket to open.
+   * @param ipAdress the ip adress of the Websocket server
+   * @returns true if it connects or false if it reaches the timeout.
+   */
   public awaitSocketOpening = async (ipAdress: string) => {
     this.setip(ipAdress);
-    this._socket = new WebSocket('ws://' + this.ipAdress + ':9000');
+    this.socket = new WebSocket('ws://' + this.ipAdress + ':9000');
 
     console.log('Connecting to: ' + ipAdress);
     return new Promise<boolean>((resolve, reject) => {
@@ -105,7 +112,7 @@ class MobileDriver implements IObserver {
       }, 5000);
 
       this.socket.onopen = async () => {
-        this._retryCount = 0;
+        this.retryCount = 0;
         try {
           this.subscribeToCortexStream();
           this.setupSocketEvents();
@@ -121,10 +128,12 @@ class MobileDriver implements IObserver {
    * Makes an attempt to reconect to the server.
    **/
   private reconnect = () => {
-    this._retryCount++;
+    this.retryCount++;
     this.connect();
   };
-
+  /**
+   * Subscribes to the cortex stream
+   */
   subscribeToCortexStream = () => {
     let driver: CortexDriver = CortexDriver.getInstance();
     driver.subscribe(this);
@@ -134,25 +143,33 @@ class MobileDriver implements IObserver {
     return Math.floor(Math.random() * Math.floor(max));
   }
 
+  /**
+   * Unsubscribes to the cortex stream
+   */
   unsubscribeToCortexStream = () => {
     let driver: CortexDriver = CortexDriver.getInstance();
     driver.unsubscribe(this);
   };
-
+/**
+ * Closes the socket and unsubscribes to the stream.
+ */
   closeSocket() {
     this.socket.onclose = (_error) => {
       this.unsubscribeToCortexStream();
       console.log('closing stream');
     };
-    this._socket.close();
+    this.socket.close();
   }
   /**
    * Checks if we can reconnect or we have reaches our maximun amount of tries.
    **/
   private canRetry(): boolean {
-    return this._retryCount > 0;
+    return this.retryCount > 0;
   }
-
+/**
+ * Sends a command to the server.
+ * @param text The command to send
+ */
   sendSomething = async (text: string) => {
     let command: string = '';
     let state: number = this.getRandomInt(4) + 1;
@@ -184,7 +201,7 @@ class MobileDriver implements IObserver {
         }
         break;
     }
-    this._socket.send(command);
+    this.socket.send(command);
   };
 }
 
