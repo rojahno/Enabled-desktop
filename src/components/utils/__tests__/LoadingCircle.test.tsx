@@ -22,5 +22,4 @@ describe(' Loading circle component test', () => {
     // Checks if the loading cirlce is loaded.
     expect(screen.getByTestId('loadingCircle')).toBeInTheDocument();
   });
-
 });
