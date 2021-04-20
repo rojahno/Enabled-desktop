@@ -15,6 +15,7 @@ import {
   getSensitivityResponse,
   getCommandResponse,
   UpdateSessionResponse,
+  FacialExpressionSignatureType,
 } from './interfaces';
 
 const CONNECTION_RETRY_INTERVAL = 5000; // in ms
@@ -405,6 +406,38 @@ class CortexDriver {
         } catch (error) {
           console.error('Fac request error: ' + error);
           resolve(false);
+        }
+      };
+    });
+  };
+
+  public setFacialExpressionSignatureType = async (
+    authToken: string,
+    sessionId: String
+  ) => {
+    const SIGNATURE_REQUEST_ID = 26;
+    let request = {
+      id: SIGNATURE_REQUEST_ID,
+      jsonrpc: '2.0',
+      method: 'facialExpressionSignatureType',
+      params: {
+        cortexToken: authToken,
+        status: 'set',
+        session: sessionId,
+        signature: 'trained',
+      },
+    };
+
+    return new Promise<string>((resolve) => {
+      this._socket.send(JSON.stringify(request));
+      this._socket.onmessage = ({ data }: MessageEvent) => {
+        try {
+          let parsed: FacialExpressionSignatureType = JSON.parse(data);
+          if (parsed.id === SIGNATURE_REQUEST_ID) {
+            resolve(data);
+          }
+        } catch (error) {
+          console.error('Facial signature error');
         }
       };
     });
@@ -883,7 +916,8 @@ class CortexDriver {
     let observerToRemove = observer;
     console.table(this.observers);
 
-    this.observers = this.observers.filter((item) => item !== observerToRemove);
+    this.observers = [];
+    //this.observers.filter((item) => item !== observerToRemove);
     console.table(this.observers);
   }
 

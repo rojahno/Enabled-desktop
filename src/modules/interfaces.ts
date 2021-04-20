@@ -167,6 +167,15 @@ interface UpdateSessionResponse{
 
 }
 
+export interface FacialExpressionSignatureType{
+  id: number,
+  jsonrpc: string,
+  result: {
+      currentSig: string,
+      availableSig: string[],
+  }
+}
+
 export {
   RequestAccessResponse,
   RequestAccessResult,

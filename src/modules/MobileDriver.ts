@@ -2,7 +2,7 @@ import { CortexDriver, IObserver, StreamObserver } from './CortexDriver';
 import { ComDataSample, FacDataSample } from './interfaces';
 
 const CONNECTION_RETRY_INTERVAL = 5000; // in ms
-const CONNECTION_RETRY_MAX_COUNT = 60; // 60 times to retry x 5s = 5min of total retries
+const CONNECTION_RETRY_MAX_COUNT = 12; // 12 times to retry x 5s = 1min of total retries
 /**
  * The class connects to a Websockets server and sends the commands it recieves to it.
  */
@@ -25,14 +25,29 @@ class MobileDriver implements IObserver {
     if (this.currentTime - this.previousTriggerTime >= this.commandInterval) {
       if ('com' in command) {
         console.log('Mental stream command sent: ' + command.com[0]);
-        this.sendSomething(command.com[0]);
+        this.sendMentalCommand(command.com[0]);
       } else if ('fac' in command) {
-        console.log('Faciall stream command sent: ' + command.fac[0]);
-        this.previousTriggerTime = this.currentTime;
+        let facCommand:string = this.lookForFacCommand(command);
+        this.sendFacialExpression(facCommand);
       }
     }
   }
 
+  /**
+   *
+   * @returns The fac command
+   */
+  lookForFacCommand = (command: FacDataSample) => {
+    if (command.fac[0] !== 'neutral') {
+      return command.fac[0];
+    } else if (command.fac[1] !== 'neutral') {
+      return command.fac[1];
+    } else if (command.fac[3] !== 'neutral') {
+      return command.fac[3];
+    } else {
+      return 'neutral';
+    }
+  };
   static getInstance(): MobileDriver {
     if (MobileDriver.instance) {
       return MobileDriver.instance;
@@ -70,13 +85,14 @@ class MobileDriver implements IObserver {
     this.socket.onopen = async () => {
       console.log('WS OPENED ✅');
 
-      // reset the total retries
+      // Reset the total retries
       this.retryCount = 0;
       this.subscribeToCortexStream();
+
     };
 
     this.socket.onerror = (_error) => {
-      console.log('An error happened');
+      console.log('An socket error has occured. Check connection');
       if (!this.canRetry()) {
       }
     };
@@ -118,7 +134,9 @@ class MobileDriver implements IObserver {
           this.setupSocketEvents();
           resolve(true);
         } catch (error) {
-          console.log('await socket error');
+          console.log(
+            'An error occured while trying to connect to the socket server.'
+          );
         }
       };
     });
@@ -150,9 +168,9 @@ class MobileDriver implements IObserver {
     let driver: CortexDriver = CortexDriver.getInstance();
     driver.unsubscribe(this);
   };
-/**
- * Closes the socket and unsubscribes to the stream.
- */
+  /**
+   * Closes the socket and unsubscribes to the stream.
+   */
   closeSocket() {
     this.socket.onclose = (_error) => {
       this.unsubscribeToCortexStream();
@@ -166,42 +184,103 @@ class MobileDriver implements IObserver {
   private canRetry(): boolean {
     return this.retryCount > 0;
   }
-/**
- * Sends a command to the server.
- * @param text The command to send
- */
-  sendSomething = async (text: string) => {
-    let command: string = '';
-    let state: number = this.getRandomInt(4) + 1;
-    switch (state) {
-      case 1:
-        command = 'right';
-        this.previousTriggerTime = this.currentTime;
-        break;
 
-      case 2:
-        command = 'left';
-        this.previousTriggerTime = this.currentTime;
-        break;
-
-      case 3:
-        command = 'push';
-        this.previousTriggerTime = this.currentTime;
-        break;
-
-      case 4:
-        command = 'pull';
-        this.previousTriggerTime = this.currentTime;
-        break;
-
-      default:
-        {
-          command = 'neutral';
+  /**
+   * Sends a mental command to the server.
+   * @param text The command to send
+   */
+  sendMentalCommand = async (text: string) => {
+    if (this.socket.OPEN === 1) {
+      let command: string = '';
+      let state: number = this.getRandomInt(4) + 1;
+      switch (state) {
+        case 1:
+          command = 'right';
           this.previousTriggerTime = this.currentTime;
-        }
-        break;
+          break;
+
+        case 2:
+          command = 'left';
+          this.previousTriggerTime = this.currentTime;
+          break;
+
+        case 3:
+          command = 'push';
+          this.previousTriggerTime = this.currentTime;
+          break;
+
+        case 4:
+          command = 'pull';
+          this.previousTriggerTime = this.currentTime;
+          break;
+
+        default:
+          {
+            command = 'neutral';
+            this.previousTriggerTime = this.currentTime;
+          }
+          break;
+      }
+      let facialExpression = {
+        streamType: 'com',
+        command: command,
+      };
+
+      let stringCommand = JSON.stringify(facialExpression);
+
+      this.socket.send(stringCommand);
     }
-    this.socket.send(command);
+  };
+  /**
+   * Sends a facial expression command to the server.
+   * @param text The command to send
+   */
+  sendFacialExpression = async (command: string) => {
+    if(command !== 'neutral'){
+    console.log('----------------------')
+    console.log(command);
+    }
+
+    if (this.socket.OPEN === 1) {
+
+      let state = command;
+      switch (state) {
+        case 'smile':
+          command = 'smile';
+          this.previousTriggerTime = this.currentTime;
+          break;
+
+        case 'surprise':
+          command = 'raise-brows';
+          this.previousTriggerTime = this.currentTime;
+          break;
+
+        case 'winkL':
+          command = 'winkL';
+          this.previousTriggerTime = this.currentTime;
+          break;
+
+        case 'winkR':
+          command = 'winkR';
+          this.previousTriggerTime = this.currentTime;
+          break;
+
+        default:
+          {
+            command = 'neutral';
+            //this.previousTriggerTime = this.currentTime;
+          }
+          break;
+      }
+      let facialExpression = {
+        streamType: 'fac',
+        command: command,
+      };
+
+      let stringCommand = JSON.stringify(facialExpression);
+
+      this.socket.send(stringCommand);
+    }
   };
 }
 

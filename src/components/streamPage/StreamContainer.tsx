@@ -51,6 +51,8 @@ const StreamContainer = () => {
       let driver: CortexDriver = CortexDriver.getInstance();
       await driver.closeSession();
       let sessionId: string = await driver.createSession(authToken, headsetId);
+      let signature = await driver.setFacialExpressionSignatureType(authToken,sessionId);
+      console.log("signature: "+ signature);
       await driver.startFacStream(authToken, sessionId);
       setsessionId(sessionId);
       setIsComStream(false);
