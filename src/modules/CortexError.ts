@@ -60,7 +60,11 @@ class CortexError {
             return 'An error has occured';
           }
         break;
-
+        case 8:
+          {
+            return "This application cant\'t unload the profile. Check if headseth is in use on another application.";
+          }
+        break;
        
 
       default: {

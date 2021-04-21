@@ -177,10 +177,11 @@ class CortexDriver {
       this._socket.send(JSON.stringify(queryHeadsetRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
+          console.log('data:' + data);
           if (data.indexOf('error') !== -1) {
             let parsed: Warning = JSON.parse(data);
-            console.log(parsed.warning.message);
-            reject(new CortexError(2, data));
+            console.log(parsed.error.message);
+            reject(new CortexError(8, data));
           } else {
             let headsetQuery: QueryHeadsetIdResponse = JSON.parse(data);
             let queryHeadsetId: number = headsetQuery.id;
@@ -257,7 +258,7 @@ class CortexDriver {
         try {
           if (data.indexOf('error') !== -1) {
             let parsed: Warning = JSON.parse(data);
-            console.log(parsed.warning.message);
+            console.log(parsed.error.message);
             reject(new CortexError(1, data));
           }
           let parsed: AuthorizeResponse = JSON.parse(data);
@@ -616,7 +617,7 @@ class CortexDriver {
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
           if (data.indexOf('error') !== -1) {
-            reject(new CortexError(5, data));
+            reject(new CortexError(8, data));
           } else {
             let setupQuery: SetupProfileObject = JSON.parse(data);
 

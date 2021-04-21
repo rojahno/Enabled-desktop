@@ -116,7 +116,8 @@ interface FacDataSample{
 }
 interface Warning{
   jsonrpc:string,
-  warning:{
+  id:string,
+  error:{
     code:number,
     message:any
   }
