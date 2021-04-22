@@ -177,7 +177,6 @@ class CortexDriver {
       this._socket.send(JSON.stringify(queryHeadsetRequest));
       this._socket.onmessage = ({ data }: MessageEvent) => {
         try {
-          console.log('data:' + data);
           if (data.indexOf('error') !== -1) {
             let parsed: Warning = JSON.parse(data);
             console.log(parsed.error.message);
@@ -915,11 +914,11 @@ class CortexDriver {
 
   public unsubscribe(observer: IObserver) {
     let observerToRemove = observer;
-    console.table(this.observers);
+    console.log('NR observers before unsubscribe: ' + this.observers.length);
 
     this.observers = [];
-    //this.observers.filter((item) => item !== observerToRemove);
-    console.table(this.observers);
+    this.observers.filter((item) => item !== observerToRemove);
+    console.log('NR observers after unsubscribe: ' + this.observers.length);
   }
 
   /**

@@ -7,7 +7,7 @@ const CONNECTION_RETRY_MAX_COUNT = 12; // 12 times to retry x 5s = 1min of total
  * The class connects to a Websockets server and sends the commands it recieves to it.
  */
 class MobileDriver implements IObserver {
-  private socket!: WebSocket;
+  private _socket!: WebSocket;
   private static instance: MobileDriver;
   private retryCount: number = 0;
   private ipAdress: string = '';
@@ -21,14 +21,16 @@ class MobileDriver implements IObserver {
    * @param command sends a command to the websocket server
    */
   sendCommand(command: FacDataSample | ComDataSample): void {
-    this.currentTime = Date.now();
-    if (this.currentTime - this.previousTriggerTime >= this.commandInterval) {
-      if ('com' in command) {
-        console.log('Mental stream command sent: ' + command.com[0]);
-        this.sendMentalCommand(command.com[0]);
-      } else if ('fac' in command) {
-        let facCommand:string = this.lookForFacCommand(command);
-        this.sendFacialExpression(facCommand);
+    if (this.isConnected()) {
+      this.currentTime = Date.now();
+      if (this.currentTime - this.previousTriggerTime >= this.commandInterval) {
+        if ('com' in command) {
+          console.log('Mental stream command sent: ' + command.com[0]);
+          this.sendMentalCommand(command.com[0]);
+        } else if ('fac' in command) {
+          let facCommand: string = this.lookForFacCommand(command);
+          this.sendFacialExpression(facCommand);
+        }
       }
     }
   }
@@ -76,28 +78,27 @@ class MobileDriver implements IObserver {
    * Creates a connection to the websocket and sets the events.
    */
   private connect = () => {
-    this.socket = new WebSocket('ws://' + this.ipAdress + ':9000');
+    this._socket = new WebSocket('ws://' + this.ipAdress + ':9000');
 
     this.setupSocketEvents();
   };
 
   private setupSocketEvents = () => {
-    this.socket.onopen = async () => {
+    this._socket.onopen = async () => {
       console.log('WS OPENED ✅');
 
       // Reset the total retries
       this.retryCount = 0;
       this.subscribeToCortexStream();
-
     };
 
-    this.socket.onerror = (_error) => {
+    this._socket.onerror = (_error) => {
       console.log('An socket error has occured. Check connection');
       if (!this.canRetry()) {
       }
     };
 
-    this.socket.onclose = (_error) => {
+    this._socket.onclose = (_error) => {
       if (!this.canRetry()) {
         console.log('Closing');
       }
@@ -118,7 +119,7 @@ class MobileDriver implements IObserver {
    */
   public awaitSocketOpening = async (ipAdress: string) => {
     this.setip(ipAdress);
-    this.socket = new WebSocket('ws://' + this.ipAdress + ':9000');
+    this._socket = new WebSocket('ws://' + this.ipAdress + ':9000');
 
     console.log('Connecting to: ' + ipAdress);
     return new Promise<boolean>((resolve, reject) => {
@@ -127,7 +128,7 @@ class MobileDriver implements IObserver {
         resolve(false);
       }, 5000);
 
-      this.socket.onopen = async () => {
+      this._socket.onopen = async () => {
         this.retryCount = 0;
         try {
           this.subscribeToCortexStream();
@@ -148,6 +149,36 @@ class MobileDriver implements IObserver {
   private reconnect = () => {
     this.retryCount++;
     this.connect();
+  };
+
+  /**
+   * Checks if the socket status is open
+   * @returns true if open.
+   */
+  public isConnected = (): boolean => {
+    return this.getStatus() === 'OPEN';
+  };
+
+  /**
+   * Returns the socket status or an error string if no socket is found.
+   * @returns The socket status
+   */
+  public getStatus = (): string => {
+    if (!this._socket) {
+      return 'ERROR: no socket';
+    }
+
+    switch (this._socket.readyState) {
+      case this._socket.OPEN:
+        return 'OPEN';
+      case this._socket.CLOSED:
+        return 'CLOSED';
+      case this._socket.CLOSING:
+        return 'CLOSING';
+      case this._socket.CONNECTING:
+        return 'CONNECTING';
+    }
+    return 'Unknown error';
   };
   /**
    * Subscribes to the cortex stream
@@ -172,11 +203,11 @@ class MobileDriver implements IObserver {
    * Closes the socket and unsubscribes to the stream.
    */
   closeSocket() {
-    this.socket.onclose = (_error) => {
+    this._socket.onclose = (_error) => {
       this.unsubscribeToCortexStream();
       console.log('closing stream');
     };
-    this.socket.close();
+    this._socket.close();
   }
   /**
    * Checks if we can reconnect or we have reaches our maximun amount of tries.
@@ -190,7 +221,7 @@ class MobileDriver implements IObserver {
    * @param text The command to send
    */
   sendMentalCommand = async (text: string) => {
-    if (this.socket.OPEN === 1) {
+    if (this._socket.OPEN === 1) {
       let command: string = '';
       let state: number = this.getRandomInt(4) + 1;
       switch (state) {
@@ -228,7 +259,7 @@ class MobileDriver implements IObserver {
 
       let stringCommand = JSON.stringify(facialExpression);
 
-      this.socket.send(stringCommand);
+      this._socket.send(stringCommand);
     }
   };
   /**
@@ -236,13 +267,12 @@ class MobileDriver implements IObserver {
    * @param text The command to send
    */
   sendFacialExpression = async (command: string) => {
-    if(command !== 'neutral'){
-    console.log('----------------------')
-    console.log(command);
+    if (command !== 'neutral') {
+      console.log('----------------------');
+      console.log(command);
     }
 
-    if (this.socket.OPEN === 1) {
-
+    if (this._socket.OPEN === 1) {
       let state = command;
       switch (state) {
         case 'smile':
@@ -279,7 +309,7 @@ class MobileDriver implements IObserver {
 
       let stringCommand = JSON.stringify(facialExpression);
 
-      this.socket.send(stringCommand);
+      this._socket.send(stringCommand);
     }
   };
 }

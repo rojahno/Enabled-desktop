@@ -25,6 +25,7 @@ const useStyles = makeStyles((theme: Theme) =>
 interface LoadingCircleProps {
   loading: boolean;
   delay: string;
+  color:string,
 }
 
 const LoadingCircle = (props: LoadingCircleProps) => {
@@ -41,9 +42,7 @@ const LoadingCircle = (props: LoadingCircleProps) => {
       >
         <CircularProgress
           data-testid="loadingCircle"
-          classes={{
-            colorPrimary: classes.progressBarColor,
-          }}
+         style={{color:props.color}}
         />
       </Fade>
     </div>

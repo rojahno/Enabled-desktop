@@ -11,6 +11,7 @@ const StreamContainer = () => {
   const [sessionId, setsessionId] = useState('');
   const [profile, setProfile] = useState('');
   const [isComStream, setIsComStream] = useState(true);
+  const [isConnected, setIsConnected] = useState(true);
 
   const [sensitivity, setSensitivity] = useState<number>();
   const [activeCommands, setActiveCommands] = useState<string[]>();
@@ -51,8 +52,11 @@ const StreamContainer = () => {
       let driver: CortexDriver = CortexDriver.getInstance();
       await driver.closeSession();
       let sessionId: string = await driver.createSession(authToken, headsetId);
-      let signature = await driver.setFacialExpressionSignatureType(authToken,sessionId);
-      console.log("signature: "+ signature);
+      let signature = await driver.setFacialExpressionSignatureType(
+        authToken,
+        sessionId
+      );
+      console.log('signature: ' + signature);
       await driver.startFacStream(authToken, sessionId);
       setsessionId(sessionId);
       setIsComStream(false);
@@ -121,6 +125,7 @@ const StreamContainer = () => {
         }
       }
     };
+
     start();
 
     const offLoad = () => {
@@ -133,12 +138,37 @@ const StreamContainer = () => {
     return () => offLoad();
   }, []);
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      let mobileDriver: MobileDriver = MobileDriver.getInstance();
+      console.log('Mobiledriver connected: ' + mobileDriver.isConnected());
+      if (!mobileDriver.isConnected()) {
+        if (isConnected) {
+          console.log('set false');
+          setIsConnected(false);
+        }
+      } else {
+        if (!isConnected) {
+          console.log('set true');
+          setIsConnected(true);
+        }
+      }
+    }, 1000);
+
+    const offLoad = () => {
+      clearInterval(intervalId);
+    };
+
+    return () => offLoad();
+  }, [isConnected]);
+
   return (
     <StreamPage
       handleChange={handleChange}
       handleComPress={handleComPress}
       handleFacPress={handleFacPress}
       isComStream={isComStream}
+      isConnected={isConnected}
     />
   );
 };

@@ -39,7 +39,7 @@ export default function LoadingCircleDialog(props: SimpleDialogProps) {
         },
       }}
     >
-      <LoadingCircle loading={true} delay={'0ms'} />
+      <LoadingCircle loading={true} delay={'0ms'} color={'#3c3c3c'} />
     </Dialog>
   );
 }

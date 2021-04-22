@@ -48,7 +48,7 @@ function CustomList(props: listProps) {
     return (
       <div className={classes.loadingBarContent}>
         <div>
-          <LoadingCircle loading={props.isLoading} delay={'0ms'} />
+          <LoadingCircle loading={props.isLoading} delay={'0ms'} color={'#3c3c3c'} />
         </div>
       </div>
     );
