@@ -23,7 +23,7 @@ export default function StreamIndicator(props: StreamIndicatorProps) {
   if (props.isLive) {
     return (
       <div>
-        <h3 className={classes.container}>
+        <h3  data-testid='liveStream' className={classes.container}>
           Stream is live
           <CheckBoxIcon style={{ color: green[500] }} />
         </h3>
@@ -32,7 +32,7 @@ export default function StreamIndicator(props: StreamIndicatorProps) {
   } else {
     return (
       <div>
-        <h3 className={classes.container}>
+        <h3 data-testid='downStream' className={classes.container}>
           Stream is down
           <ErrorIcon style={{ color: red[500] }} />
         </h3>

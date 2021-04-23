@@ -10,6 +10,7 @@ import '@testing-library/jest-dom/extend-expect';
 import CustomInput from '../CustomInput';
 
 afterEach(cleanup);
+
 describe('test the custom input component', () => {
   test('The enter key beeing pressed', () => {
     const handleChange = jest.fn( (value) => {});
