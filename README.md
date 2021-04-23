@@ -33,16 +33,17 @@ This app is meant to be used with the Enabled Desktop App which can be found her
 ### Install
 Clone the repo via git and install dependencies:
 
+clone:
 ```bash
 gh repo clone rojahno/enabled-desktop
 ```
+install dependencies:
 ```bash
-yarn add @material-ui/core
+yarn
 ```
-```bash
-yarn add @material-ui/icons
-```
+
 ## Run application
+
 ```bash
 yarn start
 ```
@@ -51,8 +52,13 @@ yarn start
 
 To package apps for the local platform:
 
+Mac & Linux on local platforms:
 ```bash
 yarn package
+```
+Windows:
+```bash
+yarn electron-builder --win
 ```
 
 ## Built With
