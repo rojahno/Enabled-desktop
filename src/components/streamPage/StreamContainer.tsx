@@ -14,7 +14,6 @@ const StreamContainer = () => {
   const [isConnected, setIsConnected] = useState(true);
 
   const [sensitivity, setSensitivity] = useState<number>();
-  const [activeCommands, setActiveCommands] = useState<string[]>();
 
   /**
    * Changes the sensitivity of the selected profile.

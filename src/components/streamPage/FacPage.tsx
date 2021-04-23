@@ -1,8 +1,8 @@
 import React from 'react';
-import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 import StreamIndicator from './StreamIndicator';
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     root: {},
     buttons: {
@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
 interface Facprops {
   hasConnection: boolean;
 }
-export default function FacPage(props:Facprops) {
+export default function FacPage(props: Facprops) {
   const classes = useStyles();
 
   return (

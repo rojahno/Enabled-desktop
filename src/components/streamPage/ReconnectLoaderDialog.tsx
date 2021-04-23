@@ -42,7 +42,6 @@ export interface ReconnectLoaderProps {
 export default function ReconnectLoader(props: ReconnectLoaderProps) {
   const classes = useStyles();
   const [secondsLeft, setSecondsLeft] = useState(props.seconds);
-  const [isOpen] = useState(props.open);
 
   const handleClose = () => {};
 

@@ -122,7 +122,7 @@ class MobileDriver implements IObserver {
     this._socket = new WebSocket('ws://' + this.ipAdress + ':9000');
 
     console.log('Connecting to: ' + ipAdress);
-    return new Promise<boolean>((resolve, reject) => {
+    return new Promise<boolean>((resolve) => {
       let wait = setTimeout(() => {
         clearTimeout(wait);
         resolve(false);
@@ -223,24 +223,25 @@ class MobileDriver implements IObserver {
   sendMentalCommand = async (text: string) => {
     if (this._socket.OPEN === 1) {
       let command: string = '';
-      let state: number = this.getRandomInt(4) + 1;
+      //let state: number = this.getRandomInt(4) + 1;
+      let state = text;
       switch (state) {
-        case 1:
+        case 'right':
           command = 'right';
           this.previousTriggerTime = this.currentTime;
           break;
 
-        case 2:
+        case 'left':
           command = 'left';
           this.previousTriggerTime = this.currentTime;
           break;
 
-        case 3:
+        case 'push':
           command = 'push';
           this.previousTriggerTime = this.currentTime;
           break;
 
-        case 4:
+        case 'pull':
           command = 'pull';
           this.previousTriggerTime = this.currentTime;
           break;

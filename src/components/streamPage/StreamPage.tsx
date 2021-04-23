@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 import SimplePaper from '../utils/SimplePaper';
 import { Link, useHistory } from 'react-router-dom';
 import { Tab, Tabs } from '@material-ui/core';
@@ -7,7 +7,7 @@ import ComPage from './ComPage';
 import FacPage from './FacPage';
 import ReconnectLoader from './ReconnectLoader';
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     root: {},
     buttons: {
