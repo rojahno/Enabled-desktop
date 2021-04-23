@@ -113,7 +113,7 @@ export default function VerticalLinearStepper(props: stepProps) {
         activeStep={handleChange()}
         orientation="vertical"
       >
-        {steps.map((label, index) => (
+        {steps.map((label) => (
           <Step key={label}>
             <StyledStepLabel StepIconComponent={trueFalseStepIcon}>
               {label}
