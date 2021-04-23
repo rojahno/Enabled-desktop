@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   makeStyles,
   Theme,
@@ -9,22 +9,18 @@ import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from '@material-ui/core/StepContent';
-import { Error, CheckBox, Adjust} from '@material-ui/icons';
+import { Error, CheckBox, Adjust } from '@material-ui/icons';
 import { StepIconProps } from '@material-ui/core';
-
 
 const StyledStepLabel = styled(StepLabel)({
   '& .MuiStepLabel-label': {
-    color: '#fff',
+    color: '#3c3c3c',
   },
 });
 
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {
-
-    },
+    root: {},
     button: {
       marginTop: theme.spacing(1),
       marginRight: theme.spacing(1),
@@ -39,7 +35,6 @@ const useStyles = makeStyles((theme: Theme) =>
       color: '#fff',
       backgroundColor: '#ffffff00',
       borderRadius: '4px',
-      //boxShadow: '0px 6px 6px -3px rgba(0,0,0,0.2), 0px 10px 14px 1px rgba(0,0,0,0.14), 0px 4px 18px 3px rgba(0,0,0,0.12)'
     },
     successIcon: {
       color: 'green',
@@ -61,17 +56,14 @@ function getSteps() {
   ];
 }
 
-
-
-interface stepProps{
-  hasAccessError:boolean
-  headsetIdError:boolean
-  deviceError:boolean
-  isClicked:boolean
+interface stepProps {
+  hasAccessError: boolean;
+  headsetIdError: boolean;
+  deviceError: boolean;
+  isClicked: boolean;
 }
 
-export default function VerticalLinearStepper(props:stepProps) {
-
+export default function VerticalLinearStepper(props: stepProps) {
   function trueFalseStepIcon(iconProps: StepIconProps) {
     let errorIcon = <Error className={classes.errorIcon} />;
     let successIcon = <CheckBox className={classes.successIcon} />;
@@ -95,22 +87,21 @@ export default function VerticalLinearStepper(props:stepProps) {
   const classes = useStyles();
   const steps = getSteps();
 
-  function handleChange(){
-
-    if(!props.isClicked){
-      return -1
+  function handleChange() {
+    if (!props.isClicked) {
+      return -1;
     }
-    if(props.hasAccessError){
-      console.log(props.hasAccessError)
-      return 0
+    if (props.hasAccessError) {
+      console.log(props.hasAccessError);
+      return 0;
     }
-    if(props.headsetIdError){
-      console.log(props.headsetIdError)
-      return 1
+    if (props.headsetIdError) {
+      console.log(props.headsetIdError);
+      return 1;
     }
-    if(props.deviceError){
-      console.log(props.deviceError)
-      return 2
+    if (props.deviceError) {
+      console.log(props.deviceError);
+      return 2;
     }
     return 2;
   }
@@ -122,7 +113,7 @@ export default function VerticalLinearStepper(props:stepProps) {
         activeStep={handleChange()}
         orientation="vertical"
       >
-        {steps.map((label, index) => (
+        {steps.map((label) => (
           <Step key={label}>
             <StyledStepLabel StepIconComponent={trueFalseStepIcon}>
               {label}

@@ -1,8 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Dialog from '@material-ui/core/Dialog';
-import { LoadingCircle } from './components/LoadingCircle';
-import { useState } from 'react';
+import { LoadingCircle } from './LoadingCircle';
 
 const useStyles = makeStyles({
   dialogContainer: {
@@ -19,11 +18,8 @@ export interface SimpleDialogProps {
 
 export default function LoadingCircleDialog(props: SimpleDialogProps) {
   const classes = useStyles();
-  const [isOpen, setIsOpen] = useState(props.open);
 
-  const handleClose = () => {
-    setIsOpen(false);
-  };
+  const handleClose = () => {};
 
   return (
     <Dialog
@@ -39,7 +35,7 @@ export default function LoadingCircleDialog(props: SimpleDialogProps) {
         },
       }}
     >
-      <LoadingCircle loading={true} delay={'0ms'} />
+      <LoadingCircle loading={true} delay={'0ms'} color={'#3c3c3c'} />
     </Dialog>
   );
 }

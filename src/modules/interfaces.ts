@@ -116,7 +116,8 @@ interface FacDataSample{
 }
 interface Warning{
   jsonrpc:string,
-  warning:{
+  id:string,
+  error:{
     code:number,
     message:any
   }
@@ -165,6 +166,15 @@ interface UpdateSessionResponse{
         streams: []
     }
 
+}
+
+export interface FacialExpressionSignatureType{
+  id: number,
+  jsonrpc: string,
+  result: {
+      currentSig: string,
+      availableSig: string[],
+  }
 }
 
 export {

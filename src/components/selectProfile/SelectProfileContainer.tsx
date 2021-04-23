@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { CortexDriver } from '../../modules/CortexDriver';
@@ -7,7 +6,6 @@ import { CortexFacade } from '../../modules/CortexFacade';
 import SelectProfilePage from './SelectProfilePage';
 
 const SelectProfileContainer = () => {
-    
   //Select profile useStates
   const [profiles, setProfiles] = useState<string[]>([]);
   const [selectedProfile, setSelectedProfile] = useState('');
@@ -16,10 +14,8 @@ const SelectProfileContainer = () => {
   const [isLoading, setIsLoading] = useState(true);
   const history = useHistory();
 
-
-  //Select profile page functions
-
   useEffect(() => {
+    //Retrieves the profiles
     const getProfiles = async () => {
       try {
         let driver = CortexDriver.getInstance();
@@ -34,6 +30,10 @@ const SelectProfileContainer = () => {
     getProfiles();
   }, []);
 
+  /**
+   * Handles the click event for the next button.
+   * Tries to set the current profile to the selected and navigates to the next page.
+   */
   const handleNextClick = async (): Promise<void> => {
     let cortexfacade: CortexFacade = new CortexFacade();
     try {
@@ -50,7 +50,12 @@ const SelectProfileContainer = () => {
       alert(error);
     }
   };
-
+  /**
+   * Handles the click event for the list items.
+   * @param event The click event
+   * @param index The index of the item beeing clicked
+   * @param profile The selected profiel
+   */
   const handleListItemClick = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
     index: number,

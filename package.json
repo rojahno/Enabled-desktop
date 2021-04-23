@@ -49,7 +49,8 @@
       "hardenedRuntime": true,
       "entitlements": "assets/entitlements.mac.plist",
       "entitlementsInherit": "assets/entitlements.mac.plist",
-      "gatekeeperAssess": false
+      "gatekeeperAssess": false,
+      "icon":"assets/enabledbackgroundmac.icns"
     },
     "dmg": {
       "contents": [
@@ -66,11 +67,14 @@
       ]
     },
     "win": {
+      "icon":"assets/enabledLogo.ico",
       "target": [
         "nsis"
       ]
+      
     },
     "linux": {
+      "icon":"assets/enabledLogoPNG.png",
       "target": [
         "AppImage"
       ],
@@ -176,6 +180,7 @@
     "@teamsupercell/typings-for-css-modules-loader": "^2.4.0",
     "@testing-library/jest-dom": "^5.11.6",
     "@testing-library/react": "^11.2.2",
+    "@testing-library/user-event": "^13.1.2",
     "@types/enzyme": "^3.10.5",
     "@types/enzyme-adapter-react-16": "^1.0.6",
     "@types/history": "4.7.6",
@@ -226,13 +231,15 @@
     "husky": "^4.2.5",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^26.1.0",
+    "jest-websocket-mock": "^2.2.0",
     "lint-staged": "^10.2.11",
     "mini-css-extract-plugin": "^1.3.1",
+    "mock-socket": "^9.0.3",
     "node-sass": "^5.0.0",
     "opencollective-postinstall": "^2.0.3",
     "prettier": "^2.0.5",
     "react-refresh": "^0.9.0",
-    "react-test-renderer": "^17.0.1",
+    "react-test-renderer": "^17.0.2",
     "rimraf": "^3.0.0",
     "sass-loader": "^10.1.0",
     "style-loader": "^2.0.0",

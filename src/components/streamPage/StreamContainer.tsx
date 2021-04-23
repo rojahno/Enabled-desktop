@@ -11,12 +11,15 @@ const StreamContainer = () => {
   const [sessionId, setsessionId] = useState('');
   const [profile, setProfile] = useState('');
   const [isComStream, setIsComStream] = useState(true);
+  const [isConnected, setIsConnected] = useState(true);
 
   const [sensitivity, setSensitivity] = useState<number>();
-  const [activeCommands, setActiveCommands] = useState<string[]>();
 
-  //Stream page functions
-
+  /**
+   * Changes the sensitivity of the selected profile.
+   * @param event The slider event
+   * @param value The new value from the event
+   */
   const handleChange = async (
     event: React.ChangeEvent<{}>,
     value: number | number[]
@@ -39,12 +42,19 @@ const StreamContainer = () => {
       console.log(error);
     }
   };
-
+  /**
+   * Closes the previous session and creates a new session and stream.
+   * Starts the fac stream.
+   */
   const handleFacPress = async () => {
     try {
       let driver: CortexDriver = CortexDriver.getInstance();
       await driver.closeSession();
       let sessionId: string = await driver.createSession(authToken, headsetId);
+      let signature = await driver.setFacialExpressionSignatureType(
+        authToken,
+        sessionId
+      );
       await driver.startFacStream(authToken, sessionId);
       setsessionId(sessionId);
       setIsComStream(false);
@@ -53,6 +63,10 @@ const StreamContainer = () => {
     }
   };
 
+  /**
+   * Closes the previous session and creates a new session and stream.
+   * Starts the com stream
+   */
   const handleComPress = async () => {
     try {
       let driver: CortexDriver = CortexDriver.getInstance();
@@ -109,6 +123,7 @@ const StreamContainer = () => {
         }
       }
     };
+
     start();
 
     const offLoad = () => {
@@ -121,12 +136,35 @@ const StreamContainer = () => {
     return () => offLoad();
   }, []);
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      let mobileDriver: MobileDriver = MobileDriver.getInstance();
+
+      if (!mobileDriver.isConnected()) {
+        if (isConnected) {
+          setIsConnected(false);
+        }
+      } else {
+        if (!isConnected) {
+          setIsConnected(true);
+        }
+      }
+    }, 1000);
+
+    const offLoad = () => {
+      clearInterval(intervalId);
+    };
+
+    return () => offLoad();
+  }, [isConnected]);
+
   return (
     <StreamPage
       handleChange={handleChange}
       handleComPress={handleComPress}
       handleFacPress={handleFacPress}
       isComStream={isComStream}
+      isConnected={isConnected}
     />
   );
 };

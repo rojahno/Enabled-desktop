@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
-import SimplePaper from '../SimplePaper';
-import { Link, useHistory } from 'react-router-dom';
-import VerticalLinearStepper from '../stepper';
+import SimplePaper from '../utils/SimplePaper';
+import { useHistory } from 'react-router-dom';
+import VerticalLinearStepper from '../startPage/stepper';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -43,12 +43,18 @@ export default function StartPage(props: StartPageProps) {
   const classes = useStyles();
   const history = useHistory();
 
+  /**
+   * Enables or disables the next button.
+   * @returns true if no errors occurs and false one or more errors occured.
+   */
   const enableNext = () => {
     if (!props.hasAccessError && !props.headsetIdError && !props.deviceError) {
       return false;
     } else return true;
   };
-
+  /**
+   * Navigates to the next page.
+   */
   const navigateNext = () => {
     history.push({ pathname: '/select' });
   };
@@ -86,10 +92,9 @@ export default function StartPage(props: StartPageProps) {
           {props.isClicked ? 'Reconnect' : 'Connect'}
         </button>
 
-        <button 
-        onClick={navigateNext}
-        disabled={enableNext()}>
-          Next</button>
+        <button onClick={navigateNext} disabled={enableNext()}>
+          Next
+        </button>
       </div>
     </SimplePaper>
   );

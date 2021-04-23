@@ -46,7 +46,7 @@ class CortexError {
 
         case 5:
           {
-            return ' "Headset has been disconnected due to connection timeout';
+            return 'Headset has been disconnected due to connection timeout';
           }
         break;
 
@@ -55,7 +55,16 @@ class CortexError {
             return 'Unable to create a connection with the Emotiv servers';
           }
         break;
-
+        case 7:
+          {
+            return 'An error has occured';
+          }
+        break;
+        case 8:
+          {
+            return 'This application cant\'t unload the profile. Check if headseth is in use on another application.';
+          }
+        break;
        
 
       default: {

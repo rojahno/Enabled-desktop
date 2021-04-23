@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
-import SimplePaper from '../SimplePaper';
-import { Link } from 'react-router-dom';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
+import SimplePaper from '../utils/SimplePaper';
+import { Link, useHistory } from 'react-router-dom';
 import { Tab, Tabs } from '@material-ui/core';
 import ComPage from './ComPage';
 import FacPage from './FacPage';
+import ReconnectLoader from './ReconnectLoader';
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     root: {},
     buttons: {
@@ -38,6 +39,7 @@ interface StreamProps {
   handleComPress: () => void;
   handleFacPress: () => void;
   isComStream: boolean;
+  isConnected: boolean;
 }
 
 export default function StreamPage(props: StreamProps) {
@@ -46,11 +48,21 @@ export default function StreamPage(props: StreamProps) {
   const [isComTab, setIsComTab] = useState(true);
   const [value, setValue] = useState(0);
 
+  const history = useHistory();
+
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     if (newValue === 0) {
       setIsComTab(true);
     } else setIsComTab(false);
     setValue(newValue);
+  };
+
+  const navigateBack = () => {
+    history.push({
+      pathname: '/ip',
+    });
+
+    console.log('back');
   };
 
   return (
@@ -63,19 +75,25 @@ export default function StreamPage(props: StreamProps) {
         onChange={handleTabChange}
         aria-label="disabled tabs example"
       >
-        <Tab label="Command Stream" onClick={props.handleComPress}></Tab>
-        <Tab label="Expression Stream" onClick={props.handleFacPress} />
+        <Tab label="Mental command" onClick={props.handleComPress} />
+        <Tab label="Facial expression" onClick={props.handleFacPress} />
       </Tabs>
       <div className={classes.contentContainer}>
         {isComTab ? (
           <ComPage
             isComStream={props.isComStream}
             handleChange={props.handleChange}
+            hasConnection={props.isConnected}
           />
         ) : (
-          <FacPage />
+          <FacPage hasConnection={props.isConnected} />
         )}
       </div>
+      <ReconnectLoader
+        handleCountDownReached={navigateBack}
+        open={!props.isConnected}
+        seconds={60}
+      />
 
       <div className={classes.buttons}>
         <Link to="/ip">
