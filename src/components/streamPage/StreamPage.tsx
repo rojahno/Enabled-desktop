@@ -75,17 +75,18 @@ export default function StreamPage(props: StreamProps) {
         onChange={handleTabChange}
         aria-label="disabled tabs example"
       >
-        <Tab label="Command Stream" onClick={props.handleComPress} />
-        <Tab label="Expression Stream" onClick={props.handleFacPress} />
+        <Tab label="Mental command" onClick={props.handleComPress} />
+        <Tab label="Facial expression" onClick={props.handleFacPress} />
       </Tabs>
       <div className={classes.contentContainer}>
         {isComTab ? (
           <ComPage
             isComStream={props.isComStream}
             handleChange={props.handleChange}
+            hasConnection={props.isConnected}
           />
         ) : (
-          <FacPage />
+          <FacPage hasConnection={props.isConnected} />
         )}
       </div>
       <ReconnectLoader

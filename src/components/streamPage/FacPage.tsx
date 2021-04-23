@@ -1,5 +1,6 @@
 import React from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
+import StreamIndicator from './StreamIndicator';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -25,19 +26,19 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 );
-
-export default function FacPage() {
+interface Facprops {
+  hasConnection: boolean;
+}
+export default function FacPage(props:Facprops) {
   const classes = useStyles();
 
   return (
     <div>
       <div className={classes.textContainer}>
-        <p>
-          This stream will use the results of the facial expressions detection.
-        </p>
+        <StreamIndicator isLive={props.hasConnection} />
         <p>
           The supported commands are: Neutral, Smile, Wink left, Wink right and
-          Blink
+          Raise brows
         </p>
       </div>
     </div>

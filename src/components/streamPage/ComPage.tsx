@@ -1,6 +1,7 @@
 import React from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import SettingSlider from './SettingSlider';
+import StreamIndicator from './StreamIndicator';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -29,6 +30,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface ComProps {
   isComStream: boolean;
+  hasConnection: boolean;
   handleChange: (
     event: React.ChangeEvent<{}>,
     value: number | number[]
@@ -40,10 +42,7 @@ export default function ComPage(props: ComProps) {
 
   return (
     <div className={classes.root}>
-      <p>This stream will use the results of the mental commands.</p>
-      <p>The supported commands are: Neutral, Push, Pull, Left and Right</p>
-  
-
+      <StreamIndicator isLive={props.hasConnection} />
       <div className={classes.container}>
         <SettingSlider
           sliderTitle={'Headset sensitivity'}
@@ -58,6 +57,7 @@ export default function ComPage(props: ComProps) {
           }
         />
       </div>
+      <p>The supported commands are: Neutral, Push, Pull, Left and Right</p>
       <div className={classes.textContainer}>
         <p></p>
       </div>

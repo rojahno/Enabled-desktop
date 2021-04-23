@@ -44,9 +44,7 @@ export default function ReconnectLoader(props: ReconnectLoaderProps) {
   const [secondsLeft, setSecondsLeft] = useState(props.seconds);
   const [isOpen] = useState(props.open);
 
-  const handleClose = () => {
-    props.handleCountDownReached();
-  };
+  const handleClose = () => {};
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -66,6 +64,7 @@ export default function ReconnectLoader(props: ReconnectLoaderProps) {
       className={classes.dialogContainer}
       aria-labelledby=""
       open={props.open}
+      onClose={handleClose}
       PaperProps={{
         style: {
           backgroundColor: 'transparent',
@@ -79,7 +78,7 @@ export default function ReconnectLoader(props: ReconnectLoaderProps) {
           <p className={classes.title}>Reconnecting</p>
           <p>{secondsLeft}</p>
           <LoadingCircle loading={true} delay={'0ms'} color={'#ffffff'} />
-          <button onClick={handleClose}>Cancel</button>
+          <button onClick={props.handleCountDownReached}>Cancel</button>
         </div>
       </Paper>
     </Dialog>

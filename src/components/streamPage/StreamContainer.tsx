@@ -141,15 +141,13 @@ const StreamContainer = () => {
   useEffect(() => {
     const intervalId = setInterval(() => {
       let mobileDriver: MobileDriver = MobileDriver.getInstance();
-      console.log('Mobiledriver connected: ' + mobileDriver.isConnected());
+
       if (!mobileDriver.isConnected()) {
         if (isConnected) {
-          console.log('set false');
           setIsConnected(false);
         }
       } else {
         if (!isConnected) {
-          console.log('set true');
           setIsConnected(true);
         }
       }
