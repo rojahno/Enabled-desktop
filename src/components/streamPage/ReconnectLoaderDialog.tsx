@@ -64,7 +64,6 @@ export default function ReconnectLoader(props: ReconnectLoaderProps) {
   return (
     <Dialog
       className={classes.dialogContainer}
-      onClose={handleClose}
       aria-labelledby=""
       open={props.open}
       PaperProps={{
