@@ -18,10 +18,7 @@ interface SelectPageProps {
   hasSelected: boolean;
   isLoading: boolean;
 }
-/**
- * @param _props
- * @returns
- */
+
 export default function SelectProfilePage(props: SelectPageProps) {
   return (
     <SimplePaper>

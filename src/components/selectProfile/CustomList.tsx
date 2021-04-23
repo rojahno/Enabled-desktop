@@ -1,12 +1,12 @@
 import React from 'react';
-import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { List } from '@material-ui/core';
 import ListItem from '@material-ui/core/ListItem';
 import { LoadingCircle } from '../utils/LoadingCircle';
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
-    root: {
+    CustomList: {
       display: 'flex',
       flexDirection: 'column',
       minHeight: 0,
@@ -48,13 +48,17 @@ function CustomList(props: listProps) {
     return (
       <div className={classes.loadingBarContent}>
         <div>
-          <LoadingCircle loading={props.isLoading} delay={'0ms'} color={'#3c3c3c'} />
+          <LoadingCircle
+            loading={props.isLoading}
+            delay={'0ms'}
+            color={'#3c3c3c'}
+          />
         </div>
       </div>
     );
   } else {
     return (
-      <div className={classes.root}>
+      <div className={classes.CustomList}>
         <List data-testid="list">
           {props.profiles.map((profile, index) => (
             <ListItem

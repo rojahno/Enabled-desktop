@@ -379,8 +379,8 @@ class CortexDriver {
   /**
    * Starts the fac stream and notifies the observers.
    *
-   * @param authToken
-   * @param sessionId
+   * @param authToken - The cortex token
+   * @param sessionId - the session id
    */
   public startFacStream = async (authToken: string, sessionId: string) => {
     const SUB_REQUEST_ID = 26;
@@ -476,6 +476,8 @@ class CortexDriver {
   /**
    * This method is to get the active action for the mental command detection.
    *If the status is "get" then the result is and array of strings.
+   * @param authToken - The cortex token
+   * @param profile - the headset profile
    **/
   public getMentalCommandActiveActionRequest = (
     authToken: string,
@@ -684,7 +686,6 @@ class CortexDriver {
    * @param headsetId The headset id.
    *
    * @returns an response object with the currently used profile.
-   * @todo Returns the profile name
    */
   public getCurrentProfile = async (
     authToken: string,
@@ -714,7 +715,7 @@ class CortexDriver {
     });
   };
   /**
-   *
+   *Sets the sensitivity for the mental commands.
    * @param authToken The auth token
    * @param profile The profile you would like to set the sensitivity for
    * @param sessionId The session id
@@ -784,7 +785,7 @@ class CortexDriver {
   };
 
   /**
-   *
+   * Retrieves the sensitivity for the mental commands.
    * @param authToken The auth token
    * @param profile The profile you would like to get the sensitivity for.
    * @returns An array of 4 sensitivity values.

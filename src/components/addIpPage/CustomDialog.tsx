@@ -15,7 +15,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Link from '@material-ui/core/Link';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
-import { DialogContentText, Divider } from '@material-ui/core';
+import { Divider } from '@material-ui/core';
 import iphoneSettings from './../../images/iphone-settings.png';
 import iphoneWifi from './../../images/iphone-settings-wifi.png';
 import iphoneAbout from './../../images/iphone-settings-about.png';

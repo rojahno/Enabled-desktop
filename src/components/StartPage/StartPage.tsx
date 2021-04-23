@@ -52,9 +52,9 @@ export default function StartPage(props: StartPageProps) {
       return false;
     } else return true;
   };
-/**
- * Navigates to the next page.
- */
+  /**
+   * Navigates to the next page.
+   */
   const navigateNext = () => {
     history.push({ pathname: '/select' });
   };
@@ -92,10 +92,9 @@ export default function StartPage(props: StartPageProps) {
           {props.isClicked ? 'Reconnect' : 'Connect'}
         </button>
 
-        <button 
-        onClick={navigateNext}
-        disabled={enableNext()}>
-          Next</button>
+        <button onClick={navigateNext} disabled={enableNext()}>
+          Next
+        </button>
       </div>
     </SimplePaper>
   );

@@ -36,7 +36,7 @@ class MobileDriver implements IObserver {
   }
 
   /**
-   *
+   * Checks the fac object for other strings than "neutral".
    * @returns The fac command
    */
   lookForFacCommand = (command: FacDataSample) => {
@@ -210,7 +210,7 @@ class MobileDriver implements IObserver {
     this._socket.close();
   }
   /**
-   * Checks if we can reconnect or we have reaches our maximun amount of tries.
+   * Checks if we can reconnect or if we have reaches our maximun amount of tries.
    **/
   private canRetry(): boolean {
     return this.retryCount > 0;
@@ -223,7 +223,6 @@ class MobileDriver implements IObserver {
   sendMentalCommand = async (text: string) => {
     if (this._socket.OPEN === 1) {
       let command: string = '';
-      //let state: number = this.getRandomInt(4) + 1;
       let state = text;
       switch (state) {
         case 'right':
@@ -299,7 +298,6 @@ class MobileDriver implements IObserver {
         default:
           {
             command = 'neutral';
-            //this.previousTriggerTime = this.currentTime;
           }
           break;
       }

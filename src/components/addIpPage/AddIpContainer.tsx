@@ -13,7 +13,7 @@ const AddIpContainer = () => {
   const history = useHistory();
 
   /**
-   * Checks if the input is a valid ip adress.
+   * Checks if the input is a valid ip adress when the input is changed.
    * @param event the input event
    */
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {

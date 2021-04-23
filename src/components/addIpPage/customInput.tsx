@@ -33,7 +33,7 @@ const CssTextField = withStyles({
 //Change the style of the element
 const useStyles = makeStyles(function (theme: Theme) {
   return createStyles({
-    root: {
+    TextField: {
       margin: theme.spacing(2),
       width: theme.spacing(23),
       textAlign: 'center',
@@ -51,8 +51,8 @@ const CustomInput = (props: inputProps) => {
 
   return (
     <CssTextField
-    data-testid="input"
-      className={classes.root}
+      data-testid="input"
+      className={classes.TextField}
       error={false}
       hiddenLabel={true}
       inputProps={{ min: 0, style: { textAlign: 'center' } }}

@@ -55,7 +55,6 @@ const StreamContainer = () => {
         authToken,
         sessionId
       );
-      console.log('signature: ' + signature);
       await driver.startFacStream(authToken, sessionId);
       setsessionId(sessionId);
       setIsComStream(false);
