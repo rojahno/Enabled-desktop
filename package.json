@@ -49,7 +49,8 @@
       "hardenedRuntime": true,
       "entitlements": "assets/entitlements.mac.plist",
       "entitlementsInherit": "assets/entitlements.mac.plist",
-      "gatekeeperAssess": false
+      "gatekeeperAssess": false,
+      "icon":"assets/enabledbackgroundmac.icns"
     },
     "dmg": {
       "contents": [
@@ -66,11 +67,14 @@
       ]
     },
     "win": {
+      "icon":"assets/enabledLogo.ico",
       "target": [
         "nsis"
       ]
+      
     },
     "linux": {
+      "icon":"assets/enabledLogoPNG.png",
       "target": [
         "AppImage"
       ],
