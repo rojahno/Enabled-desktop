@@ -3,9 +3,6 @@ import CortexError from './CortexError';
 
 class CortexFacade {
   private driver = CortexDriver.getInstance();
-  private accessError: boolean = true;
-  private headsetError: boolean = true;
-  private deviceError: boolean = true;
 
   /**
    * Unloads the old profile and loads the new profile.
@@ -98,13 +95,6 @@ class CortexFacade {
     }
   };
 
-  /**
-   * Gets the state of errors when connecting to the headset
-   * @returns array of errors
-   */
-  getSetupErrors = () => {
-    return [this.accessError, this.headsetError, this.deviceError];
-  };
   /**
    * Check if the error was an instance of Cortex error.
    * @param error The error we would like to check.
