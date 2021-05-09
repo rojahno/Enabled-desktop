@@ -1,7 +1,7 @@
 {
   "name": "enabled-desktop-app",
   "productName": "enabled-desktop-app",
-  "version": "1.0.1",
+  "version": "2.4.0",
   "description": "This Project was created as a Bachelor Thesis at Norwegian University of Science and Technology in Ålesund. The aim of the project is to give patients with ALS a way to perform simple tasks and communicate with the people around them using the Emotiv Epoc X Headset",
   "main": "./main.prod.js",
   "author": {
