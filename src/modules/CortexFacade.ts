@@ -8,7 +8,6 @@ class CortexFacade {
   private headsetId: string = '';
   private sessionId: string = '';
   private profile: string = '';
-  private hasLoadedProfile: boolean = false;
   private allProfiles: string[] = [];
 
   private constructor() {}
@@ -78,6 +77,12 @@ class CortexFacade {
     }
   };
 
+  /**
+   * Changes the sensitivity for the mental commands. Is currently only supported for the Com-stream.
+   * @param sensitivity The new sensitivity for the headset
+   * @param isComStream A boolean to confirm that the current stream is the com stream.
+   * @returns Undefined or a CortexError if an error occurrs.
+   */
   setHeadsetSensitivity = async (
     sensitivity: number[],
     isComStream: boolean
@@ -109,6 +114,10 @@ class CortexFacade {
     }
   };
 
+  /**
+   * Fetches all the needed data and starts the Com-stream.
+   * @returns Undefined or a CortexError if an error occurrs.
+   */
   startStream = async () => {
     try {
       this.headsetId = await this.driver.queryHeadsetId();
@@ -120,7 +129,7 @@ class CortexFacade {
         this.authToken,
         this.headsetId
       );
-
+      await this.driver.startComStream(this.authToken, this.sessionId);
       return;
     } catch (error) {
       return this.errorHandling(error);
@@ -139,10 +148,6 @@ class CortexFacade {
     try {
       this.authToken = await this.driver.authorize();
       this.headsetId = await this.driver.queryHeadsetId();
-      this.hasLoadedProfile = await this.driver.hasCurrentProfile(
-        this.authToken,
-        this.headsetId
-      );
 
       return false;
     } catch (error) {
@@ -151,6 +156,10 @@ class CortexFacade {
     }
   };
 
+/**
+ * Closes the session, opens a new one and changes the stream to the Fac-stream.
+ * @returns Undefined or a CortexError if an error occurrs.
+ */
   changeToFacStream = async () => {
     try {
       await this.driver.closeSession();
@@ -183,9 +192,10 @@ class CortexFacade {
     }
   };
 
-  /**
-   * Handles the setup and checks for potential errors.
-   */
+/**
+ * Handles the setup and checks for potential errors.
+ * @returns Undefined or a CortexError if an error occurrs.
+ */
   handleSetup = async () => {
     try {
       if (!this.driver.isConnected()) {
