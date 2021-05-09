@@ -38,7 +38,7 @@ class CortexDriver {
   private cortexToken: string = '';
   private sessionId: string = '';
 
-  constructor() {
+  private constructor() {
     this._socket = new WebSocket('wss://localhost:6868');
     this._user = {
       license: '',

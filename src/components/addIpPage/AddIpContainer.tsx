@@ -59,7 +59,7 @@ const AddIpContainer = () => {
   const handleNextClick = async () => {
     try {
       setOpenLoadingCircle(true);
-      let cortexFacade = new CortexFacade();
+      let cortexFacade = CortexFacade.getInstance();
       let hasErrors = await cortexFacade.hasConnectivityErrors();
 
       if (hasErrors instanceof CortexError) {

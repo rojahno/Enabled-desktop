@@ -16,8 +16,8 @@ const StartPageContainer = () => {
    */
   async function connectClicked() {
     try {
-      const facade = new CortexFacade();
-      let setupErrors: CortexError | undefined = await facade.handleSetupApp();
+      const facade = CortexFacade.getInstance();
+      let setupErrors: CortexError | undefined = await facade.handleSetup();
 
       if (setupErrors instanceof CortexError) {
         setHasError(true);

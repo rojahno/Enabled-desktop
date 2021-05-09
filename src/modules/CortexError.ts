@@ -62,7 +62,7 @@ class CortexError {
         break;
         case 8:
           {
-            return 'This application cant\'t unload the profile. Check if headseth is in use on another application.';
+            return 'This application cant\'t unload the profile. Check if the headset is used by another application.';
           }
         break;
         case 9:

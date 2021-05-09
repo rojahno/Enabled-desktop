@@ -2,14 +2,26 @@ import { CortexDriver } from './CortexDriver';
 import CortexError from './CortexError';
 
 class CortexFacade {
+  private static instance: CortexFacade;
   private driver = CortexDriver.getInstance();
+  private authToken: string = '';
+  private constructor() {
+  }
+
+  static getInstance(): CortexFacade {
+    if (CortexFacade.instance) {
+      return CortexFacade.instance;
+    }
+    CortexFacade.instance = new CortexFacade();
+    return CortexFacade.instance;
+  }
 
   /**
    * Unloads the old profile and loads the new profile.
    * @param selectedProfile The selected profile
    * @returns
    */
-  handleSetProfile = async (selectedProfile: string) => {
+  SetProfile = async (selectedProfile: string) => {
     try {
       if (!this.driver.isConnected()) {
         let connected = await this.driver.awaitSocketOpening();
@@ -49,10 +61,10 @@ class CortexFacade {
   hasConnectivityErrors = async () => {
     try {
       let driver: CortexDriver = CortexDriver.getInstance();
-      let authToken: string = await driver.authorize();
+      this.authToken = await driver.authorize();
       let headsetId: string = await driver.queryHeadsetId();
       let hasLoadedProfile = await driver.hasCurrentProfile(
-        authToken,
+        this.authToken,
         headsetId
       );
 
@@ -64,9 +76,9 @@ class CortexFacade {
   };
 
   /**
-   * Handles the setup tand looks for errors.
+   * Handles the setup and checks for potensial errors.
    */
-  handleSetupApp = async () => {
+  handleSetup = async () => {
     try {
       if (!this.driver.isConnected()) {
         let connected = await this.driver.awaitSocketOpening();

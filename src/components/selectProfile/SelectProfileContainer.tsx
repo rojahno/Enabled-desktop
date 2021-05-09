@@ -35,9 +35,9 @@ const SelectProfileContainer = () => {
    * Tries to set the current profile to the selected and navigates to the next page.
    */
   const handleNextClick = async (): Promise<void> => {
-    let cortexfacade: CortexFacade = new CortexFacade();
+    let cortexfacade: CortexFacade = CortexFacade.getInstance();
     try {
-      let setProfileStatus = await cortexfacade.handleSetProfile(
+      let setProfileStatus = await cortexfacade.SetProfile(
         selectedProfile
       );
 
