@@ -27,9 +27,10 @@ const AddIpContainer = () => {
   };
 
   /**
-   * Check if the ip adress is valid.
+   * Regex to check if the ip adress is valid. Found on https://www.w3resource.com/javascript/form/ip-address-validation.php.
    * @param ipAdress The ip adress we would like to check
-   * @returns
+   * @returns True if the ip address is valid and false if not. 
+   * 
    */
   const hasValidIPaddress = (ipAdress: string) => {
     if (
@@ -67,7 +68,6 @@ const AddIpContainer = () => {
         setOpenLoadingCircle(false);
       } else {
         let validIpAdress = hasValidIPaddress(ipAdress);
-        console.log('valid ip: ' + validIpAdress);
         setValidIpAdress(validIpAdress);
         if (validIpAdress) {
           let mobileDriver = MobileDriver.getInstance();

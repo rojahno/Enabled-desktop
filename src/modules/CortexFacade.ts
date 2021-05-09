@@ -5,6 +5,12 @@ class CortexFacade {
   private static instance: CortexFacade;
   private driver = CortexDriver.getInstance();
   private authToken: string = '';
+  private headsetId: string = '';
+  private sessionId: string = '';
+  private profile: string = '';
+  private hasLoadedProfile: boolean = false;
+  private allProfiles: string[] = [];
+
   private constructor() {}
 
   static getInstance(): CortexFacade {
@@ -22,10 +28,8 @@ class CortexFacade {
   getProfiles = async () => {
     try {
       this.authToken = await this.driver.authorize();
-      let allProfiles: string[] = await this.driver.queryProfileRequest(
-        this.authToken
-      );
-      return allProfiles;
+      this.allProfiles = await this.driver.queryProfileRequest(this.authToken);
+      return this.allProfiles;
     } catch (error) {
       return this.errorHandling(error);
     }
@@ -44,20 +48,25 @@ class CortexFacade {
           return new CortexError(6, '');
         }
       }
-      let authoken: string = await this.driver.authorize();
-      let headsetId: string = await this.driver.queryHeadsetId();
+      this.authToken = await this.driver.authorize();
+      this.headsetId = await this.driver.queryHeadsetId();
 
       let hasLoadedProfile = await this.driver.hasCurrentProfile(
-        authoken,
-        headsetId
+        this.authToken,
+        this.headsetId
       );
 
       if (hasLoadedProfile) {
-        await this.driver.setupProfile(authoken, headsetId, '', 'unload');
+        await this.driver.setupProfile(
+          this.authToken,
+          this.headsetId,
+          '',
+          'unload'
+        );
       }
       await this.driver.setupProfile(
-        authoken,
-        headsetId,
+        this.authToken,
+        this.headsetId,
         selectedProfile,
         'load'
       );
@@ -69,18 +78,70 @@ class CortexFacade {
     }
   };
 
+  setHeadsetSensitivity = async (
+    sensitivity: number[],
+    isComStream: boolean
+  ) => {
+    try {
+      this.profile = await this.driver.getCurrentProfile(
+        this.authToken,
+        this.headsetId
+      );
+      await this.driver.setSensitivity(
+        this.authToken,
+        this.profile,
+        this.sessionId,
+        sensitivity
+      );
+      await this.driver.saveProfile(
+        this.authToken,
+        this.headsetId,
+        this.profile
+      );
+      if (isComStream) {
+        this.driver.setComStreamOnmessageEvent();
+      } else {
+        this.driver.setFacStreamOnmessageEvent();
+      }
+      return;
+    } catch (error) {
+      return this.errorHandling(error);
+    }
+  };
+
+  startStream = async () => {
+    try {
+      this.headsetId = await this.driver.queryHeadsetId();
+      this.sessionId = await this.driver.createSession(
+        this.authToken,
+        this.headsetId
+      );
+      this.profile = await this.driver.getCurrentProfile(
+        this.authToken,
+        this.headsetId
+      );
+
+      return;
+    } catch (error) {
+      return this.errorHandling(error);
+    }
+  };
+
+  closeSession = async () => {
+    await this.driver.closeSession();
+  };
+
   /**
    * Checks for errors from the Emotiv API.
    * @returns false if no errors occured and an error object if an error occures
    */
   hasConnectivityErrors = async () => {
     try {
-      let driver: CortexDriver = CortexDriver.getInstance();
-      this.authToken = await driver.authorize();
-      let headsetId: string = await driver.queryHeadsetId();
-      let hasLoadedProfile = await driver.hasCurrentProfile(
+      this.authToken = await this.driver.authorize();
+      this.headsetId = await this.driver.queryHeadsetId();
+      this.hasLoadedProfile = await this.driver.hasCurrentProfile(
         this.authToken,
-        headsetId
+        this.headsetId
       );
 
       return false;
@@ -90,8 +151,40 @@ class CortexFacade {
     }
   };
 
+  changeToFacStream = async () => {
+    try {
+      await this.driver.closeSession();
+      this.sessionId = await this.driver.createSession(
+        this.authToken,
+        this.headsetId
+      );
+      await this.driver.setFacialExpressionSignatureType(
+        this.authToken,
+        this.sessionId
+      );
+      await this.driver.startFacStream(this.authToken, this.sessionId);
+      return;
+    } catch (error) {
+      return this.errorHandling(error);
+    }
+  };
+
+  changeToComStream = async () => {
+    try {
+      await this.driver.closeSession();
+      this.sessionId = await this.driver.createSession(
+        this.authToken,
+        this.headsetId
+      );
+      await this.driver.startComStream(this.authToken, this.sessionId);
+      return;
+    } catch (error) {
+      return this.errorHandling(error);
+    }
+  };
+
   /**
-   * Handles the setup and checks for potensial errors.
+   * Handles the setup and checks for potential errors.
    */
   handleSetup = async () => {
     try {
@@ -108,10 +201,10 @@ class CortexFacade {
           return new CortexError(3, '');
         }
       }
-      // If an QueryHeadsetId error occurs, it will be catched in the catch clause.
-      let headsetID = await this.driver.queryHeadsetId();
+      // If an QueryHeadsetId error occurs, it will be catched in the catch-clause.
+      this.headsetId = await this.driver.queryHeadsetId();
 
-      let connectData: string = await this.driver.controlDevice(headsetID);
+      let connectData: string = await this.driver.controlDevice(this.headsetId);
       if (connectData.indexOf('error') !== -1) {
         return new CortexError(9, '');
       }

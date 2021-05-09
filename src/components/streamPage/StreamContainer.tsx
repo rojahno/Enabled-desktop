@@ -1,19 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { CortexDriver } from '../../modules/CortexDriver';
 import CortexError from '../../modules/CortexError';
+import { CortexFacade } from '../../modules/CortexFacade';
 import { MobileDriver } from '../../modules/MobileDriver';
 import StreamPage from './StreamPage';
 
 const StreamContainer = () => {
   //Stream useStates
-  const [headsetId, setHeadsetId] = useState('');
-  const [authToken, setAuthToken] = useState('');
-  const [sessionId, setsessionId] = useState('');
-  const [profile, setProfile] = useState('');
+
   const [isComStream, setIsComStream] = useState(true);
   const [isConnected, setIsConnected] = useState(true);
-
-  const [sensitivity, setSensitivity] = useState<number>();
 
   /**
    * Changes the sensitivity of the selected profile.
@@ -26,17 +21,15 @@ const StreamContainer = () => {
   ) => {
     try {
       if (typeof value === 'number') {
-        let driver: CortexDriver = CortexDriver.getInstance();
         let sensitivity = [value, value, value, value];
-        await driver.setSensitivity(authToken, profile, sessionId, sensitivity);
-        await driver.saveProfile(authToken, headsetId, profile);
-        let newSensitivity = await driver.getSensitivity(authToken, profile);
-        if (isComStream) {
-          driver.setComStreamOnmessageEvent();
-        } else {
-          driver.setFacStreamOnmessageEvent();
+        let cortexFacade = CortexFacade.getInstance();
+        let facadeError = cortexFacade.setHeadsetSensitivity(
+          sensitivity,
+          isComStream
+        );
+        if (facadeError instanceof CortexError) {
+          alert(facadeError.errMessage);
         }
-        setSensitivity(newSensitivity[0]);
       }
     } catch (error) {
       console.log(error);
@@ -48,16 +41,13 @@ const StreamContainer = () => {
    */
   const handleFacPress = async () => {
     try {
-      let driver: CortexDriver = CortexDriver.getInstance();
-      await driver.closeSession();
-      let sessionId: string = await driver.createSession(authToken, headsetId);
-      let signature = await driver.setFacialExpressionSignatureType(
-        authToken,
-        sessionId
-      );
-      await driver.startFacStream(authToken, sessionId);
-      setsessionId(sessionId);
-      setIsComStream(false);
+      let cortexFacade = CortexFacade.getInstance();
+      let changedStreamError = cortexFacade.changeToFacStream();
+      if (changedStreamError instanceof CortexError) {
+        alert(changedStreamError.errMessage);
+      } else {
+        setIsComStream(false);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -69,12 +59,13 @@ const StreamContainer = () => {
    */
   const handleComPress = async () => {
     try {
-      let driver: CortexDriver = CortexDriver.getInstance();
-      await driver.closeSession();
-      let sessionId: string = await driver.createSession(authToken, headsetId);
-      await driver.startComStream(authToken, sessionId);
-      setsessionId(sessionId);
-      setIsComStream(true);
+      let cortexFacade = CortexFacade.getInstance();
+      let changedStreamError = cortexFacade.changeToComStream();
+      if (changedStreamError instanceof CortexError) {
+        alert(changedStreamError.errMessage);
+      } else {
+        setIsComStream(true);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -83,44 +74,13 @@ const StreamContainer = () => {
   useEffect(() => {
     const start = async () => {
       try {
-        let driver: CortexDriver = CortexDriver.getInstance();
-        let authToken: string = await driver.authorize();
-        let headsetId: string = await driver.queryHeadsetId();
-        let sessionId: string = await driver.createSession(
-          authToken,
-          headsetId
-        );
-        let profile: string = await driver.getCurrentProfile(
-          authToken,
-          headsetId
-        );
-        let sensitivity: number[] = await driver.getSensitivity(
-          authToken,
-          profile
-        );
-
-        let commands = await driver.getMentalCommandActiveActionRequest(
-          authToken,
-          profile
-        );
-        let startStream: boolean = await driver.startComStream(
-          authToken,
-          sessionId
-        );
-        console.log('started stream: ' + startStream);
-
-        setAuthToken(authToken);
-        setHeadsetId(headsetId);
-        setsessionId(sessionId);
-        setSensitivity(sensitivity[0]);
-        setProfile(profile);
-        console.log(commands);
-      } catch (error) {
-        if (error instanceof CortexError) {
-          alert(error.errMessage);
-        } else {
-          console.error(error);
+        let cortexFacade = CortexFacade.getInstance();
+        let facadeError = cortexFacade.startStream();
+        if (facadeError instanceof CortexError) {
+          alert(facadeError.errMessage);
         }
+      } catch (error) {
+        console.error(error);
       }
     };
 
@@ -128,8 +88,8 @@ const StreamContainer = () => {
 
     const offLoad = () => {
       let mobileDriver: MobileDriver = MobileDriver.getInstance();
-      let driver: CortexDriver = CortexDriver.getInstance();
-      driver.closeSession();
+      let cortecFacade: CortexFacade = CortexFacade.getInstance();
+      cortecFacade.closeSession();
       mobileDriver.closeSocket();
     };
 
