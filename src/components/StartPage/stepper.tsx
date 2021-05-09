@@ -10,7 +10,7 @@ import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from '@material-ui/core/StepContent';
 import { Error, CheckBox, Adjust } from '@material-ui/icons';
-import { StepIconProps, Typography } from '@material-ui/core';
+import { StepIconProps } from '@material-ui/core';
 import StepperContent from './StepperContent';
 
 const StyledStepLabel = styled(StepLabel)({
@@ -47,8 +47,9 @@ const useStyles = makeStyles((theme: Theme) =>
       color: 'white',
     },
     typegraphy: {
-      color: '#3c3c3c',
-      fontSize: '12px',
+      color: '#3c3c3cee',
+      fontSize: '14px',
+      
     },
   })
 );
@@ -111,15 +112,12 @@ export default function VerticalLinearStepper(props: stepProps) {
       return -1;
     }
     if (props.hasAccessError) {
-      console.log(props.hasAccessError);
       return 0;
     }
     if (props.headsetIdError) {
-      console.log(props.headsetIdError);
       return 1;
     }
     if (props.deviceError) {
-      console.log(props.deviceError);
       return 2;
     }
     return 2;
@@ -137,11 +135,9 @@ export default function VerticalLinearStepper(props: stepProps) {
             <StyledStepLabel StepIconComponent={trueFalseStepIcon}>
               {label}
             </StyledStepLabel>
-            <StepperContent canShow={props.hasError}>
-              <Typography className={classes.typegraphy}>
-                {getStepContent(index)}
-              </Typography>
-            </StepperContent>
+            <StepContent className={classes.typegraphy} >
+              <StepperContent showContent={props.hasError}>{getStepContent(index)}</StepperContent>
+            </StepContent>
           </Step>
         ))}
       </Stepper>

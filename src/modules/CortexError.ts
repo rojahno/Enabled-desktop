@@ -65,6 +65,11 @@ class CortexError {
             return 'This application cant\'t unload the profile. Check if headseth is in use on another application.';
           }
         break;
+        case 9:
+          {
+            return 'Can\'t connect to the headset.';
+          }
+        break;
        
 
       default: {

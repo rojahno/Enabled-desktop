@@ -67,32 +67,34 @@ class CortexFacade {
   };
 
   /**
-   * Connects the app to the headset through the Cortex Driver 
+   * Handles the setup tand looks for errors.
    */
   handleSetupApp = async () => {
     try {
       if (!this.driver.isConnected()) {
         let connected = await this.driver.awaitSocketOpening();
         if (!connected) {
-          return;
+          return new CortexError(1, '');
         }
       }
       let hasAccess = await this.driver.hasAccess();
       if (!hasAccess) {
         let requestAccess = await this.driver.requestAccess();
         if (!requestAccess) {
-          return;
+          return new CortexError(3, '');
         }
       }
-      this.accessError = false;
+      // If an QueryHeadsetId error occurs, it will be catched in the catch clause.
       let headsetID = await this.driver.queryHeadsetId();
-      console.log('Facade: handleSetupApp');
-      this.headsetError = false;
-      await this.driver.controlDevice(headsetID);
-      this.deviceError = false;
-    } catch (error) {
 
-      
+      let connectData: string = await this.driver.controlDevice(headsetID);
+      if (connectData.indexOf('error') !== -1) {
+        return new CortexError(9, '');
+      }
+
+      return;
+    } catch (error) {
+      return this.errorHandling(error);
     }
   };
 

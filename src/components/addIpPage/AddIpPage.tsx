@@ -18,7 +18,7 @@ interface AddIpProps {
 }
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {
+    ipContent: {
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
@@ -32,7 +32,7 @@ export default function AddIpPage(props: AddIpProps) {
   const classes = useStyles();
   return (
     <SimplePaper>
-      <div className={classes.root}>
+      <div className={classes.ipContent}>
         <h3>Add the IP of your phone</h3>
         <CustomInput
           handleChange={props.handleChange}
