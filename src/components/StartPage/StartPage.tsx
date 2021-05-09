@@ -72,18 +72,18 @@ export default function StartPage(props: StartPageProps) {
         <div className={classes.text}>
           <h3 hidden={!props.isClicked}>
             {props.hasAccessError
-              ? 'Could not connect to the emotiv app, try to go to the emotiv app to permit access'
-              : 'Connected to the emotiv app'}
+              ? 'Could not connect to the Emotiv app, try to go to the Emotiv BCI app to permit access.'
+              : 'Connected to the Emotiv BCI app.'}
           </h3>
           <h3 hidden={!props.isClicked}>
             {props.headsetIdError
-              ? 'Could not retrieve the ID of your headset, please try to reconnect your emotiv headwear'
-              : 'Headset ID retrieved'}
+              ? 'Could not find any headset. Please make sure the headset is turned on and connected.'
+              : 'Headset found.'}
           </h3>
           <h3 hidden={!props.isClicked}>
             {props.deviceError
-              ? 'Could not connect to your emotiv device, check that your device is connected and not in need of a firmware update'
-              : 'Connected to emotiv device'}
+              ? 'Could not connect to your Emotiv headset. Please restart the device and try again.'
+              : 'Connected to emotiv headset.'}
           </h3>
         </div>
       </div>

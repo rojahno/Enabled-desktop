@@ -50,9 +50,9 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function getSteps() {
   return [
-    'Requesting permission from the emotiv app',
-    'Getting headset ID',
-    'Connecting to headset',
+    'Requesting permission from the Emotiv app',
+    'Looking for available headsets',
+    'Connecting to the headset',
   ];
 }
 
