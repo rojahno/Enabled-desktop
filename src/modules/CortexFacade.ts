@@ -5,8 +5,7 @@ class CortexFacade {
   private static instance: CortexFacade;
   private driver = CortexDriver.getInstance();
   private authToken: string = '';
-  private constructor() {
-  }
+  private constructor() {}
 
   static getInstance(): CortexFacade {
     if (CortexFacade.instance) {
@@ -15,6 +14,22 @@ class CortexFacade {
     CortexFacade.instance = new CortexFacade();
     return CortexFacade.instance;
   }
+
+  /**
+   * Fetches the users from the Cortex driver.
+   * Returns an array of all the profile names.
+   */
+  getProfiles = async () => {
+    try {
+      this.authToken = await this.driver.authorize();
+      let allProfiles: string[] = await this.driver.queryProfileRequest(
+        this.authToken
+      );
+      return allProfiles;
+    } catch (error) {
+      return this.errorHandling(error);
+    }
+  };
 
   /**
    * Unloads the old profile and loads the new profile.

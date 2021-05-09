@@ -18,11 +18,12 @@ const SelectProfileContainer = () => {
     //Retrieves the profiles
     const getProfiles = async () => {
       try {
-        let driver = CortexDriver.getInstance();
-        let authToken = await driver.authorize();
-        let allProfiles = await driver.queryProfileRequest(authToken);
+        let cortexfacade = CortexFacade.getInstance();
+        let allProfiles = await cortexfacade.getProfiles();
         setIsLoading(false);
-        setProfiles(allProfiles);
+        if (Array.isArray(allProfiles)) {
+          setProfiles(allProfiles);
+        }
       } catch (error) {
         setIsLoading(false);
       }
@@ -37,9 +38,7 @@ const SelectProfileContainer = () => {
   const handleNextClick = async (): Promise<void> => {
     let cortexfacade: CortexFacade = CortexFacade.getInstance();
     try {
-      let setProfileStatus = await cortexfacade.SetProfile(
-        selectedProfile
-      );
+      let setProfileStatus = await cortexfacade.SetProfile(selectedProfile);
 
       if (setProfileStatus instanceof CortexError) {
         alert(setProfileStatus.errMessage);
