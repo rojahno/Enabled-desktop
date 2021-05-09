@@ -90,7 +90,10 @@ class CortexFacade {
       this.headsetError = false;
       await this.driver.controlDevice(headsetID);
       this.deviceError = false;
-    } catch (error) {}
+    } catch (error) {
+
+      
+    }
   };
 
   /**

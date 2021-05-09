@@ -10,7 +10,8 @@ import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from '@material-ui/core/StepContent';
 import { Error, CheckBox, Adjust } from '@material-ui/icons';
-import { StepIconProps } from '@material-ui/core';
+import { StepIconProps, Typography } from '@material-ui/core';
+import StepperContent from './StepperContent';
 
 const StyledStepLabel = styled(StepLabel)({
   '& .MuiStepLabel-label': {
@@ -45,6 +46,10 @@ const useStyles = makeStyles((theme: Theme) =>
     notHandledIcon: {
       color: 'white',
     },
+    typegraphy: {
+      color: '#3c3c3c',
+      fontSize: '12px',
+    },
   })
 );
 
@@ -56,10 +61,24 @@ function getSteps() {
   ];
 }
 
+function getStepContent(step: number) {
+  switch (step) {
+    case 0:
+      return 'Could not connect to the Emotiv app, try to go to the Emotiv BCI app to permit access.';
+    case 1:
+      return 'Could not find any headset. Please make sure the headset is turned on and connected.';
+    case 2:
+      return 'Could not connect to your Emotiv headset. Please restart the device and try again.';
+    default:
+      return 'Unknown step';
+  }
+}
+
 interface stepProps {
   hasAccessError: boolean;
   headsetIdError: boolean;
   deviceError: boolean;
+  hasError: boolean;
   isClicked: boolean;
 }
 
@@ -113,12 +132,16 @@ export default function VerticalLinearStepper(props: stepProps) {
         activeStep={handleChange()}
         orientation="vertical"
       >
-        {steps.map((label) => (
+        {steps.map((label, index) => (
           <Step key={label}>
             <StyledStepLabel StepIconComponent={trueFalseStepIcon}>
               {label}
             </StyledStepLabel>
-            <StepContent></StepContent>
+            <StepperContent canShow={props.hasError}>
+              <Typography className={classes.typegraphy}>
+                {getStepContent(index)}
+              </Typography>
+            </StepperContent>
           </Step>
         ))}
       </Stepper>

@@ -67,6 +67,7 @@ export default function StartPage(props: StartPageProps) {
           headsetIdError={props.headsetIdError}
           deviceError={props.deviceError}
           isClicked={props.isClicked}
+          hasError={props.deviceError}
         />
 
         <div className={classes.text}>
