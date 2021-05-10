@@ -23,6 +23,7 @@ import androidSettingsFirst from '../../images/Android-Settings-Main-1.jpg';
 import androidSettingsSecond from '../../images/Android-Settings-Main-2.jpg';
 import androidAbout from '../../images/Android-Settings-About.jpg';
 import androidStatus from '../../images/Android-Settings-Status.jpg';
+import mobileIp from '../../images/mobile-ip.jpg';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -145,7 +146,8 @@ export default function CustomDialog(_props: any) {
             <ol>
               <li>Open the enabled mobile app</li>
               <li>Press the menu button</li>
-              <li>Press how to find ip</li>
+              <img className={classes.image} src={mobileIp} />
+              <li>Press "Show Mobile IP address" </li>
               <li>It should now be displayed to you</li>
             </ol>
           </div>
