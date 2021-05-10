@@ -9,6 +9,7 @@ const StreamContainer = () => {
 
   const [isComStream, setIsComStream] = useState(true);
   const [isConnected, setIsConnected] = useState(true);
+  const cortexFacade = CortexFacade.getInstance();
 
   /**
    * Changes the sensitivity of the selected profile.
@@ -22,7 +23,6 @@ const StreamContainer = () => {
     try {
       if (typeof value === 'number') {
         let sensitivity = [value, value, value, value];
-        let cortexFacade = CortexFacade.getInstance();
         let facadeError = cortexFacade.setHeadsetSensitivity(
           sensitivity,
           isComStream
@@ -41,7 +41,6 @@ const StreamContainer = () => {
    */
   const handleFacPress = async () => {
     try {
-      let cortexFacade = CortexFacade.getInstance();
       let changedStreamError = cortexFacade.changeToFacStream();
       if (changedStreamError instanceof CortexError) {
         alert(changedStreamError.errMessage);
@@ -59,7 +58,6 @@ const StreamContainer = () => {
    */
   const handleComPress = async () => {
     try {
-      let cortexFacade = CortexFacade.getInstance();
       let changedStreamError = cortexFacade.changeToComStream();
       if (changedStreamError instanceof CortexError) {
         alert(changedStreamError.errMessage);
@@ -74,7 +72,6 @@ const StreamContainer = () => {
   useEffect(() => {
     const start = async () => {
       try {
-        let cortexFacade = CortexFacade.getInstance();
         let facadeError = cortexFacade.startStream();
         if (facadeError instanceof CortexError) {
           alert(facadeError.errMessage);
@@ -88,8 +85,7 @@ const StreamContainer = () => {
 
     const offLoad = () => {
       let mobileDriver: MobileDriver = MobileDriver.getInstance();
-      let cortecFacade: CortexFacade = CortexFacade.getInstance();
-      cortecFacade.closeSession();
+      cortexFacade.closeSession();
       mobileDriver.closeSocket();
     };
 

@@ -16,6 +16,7 @@ import StepperContent from './StepperContent';
 const StyledStepLabel = styled(StepLabel)({
   '& .MuiStepLabel-label': {
     color: '#3c3c3c',
+    fontWeight: 'bold',
   },
 });
 
@@ -49,7 +50,6 @@ const useStyles = makeStyles((theme: Theme) =>
     typegraphy: {
       color: '#3c3c3cee',
       fontSize: '14px',
-      
     },
   })
 );
@@ -135,8 +135,10 @@ export default function VerticalLinearStepper(props: stepProps) {
             <StyledStepLabel StepIconComponent={trueFalseStepIcon}>
               {label}
             </StyledStepLabel>
-            <StepContent className={classes.typegraphy} >
-              <StepperContent showContent={props.hasError}>{getStepContent(index)}</StepperContent>
+            <StepContent className={classes.typegraphy}>
+              <StepperContent showContent={props.hasError}>
+                {getStepContent(index)}
+              </StepperContent>
             </StepContent>
           </Step>
         ))}

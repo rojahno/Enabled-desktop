@@ -29,6 +29,7 @@ class MobileDriver implements IObserver {
           this.sendMentalCommand(command.com[0]);
         } else if ('fac' in command) {
           let facCommand: string = this.lookForFacCommand(command);
+          console.log('Mental stream command sent: ' + facCommand);
           this.sendFacialExpression(facCommand);
         }
       }
@@ -203,10 +204,7 @@ class MobileDriver implements IObserver {
    * Closes the socket and unsubscribes to the stream.
    */
   closeSocket() {
-    this._socket.onclose = (_error) => {
-      this.unsubscribeToCortexStream();
-      console.log('closing stream');
-    };
+    this.retryCount = CONNECTION_RETRY_MAX_COUNT +1;
     this._socket.close();
   }
   /**
@@ -248,7 +246,6 @@ class MobileDriver implements IObserver {
         default:
           {
             command = 'neutral';
-            this.previousTriggerTime = this.currentTime;
           }
           break;
       }

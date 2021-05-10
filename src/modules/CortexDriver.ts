@@ -910,16 +910,12 @@ class CortexDriver {
 
   /**
    * Unsubscribes to the stream.
-   * @param observer the observer to remove
+   * @param observer the observer to remove from the array.
    */
 
   public unsubscribe(observer: IObserver) {
     let observerToRemove = observer;
-    console.log('NR observers before unsubscribe: ' + this.observers.length);
-
-    this.observers = [];
-    this.observers.filter((item) => item !== observerToRemove);
-    console.log('NR observers after unsubscribe: ' + this.observers.length);
+    this.observers = this.observers.filter((item) => item !== observerToRemove);
   }
 
   /**

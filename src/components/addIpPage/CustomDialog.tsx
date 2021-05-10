@@ -19,10 +19,10 @@ import { Divider } from '@material-ui/core';
 import iphoneSettings from './../../images/iphone-settings.png';
 import iphoneWifi from './../../images/iphone-settings-wifi.png';
 import iphoneAbout from './../../images/iphone-settings-about.png';
-import androidSettingsFirst from '../../images/Android-Settings-Main-1.jpg'
-import androidSettingsSecond from '../../images/Android-Settings-Main-2.jpg'
-import androidAbout from '../../images/Android-Settings-About.jpg'
-import androidStatus from '../../images/Android-Settings-Status.jpg'
+import androidSettingsFirst from '../../images/Android-Settings-Main-1.jpg';
+import androidSettingsSecond from '../../images/Android-Settings-Main-2.jpg';
+import androidAbout from '../../images/Android-Settings-About.jpg';
+import androidStatus from '../../images/Android-Settings-Status.jpg';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -42,7 +42,7 @@ const styles = (theme: Theme) =>
 const useStyles = makeStyles(function (theme: Theme) {
   return createStyles({
     root: {
-      color:'#3c3c3c',
+      color: '#3c3c3c',
       textDecoration: 'underline',
       fontSize: '4',
     },
@@ -140,16 +140,18 @@ export default function CustomDialog(_props: any) {
           How to find ip
         </DialogTitle>
         <DialogContent dividers className={classes.dialogContent}>
-          <h3>On enabled app:</h3>
+          <h3>On enabled mobile app:</h3>
           <div>
             <ol>
-              <li>Open the enabled app</li>
-              <li>Press the ip button</li>
+              <li>Open the enabled mobile app</li>
+              <li>Press the menu button</li>
+              <li>Press how to find ip</li>
+              <li>It should now be displayed to you</li>
             </ol>
           </div>
           <Divider className={classes.divider} />
           <h3>On iphone:</h3>
-          <div >
+          <div>
             <ol>
               <li>Open settings</li>
               <li>Press the 'Wi-Fi' tab</li>
