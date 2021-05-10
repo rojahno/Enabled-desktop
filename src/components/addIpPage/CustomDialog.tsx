@@ -146,7 +146,9 @@ export default function CustomDialog(_props: any) {
             <ol>
               <li>Open the enabled mobile app</li>
               <li>Press the menu button</li>
-              <img className={classes.image} src={mobileIp} />
+              <div className={classes.imageContainer}>
+                <img className={classes.image} src={mobileIp} />
+              </div>
               <li>Press "Show Mobile IP address" </li>
               <li>It should now be displayed to you</li>
             </ol>
