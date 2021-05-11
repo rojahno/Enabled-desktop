@@ -52,6 +52,10 @@ describe('test the custom input component', () => {
     //Checks if the value is changed
     expect(input).toHaveValue('1.0.0.1');
 
+    //Changes the value of the textfield
+    fireEvent.change(input, { target: { value: '' } })
+    expect(input).toHaveValue('');
+
   });
 
 });
