@@ -48,6 +48,7 @@ class CortexDriver {
       debit: 1,
     };
   }
+  
   static getInstance(): CortexDriver {
     if (CortexDriver.instance) {
       return CortexDriver.instance;
