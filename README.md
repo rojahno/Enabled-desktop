@@ -52,6 +52,10 @@ yarn start
 
 To package apps for the local platform:
 
+```bash
+yarn rebuild
+```
+
 Mac & Linux on local platforms:
 ```bash
 yarn package
