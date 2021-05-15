@@ -4,7 +4,9 @@ import CortexError from '../../modules/CortexError';
 import { CortexFacade } from '../../modules/CortexFacade';
 import { MobileDriver } from '../../modules/MobileDriver';
 import AddIpPage from './AddIpPage';
-
+/**
+ * A container used to fetch data for the AddIpPage.
+ */
 const AddIpContainer = () => {
   const [ipAdress, setIpAdress] = useState('No input');
   const [validIpAdress, setValidIpAdress] = useState(false);
@@ -29,8 +31,8 @@ const AddIpContainer = () => {
   /**
    * Regex to check if the ip adress is valid. Found on https://www.w3resource.com/javascript/form/ip-address-validation.php.
    * @param ipAdress The ip adress we would like to check
-   * @returns True if the ip address is valid and false if not. 
-   * 
+   * @returns True if the ip address is valid and false if not.
+   *
    */
   const hasValidIPaddress = (ipAdress: string) => {
     if (
@@ -99,7 +101,7 @@ const AddIpContainer = () => {
       handleKeyPress={handleKeyPress}
       handleNextClick={handleNextClick}
       ipAdress={ipAdress}
-      validIpAdress={validIpAdress}
+      validIpAddress={validIpAdress}
       openLoadingCircle={openLoadingCircle}
     />
   );

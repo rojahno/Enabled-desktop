@@ -1,20 +1,8 @@
 import React from 'react';
-import {
-  createStyles,
-  makeStyles,
-  Theme,
-  withStyles,
-  WithStyles,
-} from '@material-ui/core/styles';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Dialog, { DialogProps } from '@material-ui/core/Dialog';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
-import IconButton from '@material-ui/core/IconButton';
 import Link from '@material-ui/core/Link';
-import CloseIcon from '@material-ui/icons/Close';
-import Typography from '@material-ui/core/Typography';
 import { Divider } from '@material-ui/core';
 import iphoneSettings from './../../images/iphone-settings.png';
 import iphoneWifi from './../../images/iphone-settings-wifi.png';
@@ -24,20 +12,7 @@ import androidSettingsSecond from '../../images/Android-Settings-Main-2.jpg';
 import androidAbout from '../../images/Android-Settings-About.jpg';
 import androidStatus from '../../images/Android-Settings-Status.jpg';
 import mobileIp from '../../images/mobile-ip.jpg';
-
-const styles = (theme: Theme) =>
-  createStyles({
-    root: {
-      margin: 0,
-      padding: theme.spacing(2),
-    },
-    closeButton: {
-      position: 'absolute',
-      right: theme.spacing(1),
-      top: theme.spacing(1),
-      color: theme.palette.grey[500],
-    },
-  });
+import { DialogActions, DialogContent, DialogTitle } from './DialogComponents';
 
 //Change the style of the element
 const useStyles = makeStyles(function (theme: Theme) {
@@ -70,45 +45,10 @@ const useStyles = makeStyles(function (theme: Theme) {
   });
 });
 
-export interface DialogTitleProps extends WithStyles<typeof styles> {
-  id: string;
-  children: React.ReactNode;
-  onClose: () => void;
-}
-
-const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
-  const { children, classes, onClose, ...other } = props;
-  return (
-    <MuiDialogTitle disableTypography className={classes.root} {...other}>
-      <Typography variant="h6">{children}</Typography>
-      {onClose ? (
-        <IconButton
-          aria-label="close"
-          className={classes.closeButton}
-          onClick={onClose}
-        >
-          <CloseIcon />{' '}
-        </IconButton>
-      ) : null}
-    </MuiDialogTitle>
-  );
-});
-
-const DialogContent = withStyles((theme: Theme) => ({
-  root: {
-    padding: theme.spacing(2),
-    backgroundColor: '#fff',
-  },
-}))(MuiDialogContent);
-
-const DialogActions = withStyles((theme: Theme) => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(1),
-    backgroundColor: '#fff',
-  },
-}))(MuiDialogActions);
-
+/**
+ * The custom dialog component. Open a dialog when the link component is clicked.
+ * The dialog shows how to find an IP adress.
+ */
 export default function CustomDialog(_props: any) {
   const [open, setOpen] = React.useState(false);
   const [scroll, setScroll] = React.useState<DialogProps['scroll']>('paper');
@@ -173,7 +113,7 @@ export default function CustomDialog(_props: any) {
             </ol>
           </div>
           <Divider className={classes.divider} />
-          <h3>On android :</h3>
+          <h3>On android:</h3>
           <div>
             <ol>
               <li>Open settings</li>

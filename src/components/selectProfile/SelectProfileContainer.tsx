@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { CortexDriver } from '../../modules/CortexDriver';
 import CortexError from '../../modules/CortexError';
 import { CortexFacade } from '../../modules/CortexFacade';
 import SelectProfilePage from './SelectProfilePage';
 
+/**
+ * The select profile container component. Fetches Emotiv training profiles and loads 
+ * the selected profile when the user navigates to the next page.
+ */
 const SelectProfileContainer = () => {
   //Select profile useStates
   const [profiles, setProfiles] = useState<string[]>([]);
@@ -15,7 +18,7 @@ const SelectProfileContainer = () => {
   const history = useHistory();
 
   useEffect(() => {
-    //Retrieves the profiles
+    //Fetches the Emotives training profiles.
     const getProfiles = async () => {
       try {
         let cortexfacade = CortexFacade.getInstance();

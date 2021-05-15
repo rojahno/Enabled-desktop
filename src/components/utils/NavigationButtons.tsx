@@ -20,7 +20,10 @@ interface navButtonProps {
   ) => Promise<void>;
   backNavigation: string;
 }
-
+/**
+ * The navigation buttons component. Shows a back and a next button. 
+ * The next button is grayed out if the canNavigateforward props is false.
+ */
 function NavigationButtons(props: navButtonProps) {
   const classes = useStyles();
   const history = useHistory();

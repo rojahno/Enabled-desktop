@@ -3,6 +3,10 @@ import CortexError from '../../modules/CortexError';
 import { CortexFacade } from '../../modules/CortexFacade';
 import StartPage from './StartPage';
 
+/**
+ * The start page container component. This component checks if there are
+ *  any errors with the user setup. If no errors, enables the navigation to the next page.
+ */
 const StartPageContainer = () => {
   //StartPage useStates
   const [hasAccessError, setHasAccessError] = useState(true);

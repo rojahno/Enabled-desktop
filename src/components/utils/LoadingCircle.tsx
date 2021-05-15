@@ -5,7 +5,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {
+    loadingCircle: {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -27,12 +27,14 @@ interface LoadingCircleProps {
   delay: string;
   color:string,
 }
-
+/**
+ * The loading circle component. Shows a loading circle if the loading prop is true.
+ */
 const LoadingCircle = (props: LoadingCircleProps) => {
   const classes = useStyles();
 
   return (
-    <div className={classes.root}>
+    <div className={classes.loadingCircle}>
       <Fade
         in={props.loading}
         style={{

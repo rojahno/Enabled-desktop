@@ -6,19 +6,12 @@ import VerticalLinearStepper from '../startPage/stepper';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {},
     button: {
       display: 'flex',
       justifyContent: 'space-between',
       width: '100%',
       padding: '3px',
       marginTop: 'auto',
-    },
-    text: {
-      marginTop: 'auto',
-      marginBot: 'auto',
-      padding: '12px',
-      fontSize: '12px',
     },
     content: {
       display: 'flex',

@@ -3,7 +3,10 @@ import CortexError from '../../modules/CortexError';
 import { CortexFacade } from '../../modules/CortexFacade';
 import { MobileDriver } from '../../modules/MobileDriver';
 import StreamPage from './StreamPage';
-
+/**
+ * The stream container component. Handles the setup of the stream, changes between fac and com stream and 
+ * checks the connection of the mobile driver.
+ */
 const StreamContainer = () => {
   //Stream useStates
 
@@ -70,6 +73,7 @@ const StreamContainer = () => {
   };
 
   useEffect(() => {
+    //Prepares the variables needed to start the stream.
     const start = async () => {
       try {
         let facadeError = cortexFacade.startStream();
@@ -83,6 +87,7 @@ const StreamContainer = () => {
 
     start();
 
+    //Removes the socket connection and closes the stream session. 
     const offLoad = () => {
       let mobileDriver: MobileDriver = MobileDriver.getInstance();
       cortexFacade.closeSession();

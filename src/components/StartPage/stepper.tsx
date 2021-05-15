@@ -22,17 +22,6 @@ const StyledStepLabel = styled(StepLabel)({
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {},
-    button: {
-      marginTop: theme.spacing(1),
-      marginRight: theme.spacing(1),
-    },
-    actionsContainer: {
-      marginBottom: theme.spacing(2),
-    },
-    resetContainer: {
-      padding: theme.spacing(3),
-    },
     text: {
       color: '#fff',
       backgroundColor: '#ffffff00',
@@ -54,6 +43,10 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+/**
+ * Gets the different steps in an array.
+ * @returns The steps array.
+ */
 function getSteps() {
   return [
     'Requesting permission from the Emotiv app',
@@ -62,10 +55,15 @@ function getSteps() {
   ];
 }
 
+/**
+ * Returns the step content of the stepper.
+ * @param step The current step showing.
+ * @returns The step content belonging to the current step.
+ */
 function getStepContent(step: number) {
   switch (step) {
     case 0:
-      return 'Could not connect to the Emotiv app, try to go to the Emotiv BCI app to permit access.';
+      return 'Could not connect to the Emotiv app. Please open the Emotiv BCI app to permit access.';
     case 1:
       return 'Could not find any headset. Please make sure the headset is turned on and connected.';
     case 2:
@@ -83,6 +81,9 @@ interface stepProps {
   isClicked: boolean;
 }
 
+/**
+ * The stepper component.
+ */
 export default function VerticalLinearStepper(props: stepProps) {
   function trueFalseStepIcon(iconProps: StepIconProps) {
     let errorIcon = <Error className={classes.errorIcon} />;

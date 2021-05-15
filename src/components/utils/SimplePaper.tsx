@@ -25,7 +25,9 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 );
-
+/**
+ * The paper component. Used as a background element.
+ */
 export default function SimplePaper(_props: any) {
   const classes = useStyles();
 

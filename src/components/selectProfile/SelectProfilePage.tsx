@@ -18,7 +18,9 @@ interface SelectPageProps {
   hasSelected: boolean;
   isLoading: boolean;
 }
-
+/**
+ * The select profile page component.
+ */
 export default function SelectProfilePage(props: SelectPageProps) {
   return (
     <SimplePaper>
