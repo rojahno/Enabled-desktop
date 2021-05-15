@@ -17,8 +17,8 @@ class MobileDriver implements IObserver {
   public observer!: StreamObserver;
 
   /**
-   *
-   * @param command sends a command to the websocket server
+   * Sends a command to the websocket server
+   * @param command The command beeing sent.Either a fac command or a com command.
    */
   sendCommand(command: FacDataSample | ComDataSample): void {
     if (this.isConnected()) {
@@ -86,7 +86,7 @@ class MobileDriver implements IObserver {
 
   private setupSocketEvents = () => {
     this._socket.onopen = async () => {
-      console.log('WS OPENED ✅');
+      console.log('WS OPENED');
 
       // Reset the total retries
       this.retryCount = 0;
@@ -188,10 +188,6 @@ class MobileDriver implements IObserver {
     let driver: CortexDriver = CortexDriver.getInstance();
     driver.subscribe(this);
   };
-
-  getRandomInt(max: number) {
-    return Math.floor(Math.random() * Math.floor(max));
-  }
 
   /**
    * Unsubscribes to the cortex stream

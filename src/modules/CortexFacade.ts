@@ -1,6 +1,8 @@
 import { CortexDriver } from './CortexDriver';
 import CortexError from './CortexError';
-
+/**
+ * A facade class for the Cortex Driver. Intended to make it easier to use some of the functionality that the CortexAPI offers.
+ */
 class CortexFacade {
   private static instance: CortexFacade;
   private driver = CortexDriver.getInstance();
@@ -178,6 +180,10 @@ class CortexFacade {
     }
   };
 
+  /**
+ * Closes the session, opens a new one and changes the stream to the Com-stream.
+ * @returns Undefined or a CortexError if an error occurrs.
+ */
   changeToComStream = async () => {
     try {
       await this.driver.closeSession();
