@@ -6,7 +6,6 @@ import VerticalLinearStepper from '../startPage/stepper';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {},
     button: {
       display: 'flex',
       justifyContent: 'space-between',
@@ -14,14 +13,10 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: '3px',
       marginTop: 'auto',
     },
-    text: {
-      marginTop: 'auto',
-      marginBot: 'auto',
-      padding: '12px',
-      fontSize: '12px',
-    },
     content: {
       display: 'flex',
+      justifyContent:'center',
+      alignItems:'center',
       flexDirection: 'column',
       minHeight: 0,
       flexGrow: 1,
@@ -36,6 +31,7 @@ interface StartPageProps {
   headsetIdError: boolean;
   deviceError: boolean;
   isClicked: boolean;
+  hasError: boolean;
   connectClicked: () => void;
 }
 
@@ -45,7 +41,7 @@ export default function StartPage(props: StartPageProps) {
 
   /**
    * Enables or disables the next button.
-   * @returns true if no errors occurs and false one or more errors occured.
+   * @returns true if no errors occurs and false if an error occurr.
    */
   const enableNext = () => {
     if (!props.hasAccessError && !props.headsetIdError && !props.deviceError) {
@@ -61,31 +57,15 @@ export default function StartPage(props: StartPageProps) {
 
   return (
     <SimplePaper>
+      <h3>Setup</h3>
       <div className={classes.content}>
         <VerticalLinearStepper
           hasAccessError={props.hasAccessError}
           headsetIdError={props.headsetIdError}
           deviceError={props.deviceError}
           isClicked={props.isClicked}
+          hasError={props.hasError}
         />
-
-        <div className={classes.text}>
-          <h3 hidden={!props.isClicked}>
-            {props.hasAccessError
-              ? 'Could not connect to the emotiv app, try to go to the emotiv app to permit access'
-              : 'Connected to the emotiv app'}
-          </h3>
-          <h3 hidden={!props.isClicked}>
-            {props.headsetIdError
-              ? 'Could not retrieve the ID of your headset, please try to reconnect your emotiv headwear'
-              : 'Headset ID retrieved'}
-          </h3>
-          <h3 hidden={!props.isClicked}>
-            {props.deviceError
-              ? 'Could not connect to your emotiv device, check that your device is connected and not in need of a firmware update'
-              : 'Connected to emotiv device'}
-          </h3>
-        </div>
       </div>
       <div className={classes.button}>
         <button onClick={props.connectClicked}>

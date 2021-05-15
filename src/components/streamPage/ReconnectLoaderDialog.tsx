@@ -38,7 +38,9 @@ export interface ReconnectLoaderProps {
   seconds: number;
   handleCountDownReached: () => void;
 }
-
+/**
+ * The reconnect loader. Shows a circular loading bar and counts down from 60.
+ */
 export default function ReconnectLoader(props: ReconnectLoaderProps) {
   const classes = useStyles();
   const [secondsLeft, setSecondsLeft] = useState(props.seconds);

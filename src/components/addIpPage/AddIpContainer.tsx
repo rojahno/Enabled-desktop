@@ -4,7 +4,9 @@ import CortexError from '../../modules/CortexError';
 import { CortexFacade } from '../../modules/CortexFacade';
 import { MobileDriver } from '../../modules/MobileDriver';
 import AddIpPage from './AddIpPage';
-
+/**
+ * A container used to fetch data for the AddIpPage.
+ */
 const AddIpContainer = () => {
   const [ipAdress, setIpAdress] = useState('No input');
   const [validIpAdress, setValidIpAdress] = useState(false);
@@ -27,9 +29,10 @@ const AddIpContainer = () => {
   };
 
   /**
-   * Check if the ip adress is valid.
+   * Regex to check if the ip adress is valid. Found on https://www.w3resource.com/javascript/form/ip-address-validation.php.
    * @param ipAdress The ip adress we would like to check
-   * @returns
+   * @returns True if the ip address is valid and false if not.
+   *
    */
   const hasValidIPaddress = (ipAdress: string) => {
     if (
@@ -59,7 +62,7 @@ const AddIpContainer = () => {
   const handleNextClick = async () => {
     try {
       setOpenLoadingCircle(true);
-      let cortexFacade = new CortexFacade();
+      let cortexFacade = CortexFacade.getInstance();
       let hasErrors = await cortexFacade.hasConnectivityErrors();
 
       if (hasErrors instanceof CortexError) {
@@ -67,7 +70,6 @@ const AddIpContainer = () => {
         setOpenLoadingCircle(false);
       } else {
         let validIpAdress = hasValidIPaddress(ipAdress);
-        console.log('valid ip: ' + validIpAdress);
         setValidIpAdress(validIpAdress);
         if (validIpAdress) {
           let mobileDriver = MobileDriver.getInstance();
@@ -99,7 +101,7 @@ const AddIpContainer = () => {
       handleKeyPress={handleKeyPress}
       handleNextClick={handleNextClick}
       ipAdress={ipAdress}
-      validIpAdress={validIpAdress}
+      validIpAddress={validIpAdress}
       openLoadingCircle={openLoadingCircle}
     />
   );

@@ -9,7 +9,6 @@ import ReconnectLoader from './ReconnectLoader';
 
 const useStyles = makeStyles(() =>
   createStyles({
-    root: {},
     buttons: {
       display: 'flex',
       justifyContent: 'flex-start',
@@ -25,9 +24,6 @@ const useStyles = makeStyles(() =>
       justifyContent: 'center',
       alignContent: 'center',
     },
-    dialog: {
-      paddingTop: '10px',
-    },
   })
 );
 
@@ -41,7 +37,9 @@ interface StreamProps {
   isComStream: boolean;
   isConnected: boolean;
 }
-
+/**
+ * The stream page component. Handles the change between the fac and com tabs and the back navigation.
+ */
 export default function StreamPage(props: StreamProps) {
   const classes = useStyles();
 

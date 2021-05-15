@@ -3,6 +3,7 @@ import { createStyles, makeStyles } from '@material-ui/core/styles';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import ErrorIcon from '@material-ui/icons/Error';
 import { green, red } from '@material-ui/core/colors';
+
 const useStyles = makeStyles(() =>
   createStyles({
     container: {
@@ -16,7 +17,9 @@ const useStyles = makeStyles(() =>
 interface StreamIndicatorProps {
   isLive: boolean;
 }
-
+/**
+ * The stream indicator component. Shows a green check mark if the isLive prop is true and a red cross if false.
+ */
 export default function StreamIndicator(props: StreamIndicatorProps) {
   const classes = useStyles();
 

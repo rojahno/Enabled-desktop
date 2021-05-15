@@ -1,3 +1,7 @@
+/**
+ * The Cortex Error class handles the error string returned to the user. Made to be easier for the user to understand 
+ * and easier to make changes of an error throughout the entire system. 
+ */
 class CortexError {
   private errorId: number;
   private cortexMessage: string;
@@ -5,15 +9,23 @@ class CortexError {
   constructor(errorId: number, cortexMessage: string) {
     this.errorId = errorId;
     this.cortexMessage = cortexMessage;
-    
   }
 
+  /**
+   * Returns the id of the CortexError.
+   */
   public get id() {
     return this.errorId;
   }
+  /**
+   * Returns the error message you would like the user to see.
+   */
   public get errMessage() {
     return this.getErrorMessage(this.errorId);
   }
+  /**
+   * Returns the cortex error message. Could be used to debug. 
+   */
   public get cMessage() {
     return this.cortexMessage;
   }
@@ -62,7 +74,12 @@ class CortexError {
         break;
         case 8:
           {
-            return 'This application cant\'t unload the profile. Check if headseth is in use on another application.';
+            return 'This application cant\'t unload the profile. Check if the headset is used by another application.';
+          }
+        break;
+        case 9:
+          {
+            return 'Can\'t connect to the headset.';
           }
         break;
        

@@ -17,8 +17,8 @@ class MobileDriver implements IObserver {
   public observer!: StreamObserver;
 
   /**
-   *
-   * @param command sends a command to the websocket server
+   * Sends a command to the websocket server
+   * @param command The command beeing sent.Either a fac command or a com command.
    */
   sendCommand(command: FacDataSample | ComDataSample): void {
     if (this.isConnected()) {
@@ -29,6 +29,7 @@ class MobileDriver implements IObserver {
           this.sendMentalCommand(command.com[0]);
         } else if ('fac' in command) {
           let facCommand: string = this.lookForFacCommand(command);
+          console.log('Mental stream command sent: ' + facCommand);
           this.sendFacialExpression(facCommand);
         }
       }
@@ -85,7 +86,7 @@ class MobileDriver implements IObserver {
 
   private setupSocketEvents = () => {
     this._socket.onopen = async () => {
-      console.log('WS OPENED ✅');
+      console.log('WS OPENED');
 
       // Reset the total retries
       this.retryCount = 0;
@@ -188,10 +189,6 @@ class MobileDriver implements IObserver {
     driver.subscribe(this);
   };
 
-  getRandomInt(max: number) {
-    return Math.floor(Math.random() * Math.floor(max));
-  }
-
   /**
    * Unsubscribes to the cortex stream
    */
@@ -203,10 +200,7 @@ class MobileDriver implements IObserver {
    * Closes the socket and unsubscribes to the stream.
    */
   closeSocket() {
-    this._socket.onclose = (_error) => {
-      this.unsubscribeToCortexStream();
-      console.log('closing stream');
-    };
+    this.retryCount = CONNECTION_RETRY_MAX_COUNT +1;
     this._socket.close();
   }
   /**
@@ -248,7 +242,6 @@ class MobileDriver implements IObserver {
         default:
           {
             command = 'neutral';
-            this.previousTriggerTime = this.currentTime;
           }
           break;
       }

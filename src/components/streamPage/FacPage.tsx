@@ -4,15 +4,6 @@ import StreamIndicator from './StreamIndicator';
 
 const useStyles = makeStyles(() =>
   createStyles({
-    root: {},
-    buttons: {
-      display: 'flex',
-      justifyContent: 'flex-start',
-      alignItems: 'flex-end',
-      width: '100%',
-      height: '100%',
-      padding: '3px',
-    },
     textContainer: {
       display: 'flex',
       flexDirection: 'column',
@@ -21,14 +12,14 @@ const useStyles = makeStyles(() =>
       fontSize: '15px',
       padding: '15px',
     },
-    dialog: {
-      paddingTop: '10px',
-    },
   })
 );
 interface Facprops {
   hasConnection: boolean;
 }
+/**
+ * The pac page component.
+ */
 export default function FacPage(props: Facprops) {
   const classes = useStyles();
 

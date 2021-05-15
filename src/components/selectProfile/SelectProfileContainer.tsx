@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { CortexDriver } from '../../modules/CortexDriver';
 import CortexError from '../../modules/CortexError';
 import { CortexFacade } from '../../modules/CortexFacade';
 import SelectProfilePage from './SelectProfilePage';
 
+/**
+ * The select profile container component. Fetches Emotiv training profiles and loads 
+ * the selected profile when the user navigates to the next page.
+ */
 const SelectProfileContainer = () => {
   //Select profile useStates
   const [profiles, setProfiles] = useState<string[]>([]);
@@ -15,14 +18,15 @@ const SelectProfileContainer = () => {
   const history = useHistory();
 
   useEffect(() => {
-    //Retrieves the profiles
+    //Fetches the Emotives training profiles.
     const getProfiles = async () => {
       try {
-        let driver = CortexDriver.getInstance();
-        let authToken = await driver.authorize();
-        let allProfiles = await driver.queryProfileRequest(authToken);
+        let cortexfacade = CortexFacade.getInstance();
+        let allProfiles = await cortexfacade.getProfiles();
         setIsLoading(false);
-        setProfiles(allProfiles);
+        if (Array.isArray(allProfiles)) {
+          setProfiles(allProfiles);
+        }
       } catch (error) {
         setIsLoading(false);
       }
@@ -35,11 +39,9 @@ const SelectProfileContainer = () => {
    * Tries to set the current profile to the selected and navigates to the next page.
    */
   const handleNextClick = async (): Promise<void> => {
-    let cortexfacade: CortexFacade = new CortexFacade();
+    let cortexfacade: CortexFacade = CortexFacade.getInstance();
     try {
-      let setProfileStatus = await cortexfacade.handleSetProfile(
-        selectedProfile
-      );
+      let setProfileStatus = await cortexfacade.SetProfile(selectedProfile);
 
       if (setProfileStatus instanceof CortexError) {
         alert(setProfileStatus.errMessage);

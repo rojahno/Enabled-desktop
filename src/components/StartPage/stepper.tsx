@@ -11,26 +11,17 @@ import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from '@material-ui/core/StepContent';
 import { Error, CheckBox, Adjust } from '@material-ui/icons';
 import { StepIconProps } from '@material-ui/core';
+import StepperContent from './StepperContent';
 
 const StyledStepLabel = styled(StepLabel)({
   '& .MuiStepLabel-label': {
     color: '#3c3c3c',
+    fontWeight: 'bold',
   },
 });
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {},
-    button: {
-      marginTop: theme.spacing(1),
-      marginRight: theme.spacing(1),
-    },
-    actionsContainer: {
-      marginBottom: theme.spacing(2),
-    },
-    resetContainer: {
-      padding: theme.spacing(3),
-    },
     text: {
       color: '#fff',
       backgroundColor: '#ffffff00',
@@ -45,24 +36,54 @@ const useStyles = makeStyles((theme: Theme) =>
     notHandledIcon: {
       color: 'white',
     },
+    typegraphy: {
+      color: '#3c3c3cee',
+      fontSize: '14px',
+    },
   })
 );
 
+/**
+ * Gets the different steps in an array.
+ * @returns The steps array.
+ */
 function getSteps() {
   return [
-    'Requesting permission from the emotiv app',
-    'Getting headset ID',
-    'Connecting to headset',
+    'Requesting permission from the Emotiv app',
+    'Looking for available headsets',
+    'Connecting to the headset',
   ];
+}
+
+/**
+ * Returns the step content of the stepper.
+ * @param step The current step showing.
+ * @returns The step content belonging to the current step.
+ */
+function getStepContent(step: number) {
+  switch (step) {
+    case 0:
+      return 'Could not connect to the Emotiv app. Please open the Emotiv BCI app to permit access.';
+    case 1:
+      return 'Could not find any headset. Please make sure the headset is turned on and connected.';
+    case 2:
+      return 'Could not connect to your Emotiv headset. Please restart the device and try again.';
+    default:
+      return 'Unknown step';
+  }
 }
 
 interface stepProps {
   hasAccessError: boolean;
   headsetIdError: boolean;
   deviceError: boolean;
+  hasError: boolean;
   isClicked: boolean;
 }
 
+/**
+ * The stepper component.
+ */
 export default function VerticalLinearStepper(props: stepProps) {
   function trueFalseStepIcon(iconProps: StepIconProps) {
     let errorIcon = <Error className={classes.errorIcon} />;
@@ -92,15 +113,12 @@ export default function VerticalLinearStepper(props: stepProps) {
       return -1;
     }
     if (props.hasAccessError) {
-      console.log(props.hasAccessError);
       return 0;
     }
     if (props.headsetIdError) {
-      console.log(props.headsetIdError);
       return 1;
     }
     if (props.deviceError) {
-      console.log(props.deviceError);
       return 2;
     }
     return 2;
@@ -113,12 +131,16 @@ export default function VerticalLinearStepper(props: stepProps) {
         activeStep={handleChange()}
         orientation="vertical"
       >
-        {steps.map((label) => (
+        {steps.map((label, index) => (
           <Step key={label}>
             <StyledStepLabel StepIconComponent={trueFalseStepIcon}>
               {label}
             </StyledStepLabel>
-            <StepContent></StepContent>
+            <StepContent className={classes.typegraphy}>
+              <StepperContent showContent={props.hasError}>
+                {getStepContent(index)}
+              </StepperContent>
+            </StepContent>
           </Step>
         ))}
       </Stepper>

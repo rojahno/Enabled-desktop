@@ -5,7 +5,7 @@ import StreamIndicator from './StreamIndicator';
 
 const useStyles = makeStyles(() =>
   createStyles({
-    root: {
+    comContainer: {
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
@@ -36,12 +36,14 @@ interface ComProps {
     value: number | number[]
   ) => void;
 }
-
+/**
+ * The com page component. 
+ */
 export default function ComPage(props: ComProps) {
   const classes = useStyles();
 
   return (
-    <div className={classes.root}>
+    <div className={classes.comContainer}>
       <StreamIndicator isLive={props.hasConnection} />
       <div className={classes.container}>
         <SettingSlider

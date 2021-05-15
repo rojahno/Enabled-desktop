@@ -24,13 +24,14 @@ const CONNECTION_RETRY_MAX_COUNT = 60; // 60 times to retry x 5s = 5min of total
 type StreamObserver = (streamCommand: string) => void;
 /**
  * This class works as a connection between an app and the Emotiv API.
+ * The class handles the requests and responses to the CortexAPI.
  * This class uses async/await and Promise for request and needs to be run on sync.
  *
  */
 class CortexDriver {
   private static instance: CortexDriver;
-  private _socket!: WebSocket;
-  private _user: any;
+  private socket!: WebSocket;
+  private user: any;
 
   private _retryCount: number = 0;
   private observers: IObserver[] = [];
@@ -38,9 +39,9 @@ class CortexDriver {
   private cortexToken: string = '';
   private sessionId: string = '';
 
-  constructor() {
-    this._socket = new WebSocket('wss://localhost:6868');
-    this._user = {
+  private constructor() {
+    this.socket = new WebSocket('wss://localhost:6868');
+    this.user = {
       license: '',
       clientId: '0wyWnYNd61cedWF0Bp7AbZ10ogKlpa6EvgsH4DCV',
       clientSecret:
@@ -48,6 +49,7 @@ class CortexDriver {
       debit: 1,
     };
   }
+
   static getInstance(): CortexDriver {
     if (CortexDriver.instance) {
       return CortexDriver.instance;
@@ -60,7 +62,7 @@ class CortexDriver {
    * Creates a connection to the websocket and sets the events.
    */
   private connect = async () => {
-    this._socket = new WebSocket('wss://localhost:6868');
+    this.socket = new WebSocket('wss://localhost:6868');
 
     this.setupSocketEvents();
 
@@ -74,7 +76,7 @@ class CortexDriver {
   };
 
   public awaitSocketOpening = async () => {
-    this._socket = new WebSocket('wss://localhost:6868');
+    this.socket = new WebSocket('wss://localhost:6868');
 
     return new Promise<boolean>((resolve) => {
       let wait = setTimeout(() => {
@@ -90,8 +92,8 @@ class CortexDriver {
   };
 
   private setupSocketEvents = () => {
-    this._socket.onopen = () => {
-      console.log('WS OPENED ✅');
+    this.socket.onopen = () => {
+      console.log('WS OPENED');
 
       this._retryCount = 0;
     };
@@ -138,30 +140,27 @@ class CortexDriver {
    * @returns The socket status
    */
   public getStatus = (): string => {
-    if (!this._socket) {
+    if (!this.socket) {
       return 'ERROR: no socket';
     }
 
-    switch (this._socket.readyState) {
-      case this._socket.OPEN:
+    switch (this.socket.readyState) {
+      case this.socket.OPEN:
         return 'OPEN';
-      case this._socket.CLOSED:
+      case this.socket.CLOSED:
         return 'CLOSED';
-      case this._socket.CLOSING:
+      case this.socket.CLOSING:
         return 'CLOSING';
-      case this._socket.CONNECTING:
+      case this.socket.CONNECTING:
         return 'CONNECTING';
     }
     return 'Unknown error';
   };
 
-  public get socket() {
-    return this._socket;
-  }
-
   /**
    * Find and returns a headset id. If there are more than one
    * headset it chooses the first one found.
+   * The documentation: https://emotiv.gitbook.io/cortex-api/headset/queryheadsets
    *
    * @returns the headseth id
    */
@@ -174,8 +173,8 @@ class CortexDriver {
       params: {},
     };
     return new Promise<string>((resolve, reject) => {
-      this._socket.send(JSON.stringify(queryHeadsetRequest));
-      this._socket.onmessage = ({ data }: MessageEvent) => {
+      this.socket.send(JSON.stringify(queryHeadsetRequest));
+      this.socket.onmessage = ({ data }: MessageEvent) => {
         try {
           if (data.indexOf('error') !== -1) {
             let parsed: Warning = JSON.parse(data);
@@ -203,6 +202,7 @@ class CortexDriver {
   /**
    * Requests acces to the emotiv app. When the script calls this method for the first time
    * a display message is shown in the Emotiv app.
+   * The documentation:https://emotiv.gitbook.io/cortex-api/authentication/requestaccess
    * @returns true and a message string if the user accepts and false and a message string otherwise.
    */
 
@@ -214,13 +214,13 @@ class CortexDriver {
         jsonrpc: '2.0',
         method: 'requestAccess',
         params: {
-          clientId: this._user.clientId,
-          clientSecret: this._user.clientSecret,
+          clientId: this.user.clientId,
+          clientSecret: this.user.clientSecret,
         },
       };
 
-      this._socket.send(JSON.stringify(requestAccessRequest));
-      this._socket.onmessage = ({ data }: MessageEvent) => {
+      this.socket.send(JSON.stringify(requestAccessRequest));
+      this.socket.onmessage = ({ data }: MessageEvent) => {
         try {
           let parsed: RequestAccessResponse = JSON.parse(data);
           if (parsed.id == REQUEST_ACCESS_ID) {
@@ -235,7 +235,7 @@ class CortexDriver {
 
   /**
    * Generates the Cortex token. The token can be used for 2 days.
-   *
+   * The documentation:https://emotiv.gitbook.io/cortex-api/authentication/authorize
    * @returns the Cortex token
    */
   public authorize = async (): Promise<string> => {
@@ -245,15 +245,15 @@ class CortexDriver {
         jsonrpc: '2.0',
         method: 'authorize',
         params: {
-          clientId: this._user.clientId,
-          clientSecret: this._user.clientSecret,
-          license: this._user.license,
-          debit: this._user.debit,
+          clientId: this.user.clientId,
+          clientSecret: this.user.clientSecret,
+          license: this.user.license,
+          debit: this.user.debit,
         },
         id: AUTHORIZE_ID,
       };
-      this._socket.send(JSON.stringify(authorizeRequest));
-      this._socket.onmessage = ({ data }: MessageEvent) => {
+      this.socket.send(JSON.stringify(authorizeRequest));
+      this.socket.onmessage = ({ data }: MessageEvent) => {
         try {
           if (data.indexOf('error') !== -1) {
             let parsed: Warning = JSON.parse(data);
@@ -275,7 +275,7 @@ class CortexDriver {
 
   /**
    * Connects to a headset based on the headset id.
-   *
+   * The documentation: https://emotiv.gitbook.io/cortex-api/headset/controldevice
    * @param headsetId - the headset id returned from queryHeadset.
    * @returns an response object from the Emotiv API.
    * */
@@ -291,8 +291,8 @@ class CortexDriver {
       },
     };
     return new Promise<string>((resolve, reject) => {
-      this._socket.send(JSON.stringify(controlDeviceRequest));
-      this._socket.onmessage = ({ data }: MessageEvent) => {
+      this.socket.send(JSON.stringify(controlDeviceRequest));
+      this.socket.onmessage = ({ data }: MessageEvent) => {
         try {
           let parsedData: ControlDeviceResponse = JSON.parse(data);
           if (parsedData.id == CONTROL_DEVICE_ID) {
@@ -306,7 +306,7 @@ class CortexDriver {
   };
 
   /** This method is to open a session with an EMOTIV headset.
-   *
+   * The documentation: https://emotiv.gitbook.io/cortex-api/session/createsession
    * @returns The data sample obejcts from the session.
    */
   public createSession = async (
@@ -325,8 +325,8 @@ class CortexDriver {
       },
     };
     return new Promise<string>((resolve, reject) => {
-      this._socket.send(JSON.stringify(createSessionRequest));
-      this._socket.onmessage = ({ data }: MessageEvent) => {
+      this.socket.send(JSON.stringify(createSessionRequest));
+      this.socket.onmessage = ({ data }: MessageEvent) => {
         try {
           let parsed: CreateSessionResponse = JSON.parse(data);
           if (parsed.id == CREATE_SESSION_ID) {
@@ -343,7 +343,7 @@ class CortexDriver {
 
   /**
    * Starts the com stream and notifies the observers.
-   *
+   * The documentation:https://emotiv.gitbook.io/cortex-api/data-subscription/subscribe
    * @param authToken - The cortex token
    * @param sessionId - the session id
    */
@@ -360,8 +360,8 @@ class CortexDriver {
       id: SUB_REQUEST_ID,
     };
     return new Promise<boolean>((resolve) => {
-      this._socket.send(JSON.stringify(subRequest));
-      this._socket.onmessage = ({ data }: MessageEvent) => {
+      this.socket.send(JSON.stringify(subRequest));
+      this.socket.onmessage = ({ data }: MessageEvent) => {
         try {
           if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
             let parsed: ComDataSample = JSON.parse(data);
@@ -378,7 +378,7 @@ class CortexDriver {
 
   /**
    * Starts the fac stream and notifies the observers.
-   *
+   * The documentation:https://emotiv.gitbook.io/cortex-api/data-subscription/subscribe
    * @param authToken - The cortex token
    * @param sessionId - the session id
    */
@@ -395,8 +395,8 @@ class CortexDriver {
       id: SUB_REQUEST_ID,
     };
     return new Promise<boolean>((resolve) => {
-      this._socket.send(JSON.stringify(subRequest));
-      this._socket.onmessage = ({ data }: MessageEvent) => {
+      this.socket.send(JSON.stringify(subRequest));
+      this.socket.onmessage = ({ data }: MessageEvent) => {
         try {
           if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
             let parsed: FacDataSample = JSON.parse(data);
@@ -410,7 +410,12 @@ class CortexDriver {
       };
     });
   };
-
+  /** This method can get or set the signature used by the facial expression detection.
+   *  The documentation:https://emotiv.gitbook.io/cortex-api/advanced-bci/facialexpressionsignaturetype
+   * @param authToken - The cortex token
+   * @param sessionId - the session id
+   * @returns The data from the response.
+   */
   public setFacialExpressionSignatureType = async (
     authToken: string,
     sessionId: String
@@ -429,8 +434,8 @@ class CortexDriver {
     };
 
     return new Promise<string>((resolve) => {
-      this._socket.send(JSON.stringify(request));
-      this._socket.onmessage = ({ data }: MessageEvent) => {
+      this.socket.send(JSON.stringify(request));
+      this.socket.onmessage = ({ data }: MessageEvent) => {
         try {
           let parsed: FacialExpressionSignatureType = JSON.parse(data);
           if (parsed.id === SIGNATURE_REQUEST_ID) {
@@ -444,6 +449,7 @@ class CortexDriver {
   };
   /**
    * Closes the session.
+   * The documentation: https://emotiv.gitbook.io/cortex-api/session/updatesession
    * @returns The response object from the Emotiv API.
    */
   public closeSession = async () => {
@@ -459,8 +465,8 @@ class CortexDriver {
       id: CLOSE_REQUEST_ID,
     };
     return new Promise<boolean>((resolve) => {
-      if (this.cortexToken) this._socket.send(JSON.stringify(subRequest));
-      this._socket.onmessage = ({ data }: MessageEvent) => {
+      if (this.cortexToken) this.socket.send(JSON.stringify(subRequest));
+      this.socket.onmessage = ({ data }: MessageEvent) => {
         try {
           let parsed: UpdateSessionResponse = JSON.parse(data);
           if (parsed.id === CLOSE_REQUEST_ID) {
@@ -475,7 +481,8 @@ class CortexDriver {
 
   /**
    * This method is to get the active action for the mental command detection.
-   *If the status is "get" then the result is and array of strings.
+   * If the status is "get" then the result is and array of strings.
+   * The documentation: https://emotiv.gitbook.io/cortex-api/advanced-bci/mentalcommandactiveaction
    * @param authToken - The cortex token
    * @param profile - the headset profile
    **/
@@ -495,8 +502,8 @@ class CortexDriver {
       id: MENTAL_COMMAND_ACTIVE_ACTION_ID,
     };
     return new Promise<string[]>((resolve, reject) => {
-      this._socket.send(JSON.stringify(mentalCommandActiveActionRequest));
-      this._socket.onmessage = ({ data }: MessageEvent) => {
+      this.socket.send(JSON.stringify(mentalCommandActiveActionRequest));
+      this.socket.onmessage = ({ data }: MessageEvent) => {
         try {
           if (JSON.parse(data)['id'] == MENTAL_COMMAND_ACTIVE_ACTION_ID) {
             if (data.indexOf('error') === -1) {
@@ -513,6 +520,7 @@ class CortexDriver {
   /**
    * This method is to set the active action for the mental command detection.
    * If the status is "set", then the result is an object with "action" and "message" as fields.
+   * The documentation: https://emotiv.gitbook.io/cortex-api/advanced-bci/mentalcommandactiveaction
    * @param authToken - The auth token
    * @param sessionId - The session id
    * @param profile - The profile you would like to set the sensitivity for.
@@ -539,8 +547,8 @@ class CortexDriver {
       id: MENTAL_COMMAND_ACTIVE_ACTION_ID,
     };
     return new Promise((resolve, reject) => {
-      this._socket.send(JSON.stringify(mentalCommandActiveActionRequest));
-      this._socket.onmessage = ({ data }: MessageEvent) => {
+      this.socket.send(JSON.stringify(mentalCommandActiveActionRequest));
+      this.socket.onmessage = ({ data }: MessageEvent) => {
         try {
           if (JSON.parse(data)['id'] == MENTAL_COMMAND_ACTIVE_ACTION_ID) {
             console.log(data);
@@ -554,7 +562,7 @@ class CortexDriver {
   };
   /**
    * Checks if ths application has access to the Emotiv App.
-   *
+   * The documentation: https://emotiv.gitbook.io/cortex-api/authentication/hasaccessright
    * @returns true if it has access and rejects an error message if not.
    */
   public hasAccess = async (): Promise<boolean> => {
@@ -565,13 +573,13 @@ class CortexDriver {
         jsonrpc: '2.0',
         method: 'requestAccess',
         params: {
-          clientId: this._user.clientId,
-          clientSecret: this._user.clientSecret,
+          clientId: this.user.clientId,
+          clientSecret: this.user.clientSecret,
         },
       };
 
-      this._socket.send(JSON.stringify(requestAccessRequest));
-      this._socket.onmessage = ({ data }: MessageEvent) => {
+      this.socket.send(JSON.stringify(requestAccessRequest));
+      this.socket.onmessage = ({ data }: MessageEvent) => {
         try {
           let accessQuery: RequestAccessResponse = JSON.parse(data);
           if (accessQuery.id == REQUEST_ACCESS_ID) {
@@ -586,7 +594,7 @@ class CortexDriver {
 
   /**
    * Sets the profile of the headset.
-   *
+   * The documentation: https://emotiv.gitbook.io/cortex-api/bci/setupprofile
    * @param authToken The cortex token
    * @param headsetId The headset id
    * @param profileName The profile name you want to set
@@ -614,8 +622,8 @@ class CortexDriver {
     };
 
     return new Promise<string>((resolve, reject) => {
-      this._socket.send(JSON.stringify(setupProfileRequest));
-      this._socket.onmessage = ({ data }: MessageEvent) => {
+      this.socket.send(JSON.stringify(setupProfileRequest));
+      this.socket.onmessage = ({ data }: MessageEvent) => {
         try {
           if (data.indexOf('error') !== -1) {
             reject(new CortexError(8, data));
@@ -637,12 +645,10 @@ class CortexDriver {
   };
 
   /**
-   * Sets the profile of the headset.
-   *
+   * Check if has loaded a profile.
+   * The documentation: https://emotiv.gitbook.io/cortex-api/bci/getcurrentprofile
    * @param authToken The cortex token
    * @param headsetId The headset id
-   * @param profileName The profile name you want to set
-   * @param status The status
    *
    * @returns true if there was a loaded profile and false if not.
    */
@@ -661,8 +667,8 @@ class CortexDriver {
     };
 
     return new Promise<boolean>((resolve, reject) => {
-      this._socket.send(JSON.stringify(hasCurrentProfileRequest));
-      this._socket.onmessage = ({ data }: MessageEvent) => {
+      this.socket.send(JSON.stringify(hasCurrentProfileRequest));
+      this.socket.onmessage = ({ data }: MessageEvent) => {
         try {
           let currentProfileResponse: GetCurrentProfileResponse = JSON.parse(
             data
@@ -681,7 +687,7 @@ class CortexDriver {
 
   /**
    * Gets the currently loaded profile.
-   *
+   * The documentation: https://emotiv.gitbook.io/cortex-api/bci/getcurrentprofile
    * @param authToken The cortex token.
    * @param headsetId The headset id.
    *
@@ -701,8 +707,8 @@ class CortexDriver {
       },
     };
     return new Promise<string>((resolve, reject) => {
-      this._socket.send(JSON.stringify(currentProfileRequest));
-      this._socket.onmessage = ({ data }: MessageEvent) => {
+      this.socket.send(JSON.stringify(currentProfileRequest));
+      this.socket.onmessage = ({ data }: MessageEvent) => {
         try {
           if (data.indexOf('error') === -1) {
             let parsed: GetCurrentProfileResponse = JSON.parse(data);
@@ -715,7 +721,8 @@ class CortexDriver {
     });
   };
   /**
-   *Sets the sensitivity for the mental commands.
+   * Sets the sensitivity for the mental commands.
+   * The documentation: https://emotiv.gitbook.io/cortex-api/advanced-bci/mentalcommandactionsensitivity
    * @param authToken The auth token
    * @param profile The profile you would like to set the sensitivity for
    * @param sessionId The session id
@@ -740,8 +747,8 @@ class CortexDriver {
       },
     };
     return new Promise<string>((resolve) => {
-      this._socket.send(JSON.stringify(currentProfileRequest));
-      this._socket.onmessage = async ({ data }: MessageEvent) => {
+      this.socket.send(JSON.stringify(currentProfileRequest));
+      this.socket.onmessage = async ({ data }: MessageEvent) => {
         try {
           console.log('set sensitivity:  ' + values + ' \n' + 'data: ' + data);
           resolve(data);
@@ -756,7 +763,7 @@ class CortexDriver {
    * Sets the onmessage events for com stream.
    */
   public setComStreamOnmessageEvent = () => {
-    this._socket.onmessage = ({ data }: MessageEvent) => {
+    this.socket.onmessage = ({ data }: MessageEvent) => {
       try {
         if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
           let parsed: ComDataSample = JSON.parse(data);
@@ -772,7 +779,7 @@ class CortexDriver {
    * Sets the onmessage events for fac stream.
    */
   public setFacStreamOnmessageEvent = () => {
-    this._socket.onmessage = ({ data }: MessageEvent) => {
+    this.socket.onmessage = ({ data }: MessageEvent) => {
       try {
         if (JSON.stringify(data).indexOf('jsonrpc') === -1) {
           let parsed: FacDataSample = JSON.parse(data);
@@ -786,6 +793,7 @@ class CortexDriver {
 
   /**
    * Retrieves the sensitivity for the mental commands.
+   * The documentation: https://emotiv.gitbook.io/cortex-api/advanced-bci/mentalcommandactionsensitivity
    * @param authToken The auth token
    * @param profile The profile you would like to get the sensitivity for.
    * @returns An array of 4 sensitivity values.
@@ -805,8 +813,8 @@ class CortexDriver {
       },
     };
     return new Promise<number[]>((resolve, reject) => {
-      this._socket.send(JSON.stringify(getSensitivityRequest));
-      this._socket.onmessage = ({ data }: MessageEvent) => {
+      this.socket.send(JSON.stringify(getSensitivityRequest));
+      this.socket.onmessage = ({ data }: MessageEvent) => {
         try {
           if (data.indexOf('error') === -1) {
             console.log('get sensitivity: ' + data);
@@ -824,6 +832,7 @@ class CortexDriver {
   };
   /**
    * Updates the selected profile and saves it.
+   * The documentation: https://emotiv.gitbook.io/cortex-api/bci/setupprofile
    * @param authToken The auth token
    * @param headsetId The headset id
    * @param profile The profile you would like to update
@@ -847,8 +856,8 @@ class CortexDriver {
     };
     console.log('save profile called');
     return new Promise<number[]>((resolve, reject) => {
-      this._socket.send(JSON.stringify(saveProfileRequest));
-      this._socket.onmessage = ({ data }: MessageEvent) => {
+      this.socket.send(JSON.stringify(saveProfileRequest));
+      this.socket.onmessage = ({ data }: MessageEvent) => {
         try {
           console.log('Save profile: ' + data);
           if (data.indexOf('error') === -1) {
@@ -863,7 +872,7 @@ class CortexDriver {
 
   /**
    * Queries all the profiles saved on this user.
-   *
+   * The documentation: https://emotiv.gitbook.io/cortex-api/bci/queryprofile
    * @param authToken The cortex token
    *
    * @returns an array of strings with all the names of the profiles.
@@ -880,8 +889,8 @@ class CortexDriver {
     };
 
     return new Promise<string[]>((resolve, reject) => {
-      this._socket.send(JSON.stringify(queryProfileRequest));
-      this._socket.onmessage = ({ data }: MessageEvent) => {
+      this.socket.send(JSON.stringify(queryProfileRequest));
+      this.socket.onmessage = ({ data }: MessageEvent) => {
         try {
           let profileQuery: QueryProfileResponse = JSON.parse(data);
           if (profileQuery.id == QUERY_PROFILE_ID) {
@@ -910,16 +919,12 @@ class CortexDriver {
 
   /**
    * Unsubscribes to the stream.
-   * @param observer the observer to remove
+   * @param observer the observer to remove from the array.
    */
 
   public unsubscribe(observer: IObserver) {
     let observerToRemove = observer;
-    console.log('NR observers before unsubscribe: ' + this.observers.length);
-
-    this.observers = [];
-    this.observers.filter((item) => item !== observerToRemove);
-    console.log('NR observers after unsubscribe: ' + this.observers.length);
+    this.observers = this.observers.filter((item) => item !== observerToRemove);
   }
 
   /**

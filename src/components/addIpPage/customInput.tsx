@@ -46,6 +46,9 @@ export interface inputProps {
   handleKeyPress: (event: React.KeyboardEvent) => void;
 }
 
+/**
+ * IP input component.
+ */
 const CustomInput = (props: inputProps) => {
   const classes = useStyles();
 

@@ -1,3 +1,7 @@
+/**
+ * Interfaces from the CortexAPI: https://emotiv.gitbook.io/cortex-api/
+ */
+
 interface RequestAccessResponse {
   id: number;
   jsonrpc: string;

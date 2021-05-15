@@ -32,16 +32,19 @@ const useStyles = makeStyles(() =>
 );
 
 interface listProps {
-  profiles: string[];
+  profiles: string[]; //The items shown in the list
   handleListItemClick: (
     event: React.MouseEvent<HTMLDivElement>,
     index: number,
     profile: string
   ) => void;
-  selectedIndex: number;
-  isLoading: boolean;
+  selectedIndex: number; //The index of the selected element.
+  isLoading: boolean; //A circular loading bar is showing while the list waits for data.
 }
 
+/**
+ * A list component. Loads elements verticaly and enables a scroll bar when the list has an overflow. 
+ */
 function CustomList(props: listProps) {
   const classes = useStyles();
   if (props.isLoading) {

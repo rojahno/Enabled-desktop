@@ -3,10 +3,15 @@ import CortexError from '../../modules/CortexError';
 import { CortexFacade } from '../../modules/CortexFacade';
 import StartPage from './StartPage';
 
+/**
+ * The start page container component. This component checks if there are
+ *  any errors with the user setup. If no errors, enables the navigation to the next page.
+ */
 const StartPageContainer = () => {
   //StartPage useStates
   const [hasAccessError, setHasAccessError] = useState(true);
   const [headsetIdError, setHeadSetIdError] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const [deviceError, setDeviceError] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
 
@@ -15,14 +20,35 @@ const StartPageContainer = () => {
    */
   async function connectClicked() {
     try {
-      const facade = new CortexFacade();
-      await facade.handleSetupApp();
-      let errors: any = facade.getSetupErrors();
+      const facade = CortexFacade.getInstance();
+      let setupErrors: CortexError | undefined = await facade.handleSetup();
 
+      if (setupErrors instanceof CortexError) {
+        setHasError(true);
+        if (setupErrors.id == 1 || setupErrors.id == 3) {
+          setHasAccessError(true);
+        } else {
+          setHasAccessError(false);
+        }
+
+        if (setupErrors.id == 2) {
+          setHeadSetIdError(true);
+        } else {
+          false;
+        }
+
+        if (setupErrors.id == 9) {
+          setDeviceError(true);
+        } else {
+          setDeviceError(false);
+        }
+      } else {
+        setHasError(false);
+        setHasAccessError(false);
+        setHeadSetIdError(false);
+        setDeviceError(false);
+      }
       setIsClicked(true);
-      setHasAccessError(errors[0]);
-      setHeadSetIdError(errors[1]);
-      setDeviceError(errors[2]);
     } catch (error) {
       if (error instanceof CortexError) {
         alert(error.errMessage);
@@ -31,6 +57,7 @@ const StartPageContainer = () => {
   }
   return (
     <StartPage
+      hasError={hasError}
       connectClicked={connectClicked}
       hasAccessError={hasAccessError}
       headsetIdError={headsetIdError}

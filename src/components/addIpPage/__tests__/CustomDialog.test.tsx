@@ -19,8 +19,8 @@ test('modal shows the children and close button', async () => {
   expect(screen.getByText('Find ip address')).toBeTruthy();
 
   //Checks that the modal dialog is not loaded before the link is clicked.
-  const title1 = screen.queryByText('How to find ip');
-  expect(title1).not.toBeInTheDocument();
+  const title = screen.queryByText('How to find ip');
+  expect(title).not.toBeInTheDocument();
 
   //Fires the click event which opens the dialog.
   userEvent.click(screen.getByText('Find ip address'));

@@ -24,6 +24,7 @@ function valuetext(value: number) {
   return `${value}`;
 }
 
+// The marks on the slider. Change the marks to change the different levels on the slider.
 const marks = [
   {
     value: 1,
@@ -78,6 +79,9 @@ interface sliderProps {
   disabled: boolean;
   tooltip: string;
 }
+/**
+ * A slider component. The slider valeus are detirmined by the marks.
+ */
 export default function SettingSlider(props: sliderProps) {
   const classes = useStyles();
 

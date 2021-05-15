@@ -1,5 +1,5 @@
 import React from 'react';
-import CustomInput from './customInput';
+import CustomInput from './CustomInput';
 import CustomDialog from './CustomDialog';
 import SimplePaper from '../utils/SimplePaper';
 import NavigationButtons from '../utils/NavigationButtons';
@@ -7,18 +7,18 @@ import { makeStyles, Theme, createStyles } from '@material-ui/core';
 import LoadingCircleDialog from '../utils/LoadingCircleDialog';
 
 interface AddIpProps {
-  ipAdress: string;
+  ipAdress: string; //The ip adress to the mobile socket server.
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleKeyPress: (event: React.KeyboardEvent) => void;
   handleNextClick: (
     event: React.MouseEvent<HTMLButtonElement>
   ) => Promise<void>;
-  validIpAdress: boolean;
-  openLoadingCircle:boolean;
+  validIpAddress: boolean; //A bolean to see if the ip address is valid or not.
+  openLoadingCircle:boolean; // A boolean to open the loading circle dialog.
 }
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {
+    ipContent: {
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
@@ -27,12 +27,14 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 );
-
+/**
+ * The Add IP page component. 
+ */
 export default function AddIpPage(props: AddIpProps) {
   const classes = useStyles();
   return (
     <SimplePaper>
-      <div className={classes.root}>
+      <div className={classes.ipContent}>
         <h3>Add the IP of your phone</h3>
         <CustomInput
           handleChange={props.handleChange}
@@ -41,7 +43,7 @@ export default function AddIpPage(props: AddIpProps) {
         <CustomDialog />
       </div>
       <NavigationButtons
-        canNavigateForward={props.validIpAdress}
+        canNavigateForward={props.validIpAddress}
         handleNextClick={props.handleNextClick}
         backNavigation={'/select'}
       />

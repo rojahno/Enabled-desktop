@@ -16,6 +16,9 @@ export interface SimpleDialogProps {
   //onClose: (value: string) => void;
 }
 
+/**
+ * The loading circle component. Open a transparent dialog and shows a loading circle if the open prop is true. 
+ */
 export default function LoadingCircleDialog(props: SimpleDialogProps) {
   const classes = useStyles();
 
