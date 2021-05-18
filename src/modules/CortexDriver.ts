@@ -23,6 +23,7 @@ const CONNECTION_RETRY_MAX_COUNT = 60; // 60 times to retry x 5s = 5min of total
 
 type StreamObserver = (streamCommand: string) => void;
 /**
+ * @class
  * This class works as a connection between an app and the Emotiv API.
  * The class handles the requests and responses to the CortexAPI.
  * This class uses async/await and Promise for request and needs to be run on sync.
@@ -70,7 +71,7 @@ class CortexDriver {
     if (this._retryCount < CONNECTION_RETRY_MAX_COUNT) {
       setTimeout(this.reconnect, CONNECTION_RETRY_INTERVAL);
     } else {
-      // we passed the threshold for retries, let's abort
+      // Passed the threshold for retries, let's abort
       this._retryCount = 0;
     }
   };
@@ -383,7 +384,7 @@ class CortexDriver {
    * @param sessionId - the session id
    */
   public startFacStream = async (authToken: string, sessionId: string) => {
-    const SUB_REQUEST_ID = 26;
+    const SUB_REQUEST_ID = 27;
     let subRequest = {
       jsonrpc: '2.0',
       method: 'subscribe',
@@ -420,7 +421,7 @@ class CortexDriver {
     authToken: string,
     sessionId: String
   ) => {
-    const SIGNATURE_REQUEST_ID = 26;
+    const SIGNATURE_REQUEST_ID = 28;
     let request = {
       id: SIGNATURE_REQUEST_ID,
       jsonrpc: '2.0',
@@ -657,7 +658,7 @@ class CortexDriver {
     headsetId: string
   ): Promise<boolean> => {
     let hasCurrentProfileRequest = {
-      id: 1,
+      id: 29,
       jsonrpc: '2.0',
       method: 'getCurrentProfile',
       params: {
@@ -698,7 +699,7 @@ class CortexDriver {
     headsetId: string
   ): Promise<string> => {
     let currentProfileRequest = {
-      id: 1,
+      id: 30,
       jsonrpc: '2.0',
       method: 'getCurrentProfile',
       params: {

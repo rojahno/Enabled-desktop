@@ -3,7 +3,8 @@ import { ComDataSample, FacDataSample } from './interfaces';
 
 const CONNECTION_RETRY_INTERVAL = 5000; // in ms
 const CONNECTION_RETRY_MAX_COUNT = 12; // 12 times to retry x 5s = 1min of total retries
-/**
+/** 
+ * @class
  * The class connects to a Websockets server and sends the commands it recieves to it.
  */
 class MobileDriver implements IObserver {

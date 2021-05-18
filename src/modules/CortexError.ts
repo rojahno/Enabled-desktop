@@ -1,4 +1,5 @@
 /**
+ * @class
  * The Cortex Error class handles the error string returned to the user. Made to be easier for the user to understand 
  * and easier to make changes of an error throughout the entire system. 
  */

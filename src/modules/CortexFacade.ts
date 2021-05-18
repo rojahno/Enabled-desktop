@@ -1,6 +1,7 @@
 import { CortexDriver } from './CortexDriver';
 import CortexError from './CortexError';
 /**
+ * @class
  * A facade class for the Cortex Driver. Intended to make it easier to use some of the functionality that the CortexAPI offers.
  */
 class CortexFacade {
