@@ -35,7 +35,7 @@ Clone the repo via git and install dependencies:
 
 clone:
 ```bash
-gh repo clone rojahno/enabled-desktop
+gh repo clone rojahno/Enabled-desktop
 ```
 install dependencies:
 ```bash
